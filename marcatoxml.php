@@ -1,9 +1,9 @@
 <?php
 /*
- * Plugin Name: Marcato XML Parser
- * Description: Creates posts automatically from a Marcato XML feed.
+ * Plugin Name: Marcato XML Importer
+ * Description: Imports artists, venues, shows, and workshops from Marcato Festival XML Feeds.
  * Author: Marcato Digital Solutions
- * Plugin URI: http://www.marcatoapp.com
+ * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
  * Version: 1.0
  * =======================================================================
 */
