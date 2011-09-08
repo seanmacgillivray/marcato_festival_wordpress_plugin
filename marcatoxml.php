@@ -55,6 +55,7 @@ class marcatoxml_plugin {
 			"labels"=>array("name"=>"Shows","singular_name"=>"Show"),
 			"public"=>true,
 			"rewrite"=>array("slug"=>"shows", "with_front"=>false),
+			"supports"=>array("title","editor","thumbnail"),
 			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png"
 			)
 		);
