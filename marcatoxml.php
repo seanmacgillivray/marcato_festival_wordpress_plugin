@@ -3,6 +3,7 @@
  * Plugin Name: Marcato XML Importer
  * Description: Imports artists, venues, shows, and workshops from Marcato Festival XML Feeds.
  * Author: Marcato Digital Solutions
+ * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
  * Version: 1.0
  * =======================================================================
