@@ -1,0 +1,125 @@
+/*Artists*/
+
+	div.artist_homebase{}
+	img.artist_photo{}
+	div.artist_bio{}
+	div.artist_websites{}
+	div.artist_websites a.artist_website{}
+		
+/* Venues */
+
+	div.venue_community{
+		display:none;
+	}
+	div.venue_address{}
+	div.venue_address span.city{
+		margin-right:3px;
+	}
+	div.venue_address span.province_state{
+		margin-right:3px;
+	}
+	div.venue_address span.country{
+		display:block;
+		margin-right:3px;
+	}
+	div.venue_address span.postal_code{}
+	div.venue_phone{}
+		
+/*Workshops*/
+
+	div.workshop_time{}
+	div.workshop_time span.date{
+		margin-right:5px;
+	}
+	div.workshop_time span.time_divider{
+		margin-left:3px;
+		margin-right:3px;
+	}
+	div.workshop_time span.start_time{}
+	div.workshop_time span.end_time{}
+
+	div.workshop_venue{}
+	div.workshop_venue a.workshop_venue_link{}
+
+	div.workshop_ticket_info{}
+	div.workshop_ticket_info span.price{}
+	div.workshop_ticket_info span.ticket_info{}
+	div.workshop_ticket_info a.ticket_link{}
+	div.workshop_description{}
+
+	div.workshop_types{}
+	div.workshop_types span.workshop_type{}
+
+	div.workshop_lineup{}
+	div.workshop_lineup div.presentation{}
+	div.workshop_lineup div.presentation span.presenter{}
+	div.workshop_lineup div.presentation span.time_divider{
+		margin-left:3px;
+		margin-right:3px;
+	}
+	div.workshop_lineup div.presentation span.presentation_start{}
+	div.workshop_lineup div.presentation span.presentation_end{
+		margin-right:30px;
+	}
+
+/*Shows*/
+
+	div.show_time{}
+	div.show_time span.date{
+		margin-right:5px;
+	}
+	div.show_time span.time_divider{
+		margin-left:3px;
+		margin-right:3px;
+	}
+	div.show_time span.start_time{}
+	div.show_time span.end_time{}
+		
+	div.show_venue{}
+	div.show_venue a.show_venue_link{}
+
+	div.show_ticket_info{}
+	div.show_ticket_info span.price{}
+	div.show_ticket_info span.ticket_info{}
+	div.show_ticket_info a.ticket_link{}
+	div.show_description{}
+
+	div.show_lineup{}
+	div.show_lineup div.performance{}
+	div.show_lineup div.performance span.artist{}
+	div.show_lineup div.performance span.time_divider{
+		margin-left:3px;
+		margin-right:3px;
+	}
+	div.show_lineup div.performance span.performance_start{}
+	div.show_lineup div.performance span.performance_end{
+		margin-right:30px;
+	}
+/*Schedule Page*/
+	div.schedule_event{}
+	div.schedule_event div.schedule_event_title{
+		font-weight:bold;
+	}
+		
+	div.schedule_event div.schedule_time{}
+	div.schedule_event div.schedule_time span.time_divider{
+		margin-left:3px;
+		margin-right:3px;
+	}
+	div.schedule_event div.schedule_time span.date{}
+	div.schedule_event div.schedule_time span.start_time{
+		margin-left:5px;
+	}
+	div.schedule_event div.schedule_time span.end_time{
+	}
+		
+	div.schedule_event div.schedule_venue{
+		font-size:80%;
+	}
+	div.schedule_event div.schedule_venue a.schedule_venue_link{}
+		
+	div.schedule_event table.schedule_timeslots{}
+	div.schedule_event table.schedule_timeslots tr{}
+	div.schedule_event table.schedule_timeslots td.time{}
+	div.schedule_event table.schedule_timeslots td.artist{}
+		
