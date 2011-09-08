@@ -11,9 +11,7 @@
 //Initialize the plugin
 $marcatoxml = new marcatoxml_plugin();
 class marcatoxml_plugin {
-
-	public $labels = array("Artist XML Location","Workshop XML Location","Show XML Location","Venue XML Location");
-	public $fields = array('artist_xml_location','workshop_xml_location','show_xml_location','venue_xml_location');
+	
 	public $importer;
 
 	function marcatoxml_plugin(){
