@@ -234,7 +234,7 @@ class marcatoxml_importer {
 	}
 
 	private function import_post($post){
-		global $wpdb;
+	 	global $wpdb;
 		extract($post);
 		$meta = $wpdb->get_row("SELECT * FROM $wpdb->postmeta WHERE meta_key = '{$post_type}_id' AND meta_value = '$post_marcato_id'");
 		if ($meta) {
@@ -251,7 +251,7 @@ class marcatoxml_importer {
 			$post['post_status'] = "pending";
 			$post['comment_status'] = 'closed';
 			if($post_id = wp_insert_post($post)){
-				add_post_meta($post_id, "{$post_type}_id", $post_marcato_id, $unique);
+				add_post_meta($post_id, "{$post_type}_id", $post_marcato_id, true);
 				return $post_id;
 			}else{
 				return "Error creating {$post_title}.";
@@ -480,14 +480,18 @@ class marcatoxml_importer {
 		}
 		$post_type = 'page';
 		$post_name = 'schedule';
-		$page = compact('post_content', 'post_title', 'post_type');
-		$existing_page = get_page_by_title("Schedule");
-		if (!$existing_page){
-			$page['post_status'] = 'pending';
-			wp_insert_post($page, true);
-		}else{
-			$page['ID'] = $existing_page->ID;
+		$page = compact('post_content', 'post_title', 'post_type','post_name');
+		$post_marcato_id = 'marcato_schedule';
+		global $wpdb;
+		$meta = $wpdb->get_row("SELECT * FROM $wpdb->postmeta WHERE meta_key = '{$post_type}_id' AND meta_value = '$post_marcato_id'");
+		if ($meta){
+			$existing_page_id = $meta->post_id;
+			$page['ID'] = $existing_page_id;
 			wp_update_post($page);
+		}else{
+			$page['post_status'] = 'pending';
+			$page_id = wp_insert_post($page, true);
+			add_post_meta($page_id, "{$post_type}_id", $post_marcato_id, true);
 		}
 		return true;
 	}
