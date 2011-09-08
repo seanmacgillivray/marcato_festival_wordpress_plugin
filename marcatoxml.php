@@ -19,7 +19,6 @@ class marcatoxml_plugin {
 		add_action('admin_menu',array($this, 'build_menus'));
 		add_filter('posts_where', array($this, 'posts_where'));
 		add_action('init',array($this, 'register_custom_post_types')); 
-		add_filter('pre_get_posts', array($this,'query_post_type'));
 		wp_enqueue_style("marcato",plugins_url("",__FILE__)."/css/marcato.css");
 		register_activation_hook(__FILE__, array($this,'flush_rewrites'));
 		register_deactivation_hook(__FILE__, array($this, 'flush_rewrites'));
@@ -69,19 +68,7 @@ class marcatoxml_plugin {
 			)
 		);
 	}
-	
-	public function query_post_type($query) {
-	  if(is_category() || is_tag()) {
-	    $post_type = get_query_var('post_type');
-		if($post_type)
-		    $post_type = $post_type;
-		else
-		    $post_type = array('post','marcato_artist','marcato_venue','marcato_show','marcato_workshop');
-	    $query->set('post_type',$post_type);
-		return $query;
-	  }
-	}
-	
+		
 	public function import($field){
 		return $this->importer->import($field);
 	}
@@ -348,20 +335,21 @@ class marcatoxml_importer {
 			$post_content .= "<a class='ticket_link' href='" . $show->ticket_link . "'>".$show->ticket_link."</a>";
 			$post_content .= "</div>";
 			$post_content .= "<div class='show_description'>" . $show->description_web . "</div>";
-			$post_content .= "<div class='show_lineup'>";
+			$post_content .= "<table class='show_lineup'>";
 			foreach ($show->performances as $performances){
 				foreach($performances->performance as $performance){
-					$post_content .= "<div class='performance'>";
+					$post_content .= "<tr class='performance'>";
 					$artist_name = (string)$performance->artist;
-					$post_content .= "<span class='performance_start'>".date_i18n(get_option('time_format'), strtotime($show->date . ' ' . $performance->start))."</span>";
+					$post_content .= "<td class='performance_time'><span class='performance_start'>".date_i18n(get_option('time_format'), strtotime($show->date . ' ' . $performance->start))."</span>";
 					if (!empty($performance->end)){
 						$post_content .= "<span class='time_divider'>-</span><span class='performance_end'>".date_i18n(get_option('time_format'), strtotime($show->date . ' ' . $performance->end))."</span>";
 					}
-					$post_content .= "<span class='artist'><a class='performance_artist_link' href='".add_query_arg('artist_name',$artist_name,get_post_type_archive_link('marcato_artist'))."'>" .$performance->artist . "</a></span>";
-					$post_content .= "</div>";
+					$post_content .= "</td>";
+					$post_content .= "<td class='artist'><a class='performance_artist_link' href='".add_query_arg('artist_name',$artist_name,get_post_type_archive_link('marcato_artist'))."'>" .$performance->artist . "</a></td>";
+					$post_content .= "</tr>";
 				}
 			}
-			$post_content .= "</div>";
+			$post_content .= "</table>";
 			$post_type = "marcato_show";
 			$post_marcato_id = intval($show->id);
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id');
@@ -402,24 +390,25 @@ class marcatoxml_importer {
 			}
 			$post_content .= "</div>";
 
-			$post_content .= "<div class='workshop_lineup'>";
+			$post_content .= "<table class='workshop_lineup'>";
 			foreach ($workshop->presentations as $presentations){
 				foreach($presentations->presentation as $presentation){
-					$post_content .= "<div class='presentation'>";
-					$post_content .= "<span class='presentation_start'>".date_i18n(get_option('time_format'), strtotime($workshop->date . ' ' . $presentation->start))."</span>";
+					$post_content .= "<tr class='presentation'>";
+					$post_content .= "<td class='presentation_time'><span class='presentation_start'>".date_i18n(get_option('time_format'), strtotime($workshop->date . ' ' . $presentation->start))."</span>";
 					if(!empty($presentation->end)){
 						$post_content .= "<span class='time_divider'>-</span><span class='presentation_end'>".date_i18n(get_option('time_format'), strtotime($workshop->date . ' ' . $presentation->end))."</span>";
 					}
+					$post_content .= "</td>";
 					if ($presentation->presenter_type == "artist"){
 						$artist_name = (string)$presentation->presenter;
-						$post_content .= "<span class='presenter'><a class='presentation_presenter_link' href='".add_query_arg('artist_name',$artist_name,get_post_type_archive_link('marcato_artist'))."'>".$presentation->presenter."</a></span>";
+						$post_content .= "<td class='presenter'><a class='presentation_presenter_link' href='".add_query_arg('artist_name',$artist_name,get_post_type_archive_link('marcato_artist'))."'>".$presentation->presenter."</a></td>";
 					}else{
-						$post_content .= "<span class='presenter'>".$presentation->presenter."</span>";
+						$post_content .= "<td class='presenter'>".$presentation->presenter."</td>";
 					}
-					$post_content .= "</div>";
+					$post_content .= "</tr>";
 				}
 			}
-			$post_content .= "</div>";
+			$post_content .= "</table>";
 			$post_type = "marcato_workshop";
 			$post_marcato_id = intval($workshop->id);
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id');

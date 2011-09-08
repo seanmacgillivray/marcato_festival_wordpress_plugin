@@ -26,7 +26,7 @@
 	div.venue_phone{}
 		
 /*Workshops*/
-
+	
 	div.workshop_time{}
 	div.workshop_time span.date{
 		margin-right:5px;
@@ -50,17 +50,18 @@
 	div.workshop_types{}
 	div.workshop_types span.workshop_type{}
 
-	div.workshop_lineup{}
-	div.workshop_lineup div.presentation{}
-	div.workshop_lineup div.presentation span.presenter{}
-	div.workshop_lineup div.presentation span.time_divider{
+	table.workshop_lineup{}
+	table.workshop_lineup tr{}
+	table.workshop_lineup td.presentation_time{}
+	table.workshop_lineup td.presentation_time span.time_divider{
 		margin-left:3px;
 		margin-right:3px;
 	}
-	div.workshop_lineup div.presentation span.presentation_start{}
-	div.workshop_lineup div.presentation span.presentation_end{
+	table.workshop_lineup td.presentation_time span.presentation_start{}
+	table.workshop_lineup td.presentation_time span.presentation_end{
 		margin-right:30px;
 	}
+	table.workshop_lineup td.presenter{}
 
 /*Shows*/
 
@@ -84,17 +85,18 @@
 	div.show_ticket_info a.ticket_link{}
 	div.show_description{}
 
-	div.show_lineup{}
-	div.show_lineup div.performance{}
-	div.show_lineup div.performance span.artist{}
-	div.show_lineup div.performance span.time_divider{
+	table.show_lineup{}
+	table.show_lineup tr{}
+	table.show_lineup td.performance_time{}
+	table.show_lineup td.performance_time span.time_divider{
 		margin-left:3px;
 		margin-right:3px;
 	}
-	div.show_lineup div.performance span.performance_start{}
-	div.show_lineup div.performance span.performance_end{
+	table.show_lineup td.performance_time span.performance_start{}
+	table.show_lineup td.performance_time span.performance_end{
 		margin-right:30px;
 	}
+	table.show_lineup td.artist{}
 /*Schedule Page*/
 	div.schedule_event{}
 	div.schedule_event div.schedule_event_title{
