@@ -18,10 +18,7 @@ class marcatoxml_plugin {
 		$this->importer = new marcatoxml_importer();
 		add_action('admin_menu',array($this, 'build_menus'));
 		add_filter('posts_where', array($this, 'posts_where'));
-		add_action('init',array($this, 'register_artist_type')); 
-		add_action('init',array($this, 'register_venue_type'));
-		add_action('init',array($this, 'register_show_type'));
-		add_action('init',array($this, 'register_workshop_type'));
+		add_action('init',array($this, 'register_custom_post_types')); 
 		add_filter('pre_get_posts', array($this,'query_post_type'));
 		wp_enqueue_style("marcato",plugins_url("",__FILE__)."/css/marcato.css");
 		register_activation_hook(__FILE__, array($this,'flush_rewrites'));
@@ -34,8 +31,7 @@ class marcatoxml_plugin {
 	public function flush_rewrites(){
 		flush_rewrite_rules();
 	}
-	
-	public function register_artist_type(){
+	public function register_custom_post_types(){
 		register_post_type("marcato_artist", array(
 			"label"=>"Artists", "has_archive"=>"artists", 
 			"labels"=>array("name"=>"Artists","singular_name"=>"Artist"), 
@@ -45,8 +41,6 @@ class marcatoxml_plugin {
 			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png"
 			)
 		);
-	}
-	public function register_venue_type(){
 		register_post_type("marcato_venue", array(
 			"label"=>"Venues", "has_archive"=>"venues",
 			"labels"=>array("name"=>"Venues","singular_name"=>"Venue"),
@@ -56,8 +50,6 @@ class marcatoxml_plugin {
 			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png"
 			)
 		);
-	}
-	public function register_show_type(){
 		register_post_type("marcato_show", array(
 			"label"=>"Shows", "has_archive"=>"shows",
 			"labels"=>array("name"=>"Shows","singular_name"=>"Show"),
@@ -66,8 +58,6 @@ class marcatoxml_plugin {
 			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png"
 			)
 		);
-	}
-	public function register_workshop_type(){
 		register_post_type("marcato_workshop", array(
 			"label"=>"Workshops", "has_archive"=>"workshops",
 			"labels"=>array("name"=>"Workshops","singular_name"=>"Workshop"),
@@ -78,7 +68,7 @@ class marcatoxml_plugin {
 			)
 		);
 	}
-
+	
 	public function query_post_type($query) {
 	  if(is_category() || is_tag()) {
 	    $post_type = get_query_var('post_type');
