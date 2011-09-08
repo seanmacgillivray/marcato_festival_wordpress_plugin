@@ -8,12 +8,6 @@
  * =======================================================================
 */
 
-require_once(ABSPATH . '/wp-admin/includes/post.php');
-require_once(ABSPATH . '/wp-admin/includes/taxonomy.php');
-require_once(ABSPATH . '/wp-admin/includes/import.php');
-require_once(ABSPATH . '/wp-admin/includes/plugin.php');
-require_once(ABSPATH . '/wp-includes/pluggable.php');
-
 //Initialize the plugin
 $marcatoxml = new marcatoxml_plugin();
 class marcatoxml_plugin {
