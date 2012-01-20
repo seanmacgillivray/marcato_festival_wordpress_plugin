@@ -265,7 +265,7 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->artist as $artist) {
-			$post_title = $artist->name;
+			$post_title = (string)$artist->name;
 			$post_content = "";
 			$post_content .= "<div class='artist_homebase'>" . $artist->homebase . "</div>";
 			if (!empty($artist->web_photo_url)){
@@ -290,7 +290,7 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->venue as $venue) {
-			$post_title = $venue->name;
+			$post_title = (string)$venue->name;
 			$post_content = "";
 			$post_content .= "<div class='venue_community'>" . $venue->community . "</div>";
 			if (!empty($venue->photo_url)){
@@ -316,7 +316,7 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->show as $show) {
-			$post_title = $show->name;			
+			$post_title = (string)$show->name;			
 			$post_content = "";
 			$post_content .= "<div class='show_time'>";
 			$post_content .= "<span class='date'>" .date_i18n(get_option('date_format'), strtotime($show->date)) . "</span>";
@@ -364,7 +364,7 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->workshop as $workshop) {
-			$post_title = $workshop->name;
+			$post_title = (string)$workshop->name;
 			$post_content = "";
 			$post_content .= "<div class='workshop_time'>";
 			$post_content .= "<span class='date'>" .date_i18n(get_option('date_format'), strtotime($workshop->date)). "</span>";
@@ -432,7 +432,7 @@ class marcatoxml_importer {
 			$events[] = $workshop; 
 		}
 		foreach($show_xml->show as $show){ 
-			$events[]= $show; 
+			$events[] = $show; 
 		}
 		function sort_by_datetime($a, $b){
 			$a_date = strtotime($a->date . ' ' . $a->formatted_start_time);
