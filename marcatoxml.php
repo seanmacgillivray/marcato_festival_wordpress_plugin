@@ -38,7 +38,8 @@ class marcatoxml_plugin {
 			"public"=>true, 
 			"rewrite"=>array("slug"=>"artists", "with_front"=>false),
 			"supports"=>array("title","editor","thumbnail"),
-			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png"
+			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png",
+			"taxonomies"=>array("category","post_tag")
 			)
 		);
 		register_post_type("marcato_venue", array(
@@ -47,7 +48,8 @@ class marcatoxml_plugin {
 			"public"=>true,
 			"rewrite"=>array("slug"=>"venues", "with_front"=>false),
 			"supports"=>array("title","editor","thumbnail"),
-			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png"
+			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png",
+			"taxonomies"=>array("category","post_tag")
 			)
 		);
 		register_post_type("marcato_show", array(
@@ -56,7 +58,8 @@ class marcatoxml_plugin {
 			"public"=>true,
 			"rewrite"=>array("slug"=>"shows", "with_front"=>false),
 			"supports"=>array("title","editor","thumbnail"),
-			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png"
+			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png",
+			"taxonomies"=>array("category","post_tag")
 			)
 		);
 		register_post_type("marcato_workshop", array(
@@ -65,7 +68,8 @@ class marcatoxml_plugin {
 			"public"=>true,
 			"rewrite"=>array("slug"=>"workshops", "with_front"=>false),
 			"supports"=>array("title","editor","thumbnail"),
-			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png"
+			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png",
+			"taxonomies"=>array("category","post_tag")
 			)
 		);
 	}
