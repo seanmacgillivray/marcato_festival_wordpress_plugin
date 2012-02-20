@@ -277,8 +277,8 @@ class marcatoxml_importer {
 			}
 			$post_content .= "<div class='artist_bio'>" . $artist->bio_public . "</div>";
 			$post_content .= "<div class='artist_websites'>";
-			foreach($artist->websites as $website){
-				$post_content .= "<a class='artist_website' href='".$website->website->url."'>".$website->website->name."</a>";
+			foreach($artist->websites->website as $website){
+				$post_content .= "<a class='artist_website' href='".$website->url."'>".$website->name."</a><br>";
 			}
 			$post_content .= "</div>";
 			$post_type = "marcato_artist";
