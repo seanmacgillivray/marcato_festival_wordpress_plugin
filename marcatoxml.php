@@ -168,7 +168,7 @@ class marcatoxml_plugin {
 			<p>
 				Include photos as featured images on posts?
 				<input type="hidden" name="attach_photos" value="0">
-				<input type="checkbox" name="attach_photos" value="1" <?php $this->importer->options["attach_photos"]=="1" ? "checked='checked'" : "" ?>><br />
+				<input type="checkbox" name="attach_photos" value="1" <?php echo $this->importer->options["attach_photos"]=="1" ? "checked='checked'" : "" ?>><br />
 				<cite>Checking this will include photos from Marcato as the featured image on a post instead of embedding the image directly in the post.</cite>
 			</p>
 			<hr />
@@ -258,7 +258,7 @@ class marcatoxml_importer {
 			//If exists, update;
 			$post['ID'] = $existing_post_id;
 			if ($updated_post_id = wp_update_post($post)){
-				$this->set_featured_image($post_id, $post['post_attachment']);
+				$this->set_featured_image($existing_post_id, $post['post_attachment']);
 				return $existing_post_id;
 			}else{
 				return "Error updating {$post_title}.";
@@ -305,7 +305,6 @@ class marcatoxml_importer {
 		if (!file_exists($upload_dir['basedir']."/marcato")){
 			mkdir($upload_dir['basedir']."/marcato");
 		}
-		if (file_exists($upload_dir['base_dir']."/marcato/".$object_name.".jpg"))
 		$filename = $upload_dir['basedir']."/marcato/".$object_name.".jpg";
 		$ch = curl_init($image_url);
 		$fp = fopen($filename, 'cb');
@@ -329,7 +328,7 @@ class marcatoxml_importer {
 			$post_content .= "<div class='artist_homebase'>" . $artist->homebase . "</div>";
 			if (!empty($artist->web_photo_url)){
 				if ($this->options['attach_photos']=="1"){
-					$post_attachment = array('url'=>$artist->web_photo_url, 'name'=>$artist->name);
+					$post_attachment = array('url'=>(string)$artist->web_photo_url, 'name'=>(string)$artist->name);
 				}else{
 					$post_content .= "<img src='".$artist->web_photo_url."' class='artist_photo'>";
 				}

@@ -9,6 +9,10 @@ When you click to save the changes the plugin will fetch our XML feeds and parse
 It also sets up a Wordpress job that will redo this automatically every hour, however it can be done manually whenever you like by clicking "Import now"
 (The Marcato XML feeds are updated every few minutes)
 
+Enabling the "attach photos as featured image" option will cause the plugin to download photos from the Marcato server and save them as the featured image of the posts created in your Wordpress database.
+This is useful if your Wordpress theme makes use of Post Thumbnails/Featured Image.
+Note that enabling this option will result in the image no longer being directly embedded in the post body.
+
 If you change certain WordPress settings (such as your permalink structure) you may need to update your Marcato data by clicking Import Now on the Marcato settings page.
 
 You should now see menu options with the Marcato logo and Artists/Venues/Shows/Workshops that should be populated with your data.
