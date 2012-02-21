@@ -124,9 +124,11 @@ class marcatoxml_plugin {
 			wp_die( __('You do not have sufficient permissions to access this page.'));
 		}
 		if( isset($_POST['marcato_submit_hidden']) && $_POST['marcato_submit_hidden'] == 'Y'){
-			$field_value = $_POST[$field];
-			update_option($field, $field_value);
-			$this->importer->marcato_organization_id = $field_value;
+			foreach($this->importer->options as $option=>$value){
+				$field_value = $_POST[$option];
+				update_option($option, $field_value);
+				$this->importer->options[$option] = $field_value;
+			}
 			if (isset($_POST['Submit'])){
 				?>
 				<div class="updated"><p><strong><?php _e('settings saved.','marcatoxml-options'); ?></strong></p></div>
@@ -156,11 +158,18 @@ class marcatoxml_plugin {
 		echo '<div class="wrap">';
 		echo "<h2>" . __('Marcato XML Plugin Settings', 'marcatoxml-options') . "</h2>";
 		?>
+		
 		<form name="marcatoxmlsettings" method="post" action="">
 			<input type="hidden" name="marcato_submit_hidden" value="Y">
 			<p>
 				Marcato Organization ID
-				<input type="text" name="<?php echo $field ?>" value="<?php echo $field_value ?>">
+				<input type="text" name="marcato_organization_id" value="<?php echo $this->importer->options["marcato_organization_id"] ?>">
+			</p>
+			<p>
+				Include photos as featured images on posts?
+				<input type="hidden" name="attach_photos" value="0">
+				<input type="checkbox" name="attach_photos" value="1" <?php $this->importer->options["attach_photos"]=="1" ? "checked='checked'" : "" ?>><br />
+				<cite>Checking this will include photos from Marcato as the featured image on a post instead of embedding the image directly in the post.</cite>
 			</p>
 			<hr />
 			<p class="submit">
@@ -173,16 +182,18 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $marcato_organization_id;
+	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0");
 	public $fields = array("artists","venues","shows","workshops");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
 	function marcatoxml_importer(){
-		$this->marcato_organization_id = get_option('marcato_organization_id');
+		foreach($this->options as $option=>$value){
+			$this->options[$option] = get_option($option);
+		}
 	}	
 	
 	public function import_all(){
-		$org_id = $this->marcato_organization_id;
+		$org_id = $this->options['marcato_organization_id'];
 		if (empty($org_id)){
 			return array("Organization ID is not set.");
 		}
@@ -197,7 +208,7 @@ class marcatoxml_importer {
 	}
 	
 	public function import($field) {
-		$org_id = $this->marcato_organization_id;
+		$org_id = $this->options['marcato_organization_id'];
 		if (empty($org_id)){
 			return "Error importing {$field}: Organization ID is not set";
 		}
@@ -216,7 +227,7 @@ class marcatoxml_importer {
 	}
 	
 	private function get_xml_location($field){
-		return $this->marcato_xml_url . '/' . $field . '_' . $this->marcato_organization_id . '.xml';
+		return $this->marcato_xml_url . '/' . $field . '_' . $this->options['marcato_organization_id'] . '.xml';
 	}
 	private function get_posts($field) {
 		$xml = @simplexml_load_file($this->get_xml_location($field));
@@ -247,6 +258,7 @@ class marcatoxml_importer {
 			//If exists, update;
 			$post['ID'] = $existing_post_id;
 			if ($updated_post_id = wp_update_post($post)){
+				$this->set_featured_image($post_id, $post['post_attachment']);
 				return $existing_post_id;
 			}else{
 				return "Error updating {$post_title}.";
@@ -257,11 +269,52 @@ class marcatoxml_importer {
 			$post['comment_status'] = 'closed';
 			if($post_id = wp_insert_post($post)){
 				add_post_meta($post_id, "{$post_type}_id", $post_marcato_id, true);
+				$this->set_featured_image($post_id, $post['post_attachment']);
 				return $post_id;
 			}else{
 				return "Error creating {$post_title}.";
 			}
 		}
+	}
+	private function set_featured_image($post_id, $post_attachment){
+		$thumbnail_id = get_post_thumbnail_id($post_id);
+		if (!empty($thumbnail_id)){
+			wp_delete_attachment($thumbnail_id, true);
+		}
+		if (!empty($post_attachment)){
+			$filename = $this->save_image_locally($post_attachment['url'],$post_attachment['name']);
+			$this->save_attachment($filename,$post_id);
+		}
+	}
+	private function save_attachment($filename, $post_id){
+		$wp_filetype = wp_check_filetype(basename($filename));
+		$attachment = array(
+			'post_mime_type' => $wp_filetype['type'],
+			'post_title' => preg_replace("/\.[^.]+$/", '', basename($filename)),
+			'post_content' => '',
+			'post_status' => 'inherit'
+		);
+		$attachment_id = wp_insert_attachment($attachment, $filename, $post_id);
+		require_once(ABSPATH . 'wp-admin/includes/image.php');
+		$attach_data = wp_generate_attachment_metadata($attachment_id, $filename);
+		wp_update_attachment_metadata($attachment_id, $attach_data);
+		set_post_thumbnail($post_id, $attachment_id);
+	}
+	private function save_image_locally($image_url, $object_name){
+		$upload_dir = wp_upload_dir();
+		if (!file_exists($upload_dir['basedir']."/marcato")){
+			mkdir($upload_dir['basedir']."/marcato");
+		}
+		if (file_exists($upload_dir['base_dir']."/marcato/".$object_name.".jpg"))
+		$filename = $upload_dir['basedir']."/marcato/".$object_name.".jpg";
+		$ch = curl_init($image_url);
+		$fp = fopen($filename, 'cb');
+		curl_setopt($ch, CURLOPT_FILE, $fp);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_exec($ch);
+		curl_close($ch);
+		fclose($fp);
+		return $filename;
 	}
 	
 	private function parse_artists($xml){
@@ -269,26 +322,62 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->artist as $artist) {
+			$youtube_ids = array();
+			$link_content = "";
 			$post_title = (string)$artist->name;
 			$post_content = "";
 			$post_content .= "<div class='artist_homebase'>" . $artist->homebase . "</div>";
 			if (!empty($artist->web_photo_url)){
-				$post_content .= "<img src='".$artist->web_photo_url."' class='artist_photo'>";
+				if ($this->options['attach_photos']=="1"){
+					$post_attachment = array('url'=>$artist->web_photo_url, 'name'=>$artist->name);
+				}else{
+					$post_content .= "<img src='".$artist->web_photo_url."' class='artist_photo'>";
+				}
 			}
 			$post_content .= "<div class='artist_bio'>" . $artist->bio_public . "</div>";
-			$post_content .= "<div class='artist_websites'>";
 			foreach($artist->websites->website as $website){
-				$post_content .= "<a class='artist_website' href='".$website->url."'>".$website->name."</a><br>";
+				$youtube_id = $this->find_youtube_id($website->url);
+				if ($this->options["embed_youtube_links"] && !empty($youtube_id)){
+					$youtube_ids[] = $youtube_id;
+					continue;
+				}else{
+					$link_content .= "<a class='artist_website' href='".$website->url."'>".$website->name."</a><br>";
+				}
 			}
-			$post_content .= "</div>";
+			// if($this->options["embed_youtube_links"]){
+				foreach($youtube_ids as $youtube_id){
+					$post_content .= "<div class='artist_youtube_video'><object width='425' height='350' data='http://www.youtube.com/v/".$youtube_id."' type='application/x-shockwave-flash'><param name='src' value='http://www.youtube.com/v/".$youtube_id."' /></object></div>";
+				}
+			// }
+			$post_content .= "<div class='artist_websites'>" . $link_content . "</div>";
 			$post_type = "marcato_artist";
 			$post_marcato_id = intval($artist->id);
-			$posts[$index] = compact('post_content', 'post_title','post_type', 'post_marcato_id','post_status');
+			$posts[$index] = compact('post_content', 'post_title','post_type', 'post_marcato_id','post_status','post_attachment');
 			$index++;
 		}
 		return $posts;
 	}
 	
+	# Taken from user ridgerunner's response to http://stackoverflow.com/questions/5830387/php-regex-find-all-youtube-video-ids-in-string
+	function find_youtube_id($text) {
+		$matches = array();
+    preg_match('~
+       # Match non-linked youtube URL in the wild. (Rev:20111012)
+       https?://         # Required scheme. Either http or https.
+       (?:[0-9A-Z-]+\.)? # Optional subdomain.
+       (?:               # Group host alternatives.
+         youtu\.be/      # Either youtu.be,
+       | youtube\.com    # or youtube.com followed by
+         \S*             # Allow anything up to VIDEO_ID,
+         [^\w\-\s]       # but char before ID is non-ID char.
+       )                 # End host alternatives.
+       ([\w\-]{11})      # $1: VIDEO_ID is exactly 11 chars.
+       (?=[^\w\-]|$)     # Assert next char is non-ID or EOS.
+       [?=&+%\w]*        # Consume any URL (query) remainder.
+       ~ix', $text, $matches);
+    return $matches[0];
+	}
+		
 	private function parse_venues($xml){
 		global $wpdb;
    	$index = 0;
