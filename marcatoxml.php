@@ -275,47 +275,7 @@ class marcatoxml_importer {
 				return "Error creating {$post_title}.";
 			}
 		}
-	}
-	private function set_featured_image($post_id, $post_attachment){
-		$thumbnail_id = get_post_thumbnail_id($post_id);
-		if (!empty($thumbnail_id)){
-			wp_delete_attachment($thumbnail_id, true);
-		}
-		if (!empty($post_attachment)){
-			$filename = $this->save_image_locally($post_attachment['url'],$post_attachment['name']);
-			$this->save_attachment($filename,$post_id);
-		}
-	}
-	private function save_attachment($filename, $post_id){
-		$wp_filetype = wp_check_filetype(basename($filename));
-		$attachment = array(
-			'post_mime_type' => $wp_filetype['type'],
-			'post_title' => preg_replace("/\.[^.]+$/", '', basename($filename)),
-			'post_content' => '',
-			'post_status' => 'inherit'
-		);
-		$attachment_id = wp_insert_attachment($attachment, $filename, $post_id);
-		require_once(ABSPATH . 'wp-admin/includes/image.php');
-		$attach_data = wp_generate_attachment_metadata($attachment_id, $filename);
-		wp_update_attachment_metadata($attachment_id, $attach_data);
-		set_post_thumbnail($post_id, $attachment_id);
-	}
-	private function save_image_locally($image_url, $object_name){
-		$upload_dir = wp_upload_dir();
-		if (!file_exists($upload_dir['basedir']."/marcato")){
-			mkdir($upload_dir['basedir']."/marcato");
-		}
-		$filename = $upload_dir['basedir']."/marcato/".$object_name.".jpg";
-		$ch = curl_init($image_url);
-		$fp = fopen($filename, 'cb');
-		curl_setopt($ch, CURLOPT_FILE, $fp);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_exec($ch);
-		curl_close($ch);
-		fclose($fp);
-		return $filename;
-	}
-	
+	}	
 	private function parse_artists($xml){
 		global $wpdb;
    	$index = 0;
@@ -355,28 +315,7 @@ class marcatoxml_importer {
 			$index++;
 		}
 		return $posts;
-	}
-	
-	# Taken from user ridgerunner's response to http://stackoverflow.com/questions/5830387/php-regex-find-all-youtube-video-ids-in-string
-	function find_youtube_id($text) {
-		$matches = array();
-    preg_match('~
-       # Match non-linked youtube URL in the wild. (Rev:20111012)
-       https?://         # Required scheme. Either http or https.
-       (?:[0-9A-Z-]+\.)? # Optional subdomain.
-       (?:               # Group host alternatives.
-         youtu\.be/      # Either youtu.be,
-       | youtube\.com    # or youtube.com followed by
-         \S*             # Allow anything up to VIDEO_ID,
-         [^\w\-\s]       # but char before ID is non-ID char.
-       )                 # End host alternatives.
-       ([\w\-]{11})      # $1: VIDEO_ID is exactly 11 chars.
-       (?=[^\w\-]|$)     # Assert next char is non-ID or EOS.
-       [?=&+%\w]*        # Consume any URL (query) remainder.
-       ~ix', $text, $matches);
-    return $matches[0];
-	}
-		
+	}		
 	private function parse_venues($xml){
 		global $wpdb;
    	$index = 0;
@@ -420,7 +359,11 @@ class marcatoxml_importer {
 			$venue_name = (string)$show->venue_name;
 			$post_content .= "<div class='show_venue'><a class='show_venue_link' href='".add_query_arg('venue_name',$venue_name,get_post_type_archive_link('marcato_venue'))."'>" . $show->venue_name . "</a></div>";
 			if (!empty($show->poster_url)){
-				$post_content .= "<img src='".$show->poster_url."' class='show_photo'>";
+				if ($this->options['attach_photos']=="1"){
+					$post_attachment = array('url'=>(string)$show->poster_url, 'name'=>(string)$show->name);
+				}else{
+					$post_content .= "<img src='".$show->poster_url."' class='show_photo'>";
+				}
 			}
 			$post_content .= "<div class='show_ticket_info'>";
 			$post_content .= "<span class='price'>" . $show->price . "</span>";
@@ -445,7 +388,7 @@ class marcatoxml_importer {
 			$post_content .= "</table>";
 			$post_type = "marcato_show";
 			$post_marcato_id = intval($show->id);
-			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id');
+			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment');
 			$index++;
 		}
 		return $posts;
@@ -468,7 +411,11 @@ class marcatoxml_importer {
 			$venue_name = (string)$workshop->venue_name;
 			$post_content .= "<div class='workshop_venue'><a class='workshop_venue_link' href='".add_query_arg('venue_name',$venue_name,get_post_type_archive_link('marcato_venue'))."'>" . $workshop->venue_name . "</a></div>";
 			if (!empty($workshop->poster_url)){
-				$post_content .= "<img src='".$workshop->poster_url."' class='workshop_photo'>";
+				if ($this->options['attach_photos']=="1"){
+					$post_attachment = array('url'=>(string)$workshop->poster_url, 'name'=>(string)$workshop->name);
+				}else{
+					$post_content .= "<img src='".$workshop->poster_url."' class='workshop_photo'>";
+				}
 			}
 			$post_content .= "<div class='workshop_ticket_info'>";
 			$post_content .= "<span class='price'>" . $workshop->price . "</span>";
@@ -504,7 +451,7 @@ class marcatoxml_importer {
 			$post_content .= "</table>";
 			$post_type = "marcato_workshop";
 			$post_marcato_id = intval($workshop->id);
-			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id');
+			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment');
 			$index++;
 		}
 		return $posts;
@@ -587,6 +534,67 @@ class marcatoxml_importer {
 			add_post_meta($page_id, "{$post_type}_id", $post_marcato_id, true);
 		}
 		return true;
+	}
+	private function set_featured_image($post_id, $post_attachment){
+		#Find and delete the current featured image if there is one
+		$thumbnail_id = get_post_thumbnail_id($post_id);
+		if (!empty($thumbnail_id)){
+			wp_delete_attachment($thumbnail_id, true);
+		}
+		#Save the image from marcato and set it as the post's featured image
+		if (!empty($post_attachment)){
+			$filename = $this->save_image_locally($post_attachment['url'],$post_attachment['name']);
+			$this->save_attachment($filename,$post_id);
+		}
+	}
+	private function save_attachment($filename, $post_id){
+		$wp_filetype = wp_check_filetype(basename($filename));
+		$attachment = array(
+			'post_mime_type' => $wp_filetype['type'],
+			'post_title' => preg_replace("/\.[^.]+$/", '', basename($filename)),
+			'post_content' => '',
+			'post_status' => 'inherit'
+		);
+		$attachment_id = wp_insert_attachment($attachment, $filename, $post_id);
+		require_once(ABSPATH . 'wp-admin/includes/image.php');
+		$attach_data = wp_generate_attachment_metadata($attachment_id, $filename);
+		wp_update_attachment_metadata($attachment_id, $attach_data);
+		set_post_thumbnail($post_id, $attachment_id);
+	}
+	private function save_image_locally($image_url, $object_name){
+		#Use curl to download the image from marcato and save it to the filesystem
+		$upload_dir = wp_upload_dir();
+		if (!file_exists($upload_dir['basedir']."/marcato")){
+			mkdir($upload_dir['basedir']."/marcato");
+		}
+		$filename = $upload_dir['basedir']."/marcato/".$object_name.".jpg";
+		$ch = curl_init($image_url);
+		$fp = fopen($filename, 'cb');
+		curl_setopt($ch, CURLOPT_FILE, $fp);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_exec($ch);
+		curl_close($ch);
+		fclose($fp);
+		return $filename;
+	}
+	# Taken from user ridgerunner's response to http://stackoverflow.com/questions/5830387/php-regex-find-all-youtube-video-ids-in-string
+	function find_youtube_id($text) {
+		$matches = array();
+    preg_match('~
+	    # Match non-linked youtube URL in the wild. (Rev:20111012)
+	    https?://         # Required scheme. Either http or https.
+	    (?:[0-9A-Z-]+\.)? # Optional subdomain.
+	    (?:               # Group host alternatives.
+	      youtu\.be/      # Either youtu.be,
+	    | youtube\.com    # or youtube.com followed by
+	      \S*             # Allow anything up to VIDEO_ID,
+	      [^\w\-\s]       # but char before ID is non-ID char.
+	    )                 # End host alternatives.
+	    ([\w\-]{11})      # $1: VIDEO_ID is exactly 11 chars.
+	    (?=[^\w\-]|$)     # Assert next char is non-ID or EOS.
+	    [?=&+%\w]*        # Consume any URL (query) remainder.
+	    ~ix', $text, $matches);
+    return $matches[0];
 	}
 }
 ?>
