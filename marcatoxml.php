@@ -173,7 +173,7 @@ class marcatoxml_plugin {
 				Embed video links?
 				<input type="hidden" name="embed_video_links" value="0">
 				<input type="checkbox" name="embed_video_links" value="1" <?php echo $this->importer->options["embed_video_links"]=="1" ? "checked='checked'" : "" ?>><br />
-				<cite><small>nable this to automatically embed any YouTube or Vimeo video links that have been entered into the Marcato website fields on artists.</small></cite>
+				<cite><small>Enable this to automatically embed any YouTube or Vimeo video links that have been entered into the Marcato website fields on artists.</small></cite>
 			</p>
 			<hr />
 			<p class="submit">
