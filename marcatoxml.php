@@ -118,8 +118,6 @@ class marcatoxml_plugin {
 		add_options_page('Marcato XML Options','Marcato','manage_options','marcatoxml-options',array($this,'admin_page'),plugins_url().'/marcato/images/wp_marcato_logo.png');
 	}
 	public function admin_page(){
-		$field = 'marcato_organization_id';
-		$field_value = get_option('marcato_organization_id');
 		if (!current_user_can('manage_options')){
 			wp_die( __('You do not have sufficient permissions to access this page.'));
 		}
@@ -171,6 +169,12 @@ class marcatoxml_plugin {
 				<input type="checkbox" name="attach_photos" value="1" <?php echo $this->importer->options["attach_photos"]=="1" ? "checked='checked'" : "" ?>><br />
 				<cite>Checking this will include photos from Marcato as the featured image on a post instead of embedding the image directly in the post.</cite>
 			</p>
+			<p>
+				Embed video links?
+				<input type="hidden" name="embed_video_links" value="0">
+				<input type="checkbox" name="embed_video_links" value="1" <?php echo $this->importer->options["embed_video_links"]=="1" ? "checked='checked'" : "" ?>><br />
+				<cite>Enabling this will cause any imported websites from Marcato that contain a link to a youtube or vimeo video to be automatically embedded within the body of the post.</cite>
+			</p>
 			<hr />
 			<p class="submit">
 				<input type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e('Save Changes') ?>" />
@@ -182,7 +186,7 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0");
+	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0", 'embed_video_links'=>"0");
 	public $fields = array("artists","venues","shows","workshops");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
@@ -295,19 +299,18 @@ class marcatoxml_importer {
 			}
 			$post_content .= "<div class='artist_bio'>" . $artist->bio_public . "</div>";
 			foreach($artist->websites->website as $website){
-				$youtube_id = $this->find_youtube_id($website->url);
-				if ($this->options["embed_youtube_links"] && !empty($youtube_id)){
-					$youtube_ids[] = $youtube_id;
-					continue;
+				$embed_code = $this->get_video_embed_code($website->url);
+				if ($this->options["embed_video_links"]=="1" && !empty($embed_code)){
+					$embed_codes[] = $embed_code;
 				}else{
 					$link_content .= "<a class='artist_website' href='".$website->url."'>".$website->name."</a><br>";
 				}
 			}
-			// if($this->options["embed_youtube_links"]){
-				foreach($youtube_ids as $youtube_id){
-					$post_content .= "<div class='artist_youtube_video'><object width='425' height='350' data='http://www.youtube.com/v/".$youtube_id."' type='application/x-shockwave-flash'><param name='src' value='http://www.youtube.com/v/".$youtube_id."' /></object></div>";
+			if (!empty($embed_codes)){
+				foreach($embed_codes as $embed_code){
+					$post_content .= "<div class='artist_embedded_video'>".$embed_code."</div>";
 				}
-			// }
+			}
 			$post_content .= "<div class='artist_websites'>" . $link_content . "</div>";
 			$post_type = "marcato_artist";
 			$post_marcato_id = intval($artist->id);
@@ -539,6 +542,7 @@ class marcatoxml_importer {
 		#Find and delete the current featured image if there is one
 		$thumbnail_id = get_post_thumbnail_id($post_id);
 		if (!empty($thumbnail_id)){
+			
 			wp_delete_attachment($thumbnail_id, true);
 		}
 		#Save the image from marcato and set it as the post's featured image
@@ -578,7 +582,7 @@ class marcatoxml_importer {
 		return $filename;
 	}
 	# Taken from user ridgerunner's response to http://stackoverflow.com/questions/5830387/php-regex-find-all-youtube-video-ids-in-string
-	function find_youtube_id($text) {
+	private function find_youtube_id($text) {
 		$matches = array();
     preg_match('~
 	    # Match non-linked youtube URL in the wild. (Rev:20111012)
@@ -594,7 +598,23 @@ class marcatoxml_importer {
 	    (?=[^\w\-]|$)     # Assert next char is non-ID or EOS.
 	    [?=&+%\w]*        # Consume any URL (query) remainder.
 	    ~ix', $text, $matches);
-    return $matches[0];
+    return $matches[1];
+	}
+	private function find_vimeo_id($text){
+		$matches = array();
+		preg_match("~vimeo\.com/(\d+)~ix",$text,$matches);
+		return $matches[1];
+	}
+	private function get_video_embed_code($link){
+		$youtube_id = $this->find_youtube_id($link);
+		$vimeo_id = $this->find_vimeo_id($link);
+		if(!empty($youtube_id)){
+			return "<div class='artist_youtube_video'><object width='400' height='225' data='http://www.youtube.com/v/".$youtube_id."' type='application/x-shockwave-flash'><param name='src' value='http://www.youtube.com/v/".$youtube_id."' /></object></div>";
+		}elseif (!empty($vimeo_id)){
+			return "<iframe src='http://player.vimeo.com/video/".$vimeo_id."?title=0&amp;byline=0&amp;portrait=0' width='400' height='225' frameborder='0' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>";
+		}else{
+			return "";
+		}
 	}
 }
 ?>
