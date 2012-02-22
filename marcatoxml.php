@@ -167,13 +167,13 @@ class marcatoxml_plugin {
 				Include photos as featured images on posts?
 				<input type="hidden" name="attach_photos" value="0">
 				<input type="checkbox" name="attach_photos" value="1" <?php echo $this->importer->options["attach_photos"]=="1" ? "checked='checked'" : "" ?>><br />
-				<cite>Checking this will include photos from Marcato as the featured image on a post instead of embedding the image directly in the post.</cite>
+				<cite><small>Enable this to include photos from Marcato as the featured image of a post instead of embedding the image directly in the post body.</small></cite>
 			</p>
 			<p>
 				Embed video links?
 				<input type="hidden" name="embed_video_links" value="0">
 				<input type="checkbox" name="embed_video_links" value="1" <?php echo $this->importer->options["embed_video_links"]=="1" ? "checked='checked'" : "" ?>><br />
-				<cite>Enabling this will cause any imported websites from Marcato that contain a link to a youtube or vimeo video to be automatically embedded within the body of the post.</cite>
+				<cite><small>nable this to automatically embed any YouTube or Vimeo video links that have been entered into the Marcato website fields on artists.</small></cite>
 			</p>
 			<hr />
 			<p class="submit">
