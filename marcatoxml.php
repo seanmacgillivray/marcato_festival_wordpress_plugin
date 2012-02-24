@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.0.1
+ * Version: 1.0.2
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -24,6 +24,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //Initialize the plugin
+include_once('updater.php');
 $marcatoxml = new marcatoxml_plugin();
 class marcatoxml_plugin {
 	
@@ -40,8 +41,26 @@ class marcatoxml_plugin {
 		register_activation_hook(__FILE__, array($this, 'schedule_updates'));
 		register_deactivation_hook(__FILE__, array($this, 'unschedule_updates'));
 		add_action('marcato_update', array($this,'import_all'));
+		check_for_updates();
 	}
 	
+	public function check_for_updates(){
+		if (is_admin()){
+			$config = array(
+				'slug' => plugin_basename(__FILE__),
+				'proper_folder_name' => plugin_dir_path(__FILE__),
+				'api_url' => 'https://api.github.com/repos/morgancurrie/marcato_festival_wordpress_plugin',
+				'raw_url' => 'https://raw.github.com/morgancurrie/marcato_festival_wordpress_plugin',
+				'github_url' => 'https://github.com/morgancurrie/marcato_festival_wordpress_plugin',
+				'zip_url' => 'https://github.com/morgancurrie/marcato_festival_wordpress_plugin/zipball/master',
+				'sslverify' => true,
+				'requires' => '3.0',
+				'tested' => '3.3.1'
+			);
+			new wp_github_updater($config);
+		}
+	}
+		
 	public function flush_rewrites(){
 		flush_rewrite_rules();
 	}
