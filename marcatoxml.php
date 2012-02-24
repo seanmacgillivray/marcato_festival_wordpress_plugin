@@ -41,7 +41,7 @@ class marcatoxml_plugin {
 		register_activation_hook(__FILE__, array($this, 'schedule_updates'));
 		register_deactivation_hook(__FILE__, array($this, 'unschedule_updates'));
 		add_action('marcato_update', array($this,'import_all'));
-		check_for_updates();
+		$this->check_for_updates();
 	}
 	
 	public function check_for_updates(){
