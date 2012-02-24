@@ -50,7 +50,7 @@ class marcatoxml_plugin {
 				'slug' => plugin_basename(__FILE__),
 				'proper_folder_name' => plugin_dir_path(__FILE__),
 				'api_url' => 'https://api.github.com/repos/morgancurrie/marcato_festival_wordpress_plugin',
-				'raw_url' => 'https://raw.github.com/morgancurrie/marcato_festival_wordpress_plugin',
+				'raw_url' => 'https://raw.github.com/morgancurrie/marcato_festival_wordpress_plugin/master',
 				'github_url' => 'https://github.com/morgancurrie/marcato_festival_wordpress_plugin',
 				'zip_url' => 'https://github.com/morgancurrie/marcato_festival_wordpress_plugin/zipball/master',
 				'sslverify' => true,
