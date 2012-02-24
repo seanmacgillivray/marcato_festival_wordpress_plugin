@@ -1,3 +1,5 @@
+~Current Version:1.0.2~
+
 Marcato Festival's XML WordPress Importer
 
 Place these files into your WordPress plugins folder.
