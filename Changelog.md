@@ -1,3 +1,6 @@
+**Version 1.0.3**
+* Fixed bug in embedding video links where the variable wasn't being cleared between artists and each successive artist was then including all the previous embed codes
+
 **Version 1.0.2**  
 * Added updater from https://github.com/jkudish/WordPress-GitHub-Plugin-Updater so users can get out-of-date notifications for the plugin
 
