@@ -606,7 +606,7 @@ class marcatoxml_importer {
 		}
 		$filename = $upload_dir['basedir']."/marcato/".$object_name.".jpg";
 		$ch = curl_init($image_url);
-		$fp = fopen($filename, 'cb');
+		$fp = fopen($filename, 'wb');
 		curl_setopt($ch, CURLOPT_FILE, $fp);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_exec($ch);
