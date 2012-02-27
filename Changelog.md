@@ -1,5 +1,5 @@
 **Version 1.0.3**  
-* Fixed bug in embedding video links where the variable wasn't being cleared between artists and each successive artist was then including all the previous embed codes
+* Fixed bug in embedding video links where the variable wasn't being cleared between artists and each successive artist was then including all the previous embed codes  
 * Fixed bug in featured image downloading for users using an older version of PHP
 
 **Version 1.0.2**  
