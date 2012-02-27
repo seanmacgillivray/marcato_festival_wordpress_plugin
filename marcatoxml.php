@@ -318,7 +318,7 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->artist as $artist) {
-			$youtube_ids = array();
+			$embed_codes = array();
 			$link_content = "";
 			$post_title = (string)$artist->name;
 			$post_content = "";
