@@ -1,3 +1,6 @@
+**Version 1.0.4**  
+* Fixed bug where the featured image variable was not being unset if the artist did not have a featured image so it wound up using the image from the previous artist.
+
 **Version 1.0.3**  
 * Fixed bug in embedding video links where the variable wasn't being cleared between artists and each successive artist was then including all the previous embed codes  
 * Fixed bug in featured image downloading for users using an older version of PHP

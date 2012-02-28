@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.0.3
+ * Version: 1.0.4
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -35,7 +35,7 @@ class marcatoxml_plugin {
 		add_action('admin_menu',array($this, 'build_menus'));
 		add_filter('posts_where', array($this, 'posts_where'));
 		add_action('init',array($this, 'register_custom_post_types'));
-		add_action('init',array($this, 'enqueue_style'));
+		add_action('init',array($this, 'enqueue_styles'));
 		register_activation_hook(__FILE__, array($this,'flush_rewrites'));
 		register_deactivation_hook(__FILE__, array($this, 'flush_rewrites'));
 		register_activation_hook(__FILE__, array($this, 'schedule_updates'));
@@ -64,7 +64,7 @@ class marcatoxml_plugin {
 	public function flush_rewrites(){
 		flush_rewrite_rules();
 	}
-	public function enqueue_style(){
+	public function enqueue_styles(){
 		wp_enqueue_style("marcato",plugins_url("",__FILE__)."/css/marcato.css");
 	}
 	public function register_custom_post_types(){
@@ -337,6 +337,7 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->artist as $artist) {
+			$post_attachment = array();
 			$embed_codes = array();
 			$link_content = "";
 			$post_title = (string)$artist->name;
@@ -426,6 +427,7 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->show as $show) {
+			$post_attachment = array();
 			$post_title = (string)$show->name;			
 			$post_content = "";
 			$post_content .= "<div class='show_time'>";
@@ -478,6 +480,7 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->workshop as $workshop) {
+			$post_attachment = array();
 			$post_title = (string)$workshop->name;
 			$post_content = "";
 			$post_content .= "<div class='workshop_time'>";
@@ -550,7 +553,7 @@ class marcatoxml_importer {
 			$workshop->type = "workshop";
 			$events[] = $workshop; 
 		}
-		foreach($show_xml->show as $show){ 
+		foreach($show_xml->show as $show){
 			$show->type = "show";
 			$events[] = $show; 
 		}
@@ -677,7 +680,7 @@ class marcatoxml_importer {
 	    [?=&+%\w]*        # Consume any URL (query) remainder.
 	    ~ix', $text, $matches);
 		if(isset($matches[1])){
-    	return $matches[1];
+			return $matches[1];
 		}else{
 			return null;
 		}
@@ -685,7 +688,7 @@ class marcatoxml_importer {
 	private function find_vimeo_id($text){
 		$matches = array();
 		preg_match("~vimeo\.com/(\d+)~ix",$text,$matches);
-		if(isset($matches[1])){
+		if (isset($matches[1])){
 			return $matches[1];
 		}else{
 			return null;
