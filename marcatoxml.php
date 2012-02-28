@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.0.3
+ * Version: 1.0.4
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -318,6 +318,7 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->artist as $artist) {
+			$post_attachment = array();
 			$embed_codes = array();
 			$link_content = "";
 			$post_title = (string)$artist->name;
@@ -383,6 +384,7 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->show as $show) {
+			$post_attachment = array();
 			$post_title = (string)$show->name;			
 			$post_content = "";
 			$post_content .= "<div class='show_time'>";
@@ -435,6 +437,7 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->workshop as $workshop) {
+			$post_attachment = array();
 			$post_title = (string)$workshop->name;
 			$post_content = "";
 			$post_content .= "<div class='workshop_time'>";
