@@ -34,8 +34,8 @@ class marcatoxml_plugin {
 		$this->importer = new marcatoxml_importer();
 		add_action('admin_menu',array($this, 'build_menus'));
 		add_filter('posts_where', array($this, 'posts_where'));
-		add_action('init',array($this, 'register_custom_post_types')); 
-		wp_enqueue_style("marcato",plugins_url("",__FILE__)."/css/marcato.css");
+		add_action('init',array($this, 'register_custom_post_types'));
+		add_action('init',array($this, 'enqueue_styles'));
 		register_activation_hook(__FILE__, array($this,'flush_rewrites'));
 		register_deactivation_hook(__FILE__, array($this, 'flush_rewrites'));
 		register_activation_hook(__FILE__, array($this, 'schedule_updates'));
@@ -63,6 +63,9 @@ class marcatoxml_plugin {
 		
 	public function flush_rewrites(){
 		flush_rewrite_rules();
+	}
+	public function enqueue_styles(){
+		wp_enqueue_style("marcato",plugins_url("",__FILE__)."/css/marcato.css");
 	}
 	public function register_custom_post_types(){
 		register_post_type("marcato_artist", array(
@@ -295,7 +298,9 @@ class marcatoxml_importer {
 			//If exists, update;
 			$post['ID'] = $existing_post_id;
 			if ($updated_post_id = wp_update_post($post)){
-				$this->set_featured_image($existing_post_id, $post['post_attachment']);
+				if (isset($post['post_attachment'])){
+					$this->set_featured_image($existing_post_id, $post['post_attachment']);
+				}
 				return $existing_post_id;
 			}else{
 				return "Error updating {$post_title}.";
@@ -306,7 +311,9 @@ class marcatoxml_importer {
 			$post['comment_status'] = 'closed';
 			if($post_id = wp_insert_post($post)){
 				add_post_meta($post_id, "{$post_type}_id", $post_marcato_id, true);
-				$this->set_featured_image($post_id, $post['post_attachment']);
+				if(isset($post['post_attachment'])){
+					$this->set_featured_image($post_id, $post['post_attachment']);
+				}
 				return $post_id;
 			}else{
 				return "Error creating {$post_title}.";
@@ -506,10 +513,12 @@ class marcatoxml_importer {
 		$post_title = "Schedule";
 		$post_content = "";
 		$events = array();
-		foreach($workshop_xml->workshop as $workshop){ 
+		foreach($workshop_xml->workshop as $workshop){
+			$workshop->type = "workshop";
 			$events[] = $workshop; 
 		}
-		foreach($show_xml->show as $show){ 
+		foreach($show_xml->show as $show){
+			$show->type = "show";
 			$events[] = $show; 
 		}
 		function sort_by_datetime($a, $b){
@@ -520,13 +529,13 @@ class marcatoxml_importer {
 		}
 		usort($events, 'sort_by_datetime');
 		foreach($events as $event){
-			if ($event->performances){
+			if ($event->type=="show"){
 				$types = 'performances';
 				$type = 'performance';
 				$person = "artist";
 				$archive_link_type = "marcato_show";
 				$link_query = "show_id";
-			}else if ($event->presentations){
+			}else if ($event->type=="workshop"){
 				$types = 'presentations';
 				$type = 'presentation';
 				$person = "presenter";
@@ -634,12 +643,20 @@ class marcatoxml_importer {
 	    (?=[^\w\-]|$)     # Assert next char is non-ID or EOS.
 	    [?=&+%\w]*        # Consume any URL (query) remainder.
 	    ~ix', $text, $matches);
-    return $matches[1];
+		if(isset($matches[1])){
+			return $matches[1];
+		}else{
+			return null;
+		}
 	}
 	private function find_vimeo_id($text){
 		$matches = array();
 		preg_match("~vimeo\.com/(\d+)~ix",$text,$matches);
-		return $matches[1];
+		if (isset($matches[1])){
+			return $matches[1];
+		}else{
+			return null;
+		}
 	}
 	private function get_video_embed_code($link){
 		$youtube_id = $this->find_youtube_id($link);
