@@ -351,12 +351,14 @@ class marcatoxml_importer {
 				}
 			}
 			$post_content .= "<div class='artist_bio'>" . $artist->bio_public . "</div>";
-			foreach($artist->websites->website as $website){
-				$embed_code = $this->get_video_embed_code($website->url);
-				if ($this->options["embed_video_links"]=="1" && !empty($embed_code)){
-					$embed_codes[] = $embed_code;
-				}else{
-					$link_content .= "<a class='artist_website' href='".$website->url."'>".$website->name."</a><br>";
+			if(!empty($artist->websites)){
+				foreach($artist->websites->website as $website){
+					$embed_code = $this->get_video_embed_code($website->url);
+					if ($this->options["embed_video_links"]=="1" && !empty($embed_code)){
+						$embed_codes[] = $embed_code;
+					}else{
+						$link_content .= "<a class='artist_website' href='".$website->url."'>".$website->name."</a><br>";
+					}
 				}
 			}
 			if (!empty($embed_codes)){
@@ -372,23 +374,31 @@ class marcatoxml_importer {
 				foreach(array('name','bio_public','bio_limited','homebase','web_photo_url','web_photo_url_root','photo_url','photo_url_root','updated_at') as $field){
 					$post_meta["marcato_artist_".$field] = $artist->$field;
 				}
-				$i = 0;
-				foreach($artist->shows->show as $show){
-					foreach(array('name','show_on_website','date','formatted_date','venue_name') as $field){
-						$post_meta["marcato_artist_show_".$i."_".$field] = $show->$field;
+				if(!empty($artist->shows)){
+					$i = 0;
+					foreach($artist->shows->show as $show){
+						foreach(array('name','show_on_website','date','formatted_date','venue_name') as $field){
+							$post_meta["marcato_artist_show_".$i."_".$field] = $show->$field;
+						}
+						$i++;
 					}
-					$i++;
 				}
-				$i = 0;
-				foreach($artist->workshops->workshop as $workshop){
-					foreach(array('name','show_on_website','date','formatted_date','venue_name') as $field){
-						$post_meta["marcato_artist_workshop_".$i."_".$field] = $workshop->$field;
+				if(!empty($artist->workshops)){
+					$i = 0;
+					foreach($artist->workshops->workshop as $workshop){
+						foreach(array('name','show_on_website','date','formatted_date','venue_name') as $field){
+							$post_meta["marcato_artist_workshop_".$i."_".$field] = $workshop->$field;
+						}
+						$i++;
 					}
-					$i++;
 				}
-				foreach($artist->websites->website as $website){
-					$post_meta["marcato_artist_website_".$i."_name"] = $website->name;
-					$post_meta["marcato_artist_website_".$i."_url"] = $website->url;
+				if(!empty($artist->websites)){
+					$i = 0;
+					foreach($artist->websites->website as $website){
+						$post_meta["marcato_artist_website_".$i."_name"] = $website->name;
+						$post_meta["marcato_artist_website_".$i."_url"] = $website->url;
+						$i++;
+					}
 				}
 			}
 			$posts[$index] = compact('post_content', 'post_title','post_type', 'post_marcato_id','post_status','post_attachment','post_meta');
@@ -416,7 +426,13 @@ class marcatoxml_importer {
 			$post_content .= "<div class='venue_phone'>" . $venue->primary_phone_number . "</div>";
 			$post_type = "marcato_venue";
 			$post_marcato_id = intval($venue->id);
-			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id', 'post_status');
+			$post_meta = array();
+			if ($this->options["include_meta_data"]=="1"){
+				foreach(array('name','street','city','province_state','country','postal_code','community','longitude','latitude','primary_phone_number','photo_url','photo_url_root','updated_at') as $field){
+					$post_meta["marcato_venue_".$field] = $venue->$field;
+				}
+			}			
+			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id', 'post_status', 'post_meta');
 			$index++;
 		}
 		return $posts;
@@ -453,8 +469,8 @@ class marcatoxml_importer {
 			$post_content .= "</div>";
 			$post_content .= "<div class='show_description'>" . $show->description_web . "</div>";
 			$post_content .= "<table class='show_lineup'>";
-			foreach ($show->performances as $performances){
-				foreach($performances->performance as $performance){
+			if(!empty($show->performances)){
+				foreach ($show->performances->performance as $performance){
 					$post_content .= "<tr class='performance'>";
 					$artist_name = (string)$performance->artist;
 					$post_content .= "<td class='performance_time'><span class='performance_start'>".date_i18n(get_option('time_format'), strtotime($show->date . ' ' . $performance->start))."</span>";
@@ -469,7 +485,27 @@ class marcatoxml_importer {
 			$post_content .= "</table>";
 			$post_type = "marcato_show";
 			$post_marcato_id = intval($show->id);
-			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment');
+			$post_meta = array();
+			if ($this->options["include_meta_data"]=="1"){
+				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','updated_at') as $field){
+					$post_meta["marcato_show_".$field] = $show->$field;
+				}
+				foreach($show->venue as $venue){
+					foreach(array('name','city','province_state','community','longitute','latitude','id') as $field){
+						$post_meta["marcato_show_venue_".$field] = $venue->$field;
+					}
+				}
+				if(!empty($show->performances)){
+					$i = 0;
+					foreach($show->performances->performance as $performance){
+						foreach(array('id','artist','artist_id','start','end','rank') as $field){
+							$post_meta["marcato_show_performance_".$i."_".$field] = $performance->$field;
+						}
+						$i++;
+					}
+				}
+			}			
+			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta');
 			$index++;
 		}
 		return $posts;
@@ -507,14 +543,16 @@ class marcatoxml_importer {
 			$post_content .= "<div class='workshop_description'>" . $workshop->description_web . "</div>";
 			
 			$post_content .= "<div class='workshop_types'>";
-			foreach ($workshop->workshop_type as $type){
-				$post_content .= "<span class='workshop_type'>".$type->name."</span>";
+			if(!empty($workshop->workshop_types)){
+				foreach ($workshop->workshop_types->workshop_type as $type){
+					$post_content .= "<span class='workshop_type'>".$type->name."</span>";
+				}
 			}
 			$post_content .= "</div>";
 
 			$post_content .= "<table class='workshop_lineup'>";
-			foreach ($workshop->presentations as $presentations){
-				foreach($presentations->presentation as $presentation){
+			if (!empty($workshop->presentations)){
+				foreach ($workshop->presentations->presentation as $presentation){
 					$post_content .= "<tr class='presentation'>";
 					$post_content .= "<td class='presentation_time'><span class='presentation_start'>".date_i18n(get_option('time_format'), strtotime($workshop->date . ' ' . $presentation->start))."</span>";
 					if(!empty($presentation->end)){
@@ -533,6 +571,34 @@ class marcatoxml_importer {
 			$post_content .= "</table>";
 			$post_type = "marcato_workshop";
 			$post_marcato_id = intval($workshop->id);
+			$post_meta = array();
+			if ($this->options["include_meta_data"]=="1"){
+				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','event_contact_summary','hosting_organization_title','updated_at') as $field){
+					$post_meta["marcato_workshop_".$field] = $workshop->$field;
+				}
+				if(!empty($workshop->workshop_types)){
+					$i = 0;
+					foreach($workshop->workshop_types->workshop_type as $workshop_type){
+						$post_meta["marcato_workshop_type_".$i."_name"] = $workshop_type->name;
+						$post_meta["marcato_workshop_type_".$i."_id"] = $workshop_type->id;
+						$i++;
+					}
+				}
+				foreach($workshop->venue as $venue){
+					foreach(array('name','city','province_state','community','longitute','latitude','id') as $field){
+						$post_meta["marcato_workshop_venue_".$field] = $venue->$field;
+					}
+				}
+				if(!empty($workshop->presentations)){
+					$i = 0;
+					foreach($workshop->presentations->presentation as $presentation){
+						foreach(array('id','presenter','presenter_id','start','end','rank','presenter_type') as $field){
+							$post_meta["marcato_workshop_presentation_".$i."_".$field] = $presentation->$field;
+						}
+						$i++;
+					}
+				}
+			}			
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment');
 			$index++;
 		}
