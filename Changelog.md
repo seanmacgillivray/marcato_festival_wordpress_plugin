@@ -1,3 +1,6 @@
+**Version 1.0.5**  
+* Artist websites now have http:// prepended to the urls if it is missing
+
 **Version 1.0.4**  
 * Fixed bug where the featured image variable was not being unset if the artist did not have a featured image so it wound up using the image from the previous artist.
 
