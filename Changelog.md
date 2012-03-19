@@ -1,4 +1,4 @@
-**Version 1.0.6**
+**Version 1.0.6**  
 * Artist websites now add the name of the website as a css class to the link.
 
 **Version 1.0.5**  
