@@ -349,7 +349,7 @@ class marcatoxml_importer {
 				if ($this->options["embed_video_links"]=="1" && !empty($embed_code)){
 					$embed_codes[] = $embed_code;
 				}else{
-					$link_content .= "<a class='artist_website ".str_replace(" ","_", $website->name)."' href='".$url."'>".$website->name."</a><br>";
+					$link_content .= "<a class='artist_website ".strtolower(ereg_replace("[^A-Za-z0-9_]","",str_replace(" ","_", $website->name)))."' href='".$url."'>".$website->name."</a><br>";
 				}
 			}
 			if (!empty($embed_codes)){
