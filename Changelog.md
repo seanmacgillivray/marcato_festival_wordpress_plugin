@@ -1,3 +1,9 @@
+**Version 1.0.7**  
+* Marcato's Post types will now be pulled into category/tag pages that they are categorized/tagged with.  
+* Artist posts will now use the artist's press photo if a web photo is not available.  
+* Artist images that are embedded within post bodies now use a more web-optimized version instead of the original one that was uploaded. (Only if you aren't using the featured-image option).  
+* Added genre to artist posts.
+
 **Version 1.0.6**  
 * Artist websites now add the name of the website as a css class to the link.
 

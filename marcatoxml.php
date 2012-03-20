@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.0.6
+ * Version: 1.0.7
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -41,9 +41,20 @@ class marcatoxml_plugin {
 		register_activation_hook(__FILE__, array($this, 'schedule_updates'));
 		register_deactivation_hook(__FILE__, array($this, 'unschedule_updates'));
 		add_action('marcato_update', array($this,'import_all'));
+		add_filter('pre_get_posts', array($this,'query_post_type'));
 		$this->check_for_updates();
 	}
-	
+	function query_post_type($query) {
+	  if(is_category() || is_tag()) {
+	    $post_type = get_query_var('post_type');
+		if($post_type)
+		    $post_type = $post_type;
+		else
+		    $post_type = array('post','marcato_artist','marcato_show','marcato_workshop','marcato_venue');
+	    $query->set('post_type',$post_type);
+		return $query;
+	    }
+	}
 	public function check_for_updates(){
 		if (is_admin()){
 			$config = array(
@@ -331,11 +342,20 @@ class marcatoxml_importer {
 			$post_title = (string)$artist->name;
 			$post_content = "";
 			$post_content .= "<div class='artist_homebase'>" . $artist->homebase . "</div>";
+			if(!empty($artist->genre)){
+				$post_content .= "<div class='artist_genre'>" . $artist->genre . "</div>";
+			}
 			if (!empty($artist->web_photo_url)){
 				if ($this->options['attach_photos']=="1"){
 					$post_attachment = array('url'=>(string)$artist->web_photo_url, 'name'=>(string)$artist->name);
 				}else{
-					$post_content .= "<img src='".$artist->web_photo_url."' class='artist_photo'>";
+					$post_content .= "<img src='".$artist->web_photo_url_root."web.jpg' class='artist_photo'>";
+				}
+			}else if(!empty($artist->photo_url)){
+				if ($this->options['attach_photos']=="1"){
+					$post_attachment = array('url'=>(string)$artist->photo_url, 'name'=>(string)$artist->name);
+				}else{
+					$post_content .= "<img src='".$artist->photo_url_root.".web_compressed.jpg' class='artist_photo'>";
 				}
 			}
 			$post_content .= "<div class='artist_bio'>" . $artist->bio_public . "</div>";
