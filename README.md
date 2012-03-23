@@ -1,4 +1,4 @@
-~Current Version:1.0.4~
+~Current Version:1.0.7~
 
 # Marcato Festival's XML WordPress Importer
 
