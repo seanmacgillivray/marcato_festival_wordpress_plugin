@@ -1,3 +1,7 @@
+**Version 1.0.8**  
+* Fixed a bug where embed codes were being wiped when the scheduled job updated posts. Apparently only admins can use HTML to embed things. Now using [embed] shortcode  
+* Soundcloud tracks are now embedded
+
 **Version 1.0.7**  
 * Marcato's Post types will now be pulled into category/tag pages that they are categorized/tagged with.  
 * Artist posts will now use the artist's press photo if a web photo is not available.  

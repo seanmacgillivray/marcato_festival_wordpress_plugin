@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.0.7
+ * Version: 1.0.8
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -42,6 +42,7 @@ class marcatoxml_plugin {
 		register_deactivation_hook(__FILE__, array($this, 'unschedule_updates'));
 		add_action('marcato_update', array($this,'import_all'));
 		add_filter('pre_get_posts', array($this,'query_post_type'));
+		wp_oembed_add_provider('#http://(www\.)?soundcloud.com/.*#i', 'http://www.soundcloud.com/oembed/', true);
 		$this->check_for_updates();
 	}
 	function query_post_type($query) {
@@ -217,10 +218,13 @@ class marcatoxml_plugin {
 				<cite><small>Enable this to include photos from Marcato as the featured image of a post instead of embedding the image directly in the post body.</small></cite>
 			</p>
 			<p>
-				Embed video links?
+				Embed links?
 				<input type="hidden" name="embed_video_links" value="0">
-				<input type="checkbox" name="embed_video_links" value="1" <?php echo $this->importer->options["embed_video_links"]=="1" ? "checked='checked'" : "" ?>><br />
-				<cite><small>Enable this to automatically embed any YouTube or Vimeo video links that have been entered into the Marcato website fields on artists.</small></cite>
+				<input type="checkbox" name="embed_video_links" value="1" <?php echo $this->importer->options["embed_video_links"]=="1" ? "checked='checked'" : "" ?>>
+				<br />
+				<cite><small>Enable this to automatically embed any YouTube, Vimeo, or Soundcloud links that have been entered into the Marcato website fields on artists.</small></cite>
+			</p>
+			<p>
 			</p>
 			<hr />
 			<p class="submit">
@@ -233,13 +237,16 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0", 'embed_video_links'=>"0");
+	public $options = array('marcato_organization_id'=>"", 'attach_photos'=>"0", 'embed_video_links'=>"0");
 	public $fields = array("artists","venues","shows","workshops");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
 	function marcatoxml_importer(){
 		foreach($this->options as $option=>$value){
-			$this->options[$option] = get_option($option);
+			$set_value = get_option($option);
+			if (!empty($set_value)){
+				$this->options[$option] = get_option($option);
+			}
 		}
 	}	
 	
@@ -652,9 +659,8 @@ class marcatoxml_importer {
 		return $filename;
 	}
 	# Taken from user ridgerunner's response to http://stackoverflow.com/questions/5830387/php-regex-find-all-youtube-video-ids-in-string
-	private function find_youtube_id($text) {
-		$matches = array();
-    preg_match('~
+	private function is_youtube_link($text) {
+    if(preg_match('~
 	    # Match non-linked youtube URL in the wild. (Rev:20111012)
 	    https?://         # Required scheme. Either http or https.
 	    (?:[0-9A-Z-]+\.)? # Optional subdomain.
@@ -667,29 +673,33 @@ class marcatoxml_importer {
 	    ([\w\-]{11})      # $1: VIDEO_ID is exactly 11 chars.
 	    (?=[^\w\-]|$)     # Assert next char is non-ID or EOS.
 	    [?=&+%\w]*        # Consume any URL (query) remainder.
-	    ~ix', $text, $matches);
-		if(isset($matches[1])){
-			return $matches[1];
+	    ~ix', $text) > 0){
+			return true;
 		}else{
-			return null;
+			return false;
 		}
 	}
-	private function find_vimeo_id($text){
-		$matches = array();
-		preg_match("~vimeo\.com/(\d+)~ix",$text,$matches);
-		if (isset($matches[1])){
-			return $matches[1];
+	private function is_vimeo_link($text){
+		if(preg_match("~vimeo\.com/(\d+)~ix",$text,$matches) > 0){
+			return true;
 		}else{
-			return null;
+			return false;
+		}
+	}
+	private function is_soundcloud_link($text){
+		if (preg_match("~http://(?:www.)?soundcloud.com/(([^/]+)/([0-9a-z-/]+))~",$text,$matches) > 0){
+			return true;
+		}else{
+			return false;
 		}
 	}
 	private function get_video_embed_code($link){
-		$youtube_id = $this->find_youtube_id($link);
-		$vimeo_id = $this->find_vimeo_id($link);
-		if(!empty($youtube_id)){
-			return "<div class='artist_youtube_video'><object width='400' height='225' data='http://www.youtube.com/v/".$youtube_id."' type='application/x-shockwave-flash'><param name='src' value='http://www.youtube.com/v/".$youtube_id."' /></object></div>";
-		}elseif (!empty($vimeo_id)){
-			return "<iframe src='http://player.vimeo.com/video/".$vimeo_id."?title=0&amp;byline=0&amp;portrait=0' width='400' height='225' frameborder='0' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>";
+		if($this->is_youtube_link($link)){
+			return "<div class='artist_youtube_video'>[embed width='350']".$link."[/embed]</div>";
+		}elseif ($this->is_vimeo_link($link)){
+			return "<div class='artist_vimeo_video'>[embed width='350']".$link."[/embed]</div>";
+		}elseif ($this->is_soundcloud_link($link)){
+			return "<div class='artist_soundcloud_embed'>[embed width='350' height='166']".add_query_arg('show_artwork','false',$link)."[/embed]</div>";
 		}else{
 			return "";
 		}
