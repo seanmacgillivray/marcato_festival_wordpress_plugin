@@ -159,6 +159,13 @@ class marcatoxml_plugin {
 		else if (isset($_GET['workshop_id']) && !empty($_GET['workshop_id'])){
 			$where = " AND {$wpdb->posts}.post_type = 'marcato_workshop' AND {$wpdb->posts}.post_status = 'publish' AND EXISTS (SELECT * FROM {$wpdb->postmeta} WHERE {$wpdb->postmeta}.meta_key = 'marcato_workshop_id' AND {$wpdb->postmeta}.meta_value = '{$_GET['workshop_id']}' AND {$wpdb->postmeta}.post_id = {$wpdb->posts}.id)";
 		}
+		else if (isset($_GET['show_name']) && !empty($_GET['show_name'])){
+			$where = " AND {$wpdb->posts}.post_type = 'marcato_show' AND {$wpdb->posts}.post_status = 'publish' AND LOWER({$wpdb->posts}.post_title) = LOWER('{$_GET['show_name']}')";
+		}
+		else if (isset($_GET['workshop_name']) && !empty($_GET['workshop_name'])){
+			$where = " AND {$wpdb->posts}.post_type = 'marcato_workshop' AND {$wpdb->posts}.post_status = 'publish' AND LOWER({$wpdb->posts}.post_title) = LOWER('{$_GET['workshop_name']}')";
+		}
+		
 		return $where;
 	}
 	public function build_menus(){
