@@ -382,7 +382,7 @@ class marcatoxml_importer {
 					$post_content .= "<img src='".$artist->photo_url_root.".web_compressed.jpg' class='artist_photo'>";
 				}
 			}
-			$post_content .= "<div class='artist_bio'>" . nl2br($artist->bio_public) . "</div>";
+			$post_content .= "<div class='artist_bio'>" . nl2br((string)$artist->bio_public) . "</div>";
 			if(!empty($artist->websites)){
 				foreach($artist->websites->website as $website){
 					if(strpos($website->url,'http://')===false){
@@ -504,7 +504,7 @@ class marcatoxml_importer {
 			$post_content .= "<span class='ticket_info'>" . $show->ticket_info . "</span>";
 			$post_content .= "<a class='ticket_link' href='" . $show->ticket_link . "'>".$show->ticket_link."</a>";
 			$post_content .= "</div>";
-			$post_content .= "<div class='show_description'>" . $show->description_web . "</div>";
+			$post_content .= "<div class='show_description'>" . nl2br((string)$show->description_web) . "</div>";
 			$post_content .= "<table class='show_lineup'>";
 			if(!empty($show->performances)){
 				foreach ($show->performances->performance as $performance){
@@ -577,7 +577,7 @@ class marcatoxml_importer {
 			$post_content .= "<span class='ticket_info'>" . $workshop->ticket_info . "</span>";
 			$post_content .= "<a class='ticket_link' href='" . $workshop->ticket_link . "'>".$workshop->ticket_link."</a>";
 			$post_content .= "</div>";
-			$post_content .= "<div class='workshop_description'>" . $workshop->description_web . "</div>";
+			$post_content .= "<div class='workshop_description'>" . nl2br((string)$workshop->description_web) . "</div>";
 			
 			$post_content .= "<div class='workshop_types'>";
 			if(!empty($workshop->workshop_types)){
