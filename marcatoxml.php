@@ -409,7 +409,7 @@ class marcatoxml_importer {
 			$post_meta = array();
 			if ($this->options["include_meta_data"]=="1"){
 				foreach(array('name','bio_public','bio_limited','homebase','web_photo_url','web_photo_url_root','photo_url','photo_url_root','updated_at') as $field){
-					$post_meta["marcato_artist_".$field] = $artist->$field;
+					$post_meta["marcato_artist_".$field] = nl2br((string)$artist->$field);
 				}
 				if(!empty($artist->shows)){
 					$i = 0;
@@ -525,7 +525,7 @@ class marcatoxml_importer {
 			$post_meta = array();
 			if ($this->options["include_meta_data"]=="1"){
 				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','updated_at') as $field){
-					$post_meta["marcato_show_".$field] = $show->$field;
+					$post_meta["marcato_show_".$field] = nl2br((string)$show->$field);
 				}
 				foreach($show->venue as $venue){
 					foreach(array('name','city','province_state','community','longitute','latitude','id') as $field){
@@ -611,7 +611,7 @@ class marcatoxml_importer {
 			$post_meta = array();
 			if ($this->options["include_meta_data"]=="1"){
 				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','event_contact_summary','hosting_organization_title','updated_at') as $field){
-					$post_meta["marcato_workshop_".$field] = $workshop->$field;
+					$post_meta["marcato_workshop_".$field] = nl2br((string)$workshop->$field);
 				}
 				if(!empty($workshop->workshop_types)){
 					$i = 0;
