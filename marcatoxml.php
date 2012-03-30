@@ -375,7 +375,7 @@ class marcatoxml_importer {
 					$post_content .= "<img src='".$artist->photo_url_root.".web_compressed.jpg' class='artist_photo'>";
 				}
 			}
-			$post_content .= "<div class='artist_bio'>" . $artist->bio_public . "</div>";
+			$post_content .= "<div class='artist_bio'>" . nl2br($artist->bio_public) . "</div>";
 			if(!empty($artist->websites)){
 				foreach($artist->websites->website as $website){
 					if(strpos($website->url,'http://')===false){
