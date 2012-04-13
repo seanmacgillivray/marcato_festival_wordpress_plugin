@@ -51,7 +51,7 @@ class marcatoxml_plugin {
 		if($post_type)
 		    $post_type = $post_type;
 		else
-		    $post_type = array('post','marcato_artist','marcato_show','marcato_workshop','marcato_venue');
+		    $post_type = array('nav_menu_item','post','marcato_artist','marcato_show','marcato_workshop','marcato_venue');
 	    $query->set('post_type',$post_type);
 		return $query;
 	    }
