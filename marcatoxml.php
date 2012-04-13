@@ -48,11 +48,12 @@ class marcatoxml_plugin {
 	function query_post_type($query) {
 	  if(is_category() || is_tag()) {
 	    $post_type = get_query_var('post_type');
-		if($post_type)
+		if($post_type){
 		    $post_type = $post_type;
-		else
-		    $post_type = array('nav_menu_item','post','marcato_artist','marcato_show','marcato_workshop','marcato_venue');
+		}else{
+		  $post_type = array('nav_menu_item','post','marcato_artist','marcato_show','marcato_workshop','marcato_venue');
 	    $query->set('post_type',$post_type);
+		}
 		return $query;
 	    }
 	}
