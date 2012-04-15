@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.0.8
+ * Version: 1.0.9
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -189,6 +189,7 @@ class marcatoxml_plugin {
 				<?php
 			}
 			if (isset($_POST['marcato_import'])){
+				echo "IMPORTING...<br>NOTE: If you are importing featured images this could take a while. If you get a maximum execution time exceeded message, please try the import again.";
 				$results = $this->import_all();
 				$errors = array();
 				foreach($results as $result){
@@ -372,13 +373,13 @@ class marcatoxml_importer {
 			}
 			if (!empty($artist->web_photo_url)){
 				if ($this->options['attach_photos']=="1"){
-					$post_attachment = array('url'=>(string)$artist->web_photo_url, 'name'=>(string)$artist->name);
+					$post_attachment = array('url'=>(string)$artist->web_photo_url, 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->web_photo_fingerprint, 'field'=>'web_photo');
 				}else{
 					$post_content .= "<img src='".$artist->web_photo_url_root."web.jpg' class='artist_photo'>";
 				}
 			}else if(!empty($artist->photo_url)){
 				if ($this->options['attach_photos']=="1"){
-					$post_attachment = array('url'=>(string)$artist->photo_url, 'name'=>(string)$artist->name);
+					$post_attachment = array('url'=>(string)$artist->photo_url, 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->photo_fingerprint, 'field'=>'photo');
 				}else{
 					$post_content .= "<img src='".$artist->photo_url_root.".web_compressed.jpg' class='artist_photo'>";
 				}
@@ -495,7 +496,7 @@ class marcatoxml_importer {
 			$post_content .= "<div class='show_venue'><a class='show_venue_link' href='".add_query_arg('venue_name',$venue_name,get_post_type_archive_link('marcato_venue'))."'>" . $show->venue_name . "</a></div>";
 			if (!empty($show->poster_url)){
 				if ($this->options['attach_photos']=="1"){
-					$post_attachment = array('url'=>(string)$show->poster_url, 'name'=>(string)$show->name);
+					$post_attachment = array('url'=>(string)$show->poster_url, 'name'=>(string)$show->name, 'fingerprint'=>(string)$show->poster_fingerprint, 'field'=>'poster');
 				}else{
 					$post_content .= "<img src='".$show->poster_url."' class='show_photo'>";
 				}
@@ -568,7 +569,7 @@ class marcatoxml_importer {
 			$post_content .= "<div class='workshop_venue'><a class='workshop_venue_link' href='".add_query_arg('venue_name',$venue_name,get_post_type_archive_link('marcato_venue'))."'>" . $workshop->venue_name . "</a></div>";
 			if (!empty($workshop->poster_url)){
 				if ($this->options['attach_photos']=="1"){
-					$post_attachment = array('url'=>(string)$workshop->poster_url, 'name'=>(string)$workshop->name);
+					$post_attachment = array('url'=>(string)$workshop->poster_url, 'name'=>(string)$workshop->name, 'fingerprint'=>(string)$workshop->poster_fingerprint, 'field'=>'poster');
 				}else{
 					$post_content .= "<img src='".$workshop->poster_url."' class='workshop_photo'>";
 				}
@@ -724,16 +725,24 @@ class marcatoxml_importer {
 		return true;
 	}
 	private function set_featured_image($post_id, $post_attachment){
-		#Find and delete the current featured image if there is one
-		$thumbnail_id = get_post_thumbnail_id($post_id);
-		if (!empty($thumbnail_id)){
-			
-			wp_delete_attachment($thumbnail_id, true);
+		#determine if the fingerprint has changed
+		if(!isset($post_attachment['fingerprint']) || !isset($post_attachment['field'])){
+			$fingerprint = NULL;
+		}else{
+			$fingerprint = get_post_meta($post_id, $post_attachment['field'].'_fingerprint', true);
 		}
-		#Save the image from marcato and set it as the post's featured image
-		if (!empty($post_attachment)){
-			$filename = $this->save_image_locally($post_attachment['url'],$post_attachment['name']);
-			$this->save_attachment($filename,$post_id);
+		if(empty($fingerprint) || $fingerprint!==$post_attachment['fingerprint']){
+			#Find and delete the current featured image if there is one
+			$thumbnail_id = get_post_thumbnail_id($post_id);
+			if (!empty($thumbnail_id)){
+				wp_delete_attachment($thumbnail_id, true);
+			}
+			#Save the image from marcato and set it as the post's featured image and save the fingerprint for future reference
+			if (!empty($post_attachment)){
+				$filename = $this->save_image_locally($post_attachment['url'],$post_attachment['name']);
+				$this->save_attachment($filename,$post_id);
+				update_post_meta($post_id, $post_attachment['field'].'_fingerprint', $post_attachment['fingerprint']);
+			}
 		}
 	}
 	private function save_attachment($filename, $post_id){

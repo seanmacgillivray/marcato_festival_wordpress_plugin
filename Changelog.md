@@ -1,3 +1,6 @@
+**Version 1.0.9**  
+* Only download featured images if the image has actually changed using new fingerprint field from Marcato xml feeds
+
 **Version 1.0.8**  
 * Fixed a bug where embed codes were being wiped when the scheduled job updated posts. Apparently only admins can use HTML to embed things. Now using [embed] shortcode  
 * Soundcloud tracks are now embedded
