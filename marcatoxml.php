@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.0.9
+ * Version: 1.0.10
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -454,7 +454,11 @@ class marcatoxml_importer {
 			$post_content = "";
 			$post_content .= "<div class='venue_community'>" . $venue->community . "</div>";
 			if (!empty($venue->photo_url)){
-				$post_content .= "<img src='".$venue->photo_url."' class='venue_photo'>";
+				if ($this->options['attach_photos']=="1"){
+					$post_attachment = array('url'=>(string)$venue->photo_url, 'name'=>(string)$venue->name, 'fingerprint'=>(string)$venue->photo_fingerprint, 'field'=>'photo');
+				}else{
+					$post_content .= "<img src='".$venue->photo_url."' class='venue_photo'>";
+				}
 			}
 			$post_content .= "<div class='venue_address'>";
 			$post_content .= "<span class='city'>" . $venue->city . "</span>";
@@ -471,7 +475,7 @@ class marcatoxml_importer {
 					$post_meta["marcato_venue_".$field] = $venue->$field;
 				}
 			}			
-			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id', 'post_status', 'post_meta');
+			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id', 'post_status', 'post_meta','post_attachment');
 			$index++;
 		}
 		return $posts;

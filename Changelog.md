@@ -1,3 +1,6 @@
+**Version 1.0.10**  
+* Venue Photos will now be set as featured image if the option is selected
+
 **Version 1.0.9**  
 * Only download featured images if the image has actually changed using new fingerprint field from Marcato xml feeds
 
