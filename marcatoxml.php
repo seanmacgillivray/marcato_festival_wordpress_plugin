@@ -68,7 +68,7 @@ class marcatoxml_plugin {
 				'zip_url' => 'https://github.com/morgancurrie/marcato_festival_wordpress_plugin/zipball/master',
 				'sslverify' => true,
 				'requires' => '3.0',
-				'tested' => '3.3.1'
+				'tested' => '3.3.2'
 			);
 			new wp_github_updater($config);
 		}
