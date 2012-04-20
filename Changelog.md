@@ -1,3 +1,7 @@
+**Version 1.1.0**  
+* Added Excerpts to the Marcato post types which pull in information from artist short bios and show/workshop web descriptions  
+* Added the option to include xml fields as meta data. Useful if you want to make your own template files for the post or using another plugin that uses meta data
+
 **Version 1.0.10**  
 * Venue Photos will now be set as featured image if the option is selected
 
@@ -33,4 +37,4 @@
 **Version 1.0.1**  
 * Fixed the Artist parser so that all of the websites are being inserted into the post.  
 * Added an option to include Artist photos, Show/Workshop posters as their post's featured image.  
-* Added an option to automatically embed any YouTube or Vimeo videos that websites imported from Marcato link to.  
+* Added an option to automatically embed any YouTube or Vimeo videos that websites imported from Marcato link to.

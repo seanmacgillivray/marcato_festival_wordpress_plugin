@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.0.10
+ * Version: 1.1.0
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -86,7 +86,7 @@ class marcatoxml_plugin {
 			"labels"=>array("name"=>"Artists","singular_name"=>"Artist"), 
 			"public"=>true, 
 			"rewrite"=>array("slug"=>"artists", "with_front"=>false),
-			"supports"=>array("title","editor","thumbnail"),
+			"supports"=>array("title","editor","thumbnail","excerpt"),
 			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png",
 			"taxonomies"=>array("category","post_tag")
 			)
@@ -96,7 +96,7 @@ class marcatoxml_plugin {
 			"labels"=>array("name"=>"Venues","singular_name"=>"Venue"),
 			"public"=>true,
 			"rewrite"=>array("slug"=>"venues", "with_front"=>false),
-			"supports"=>array("title","editor","thumbnail"),
+			"supports"=>array("title","editor","thumbnail","excerpt"),
 			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png",
 			"taxonomies"=>array("category","post_tag")
 			)
@@ -106,7 +106,7 @@ class marcatoxml_plugin {
 			"labels"=>array("name"=>"Shows","singular_name"=>"Show"),
 			"public"=>true,
 			"rewrite"=>array("slug"=>"shows", "with_front"=>false),
-			"supports"=>array("title","editor","thumbnail"),
+			"supports"=>array("title","editor","thumbnail","excerpt"),
 			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png",
 			"taxonomies"=>array("category","post_tag")
 			)
@@ -116,7 +116,7 @@ class marcatoxml_plugin {
 			"labels"=>array("name"=>"Workshops","singular_name"=>"Workshop"),
 			"public"=>true,
 			"rewrite"=>array("slug"=>"workshops", "with_front"=>false),
-			"supports"=>array("title","editor","thumbnail"),
+			"supports"=>array("title","editor","thumbnail","excerpt"),
 			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png",
 			"taxonomies"=>array("category","post_tag")
 			)
@@ -234,10 +234,16 @@ class marcatoxml_plugin {
 				<cite><small>Enable this to automatically embed any YouTube, Vimeo, or Soundcloud links that have been entered into the Marcato website fields on artists.</small></cite>
 			</p>
 			<p>
+				Include Short Bio/Descriptions as excerpts?
+				<input type="hidden" name="include_exceprts" value="0">
+				<input type="checkbox" name="include_excerpts" value="1" <?php echo $this->importer->options["include_excerpts"]=="1" ? "checked='checked'" : "" ?>>
+				<br />
+				<cite><small>Enable this to include the shorter versions of things like Artist Bios and Show Descriptions from Marcato as post excerpts</small></cite>
+			<p>
 				Include XML fields as post Meta-data?
 				<input type="hidden" name="include_meta_data" value="0">
 				<input type="checkbox" name="include_meta_data" value="1" <?php echo $this->importer->options["include_meta_data"]=="1" ? "checked='checked'" : "" ?>><br />
-				<cite><small>Enable this to include all xml fields as post meta-data. This is useful if you use other plugins that make use of post meta data such as <a href="http://wp-types.com">Types and Views</a></small></cite>
+				<cite><small>Enable this to include all xml fields as post meta-data. This is useful if you use other plugins that make use of post meta data or if you want to make custom template files.</small></cite>
 			</p>
 			<hr />
 			<p class="submit">
@@ -250,7 +256,7 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0", 'embed_video_links'=>"0", 'include_meta_data'=>"0");
+	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0", 'embed_video_links'=>"0", 'include_meta_data'=>"0","include_excerpts"=>"0");
 	public $fields = array("artists","venues","shows","workshops");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
@@ -408,6 +414,11 @@ class marcatoxml_importer {
 			$post_content .= "<div class='artist_websites'>" . $link_content . "</div>";
 			$post_type = "marcato_artist";
 			$post_marcato_id = intval($artist->id);
+			if($this->options["include_excerpts"]=="1"){
+				$post_excerpt = (string)$artist->bio_limited;
+			}else{
+				$post_excerpt = "";
+			}
 			$post_meta = array();
 			if ($this->options["include_meta_data"]=="1"){
 				foreach(array('name','bio_public','bio_limited','homebase','web_photo_url','web_photo_url_root','photo_url','photo_url_root','updated_at') as $field){
@@ -440,7 +451,7 @@ class marcatoxml_importer {
 					}
 				}
 			}
-			$posts[$index] = compact('post_content', 'post_title','post_type', 'post_marcato_id','post_status','post_attachment','post_meta');
+			$posts[$index] = compact('post_content', 'post_title','post_type', 'post_marcato_id','post_status','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
 		return $posts;
@@ -528,6 +539,11 @@ class marcatoxml_importer {
 			$post_content .= "</table>";
 			$post_type = "marcato_show";
 			$post_marcato_id = intval($show->id);
+			if($this->options["include_excerpts"]=="1"){
+				$post_excerpt = (string)$show->description_web;
+			}else{
+				$post_excerpt = "";
+			}
 			$post_meta = array();
 			if ($this->options["include_meta_data"]=="1"){
 				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','updated_at') as $field){
@@ -548,7 +564,7 @@ class marcatoxml_importer {
 					}
 				}
 			}			
-			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta');
+			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
 		return $posts;
@@ -614,6 +630,11 @@ class marcatoxml_importer {
 			$post_content .= "</table>";
 			$post_type = "marcato_workshop";
 			$post_marcato_id = intval($workshop->id);
+			if($this->options["include_excerpts"]=="1"){
+				$post_excerpt = (string)$workshop->description_web;
+			}else{
+				$post_excerpt = "";
+			}
 			$post_meta = array();
 			if ($this->options["include_meta_data"]=="1"){
 				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','event_contact_summary','hosting_organization_title','updated_at') as $field){
@@ -642,7 +663,7 @@ class marcatoxml_importer {
 					}
 				}
 			}			
-			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta');
+			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
 		return $posts;
