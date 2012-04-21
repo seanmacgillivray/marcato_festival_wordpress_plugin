@@ -17,6 +17,10 @@ Note that enabling this option will result in the image no longer being directly
 
 Enabling the "embed video links" option will cause the plugin to automatically embed any YouTube or Vimeo videos that are linked to from the website fields on artists in your Marcato account.
 
+Enabling excerpts will set the Artist's short bio as artist post excerpts and Show/Workshop web descriptions as show/workshop post excerpts
+
+Including XML data as custom fields may be useful in conjunction with other plugins or themes.
+
 If you change certain WordPress settings (such as your permalink structure) you may need to update your Marcato data by clicking Import Now on the Marcato settings page.
 
 You should now see menu options with the Marcato logo and Artists/Venues/Shows/Workshops that should be populated with your data.

@@ -81,12 +81,19 @@ class marcatoxml_plugin {
 		wp_enqueue_style("marcato",plugins_url("",__FILE__)."/css/marcato.css");
 	}
 	public function register_custom_post_types(){
+		$supports = array("title","editor","thumbnail");
+		if ($this->importer->options["include_meta_data"]=="1"){
+			$supports[] = "custom-fields";
+		}
+		if($this->importer->options["include_excerpts"]=="1"){
+			$supports[] = "excerpt";
+		}
 		register_post_type("marcato_artist", array(
 			"label"=>"Artists", "has_archive"=>"artists", 
 			"labels"=>array("name"=>"Artists","singular_name"=>"Artist"), 
 			"public"=>true, 
 			"rewrite"=>array("slug"=>"artists", "with_front"=>false),
-			"supports"=>array("title","editor","thumbnail","excerpt"),
+			"supports"=>$supports,
 			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png",
 			"taxonomies"=>array("category","post_tag")
 			)
@@ -96,7 +103,7 @@ class marcatoxml_plugin {
 			"labels"=>array("name"=>"Venues","singular_name"=>"Venue"),
 			"public"=>true,
 			"rewrite"=>array("slug"=>"venues", "with_front"=>false),
-			"supports"=>array("title","editor","thumbnail","excerpt"),
+			"supports"=>$supports,
 			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png",
 			"taxonomies"=>array("category","post_tag")
 			)
@@ -106,7 +113,7 @@ class marcatoxml_plugin {
 			"labels"=>array("name"=>"Shows","singular_name"=>"Show"),
 			"public"=>true,
 			"rewrite"=>array("slug"=>"shows", "with_front"=>false),
-			"supports"=>array("title","editor","thumbnail","excerpt"),
+			"supports"=>$supports,
 			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png",
 			"taxonomies"=>array("category","post_tag")
 			)
@@ -116,7 +123,7 @@ class marcatoxml_plugin {
 			"labels"=>array("name"=>"Workshops","singular_name"=>"Workshop"),
 			"public"=>true,
 			"rewrite"=>array("slug"=>"workshops", "with_front"=>false),
-			"supports"=>array("title","editor","thumbnail","excerpt"),
+			"supports"=>$supports,
 			"menu_icon"=>plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png",
 			"taxonomies"=>array("category","post_tag")
 			)
@@ -243,7 +250,7 @@ class marcatoxml_plugin {
 				Include XML fields as post Meta-data?
 				<input type="hidden" name="include_meta_data" value="0">
 				<input type="checkbox" name="include_meta_data" value="1" <?php echo $this->importer->options["include_meta_data"]=="1" ? "checked='checked'" : "" ?>><br />
-				<cite><small>Enable this to include all xml fields as post meta-data. This is useful if you use other plugins that make use of post meta data or if you want to make custom template files.</small></cite>
+				<cite><small>Enable this to include all xml fields as custom fields on posts. This is useful if you use other plugins that make use of post meta data.</small></cite>
 			</p>
 			<hr />
 			<p class="submit">
