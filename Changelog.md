@@ -1,3 +1,7 @@
+**Version 1.1.1**  
+_In Progress_  
+* Added IDs to artist shows and workshops metadata
+
 **Version 1.1.0**  
 * Added Excerpts to the Marcato post types which pull in information from artist short bios and show/workshop web descriptions  
 * Added the option to include xml fields as meta data. Useful if you want to make your own template files for the post or using another plugin that uses meta data
