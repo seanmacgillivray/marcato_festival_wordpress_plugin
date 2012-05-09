@@ -242,7 +242,7 @@ class marcatoxml_plugin {
 			</p>
 			<p>
 				Include Short Bio/Descriptions as excerpts?
-				<input type="hidden" name="include_exceprts" value="0">
+				<input type="hidden" name="include_excerpts" value="0">
 				<input type="checkbox" name="include_excerpts" value="1" <?php echo $this->importer->options["include_excerpts"]=="1" ? "checked='checked'" : "" ?>>
 				<br />
 				<cite><small>Enable this to include the shorter versions of things like Artist Bios and Show Descriptions from Marcato as post excerpts</small></cite>
@@ -263,7 +263,7 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0", 'embed_video_links'=>"0", 'include_meta_data'=>"0","include_excerpts"=>"0");
+	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0", 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0");
 	public $fields = array("artists","venues","shows","workshops");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
