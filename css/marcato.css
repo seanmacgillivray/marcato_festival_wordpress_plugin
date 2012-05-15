@@ -14,10 +14,15 @@
 		display:none;
 	}
 	div.venue_address{}
+	div.venue_address span.street{
+		display:block;
+	}
 	div.venue_address span.city{
+		display:inline-block;
 		margin-right:3px;
 	}
 	div.venue_address span.province_state{
+		display:inline-block;
 		margin-right:3px;
 	}
 	div.venue_address span.country{

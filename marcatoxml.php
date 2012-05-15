@@ -42,6 +42,7 @@ class marcatoxml_plugin {
 		register_deactivation_hook(__FILE__, array($this, 'unschedule_updates'));
 		add_action('marcato_update', array($this,'import_all'));
 		add_filter('pre_get_posts', array($this,'query_post_type'));
+		add_filter('mce_css', array($this,'add_mce_css'));
 		wp_oembed_add_provider('#http://(www\.)?soundcloud.com/.*#i', 'http://www.soundcloud.com/oembed/', true);
 		$this->check_for_updates();
 	}
@@ -79,6 +80,13 @@ class marcatoxml_plugin {
 	}
 	public function enqueue_styles(){
 		wp_enqueue_style("marcato",plugins_url("",__FILE__)."/css/marcato.css");
+	}
+	public function add_mce_css($mce_css){
+		if(!empty($mce_css)){
+			$mce_css .= ',';
+		}
+		$mce_css .= plugins_url("", __FILE__)."/css/marcato.css";
+		return $mce_css;
 	}
 	public function register_custom_post_types(){
 		$supports = array("title","editor","thumbnail");
@@ -479,6 +487,7 @@ class marcatoxml_importer {
 				}
 			}
 			$post_content .= "<div class='venue_address'>";
+			$post_content .= "<span class='street'>" . $venue->street . "</span>";
 			$post_content .= "<span class='city'>" . $venue->city . "</span>";
 			$post_content .= "<span class='province_state'>" . $venue->province_state . "</span>";
 			$post_content .= "<span class='country'>" . $venue->country . "</span>";
