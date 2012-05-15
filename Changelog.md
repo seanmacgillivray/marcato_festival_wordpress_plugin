@@ -1,6 +1,7 @@
 **Version 1.1.1**  
-_In Progress_  
-* Added IDs to artist shows and workshops metadata
+* Added IDs to artist shows and workshops metadata  
+* Added missing Street to venue addresses  
+* Marcato CSS file now included in editor
 
 **Version 1.1.0**  
 * Added Excerpts to the Marcato post types which pull in information from artist short bios and show/workshop web descriptions  
