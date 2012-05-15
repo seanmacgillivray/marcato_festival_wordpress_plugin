@@ -490,8 +490,8 @@ class marcatoxml_importer {
 			$post_content .= "<span class='street'>" . $venue->street . "</span>";
 			$post_content .= "<span class='city'>" . $venue->city . "</span>";
 			$post_content .= "<span class='province_state'>" . $venue->province_state . "</span>";
-			$post_content .= "<span class='country'>" . $venue->country . "</span>";
 			$post_content .= "<span class='postal_code'>" . $venue->postal_code . "</span>";
+			$post_content .= "<span class='country'>" . $venue->country . "</span>";
 			$post_content .= "</div>";
 			$post_content .= "<div class='venue_phone'>" . $venue->primary_phone_number . "</div>";
 			$post_type = "marcato_venue";
