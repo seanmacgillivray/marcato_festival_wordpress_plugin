@@ -1,5 +1,6 @@
 **Version 1.1.2**  
-* Added an option to include images in post bodies that is independent of the featured image option.
+* Added an option to include images in post bodies that is independent of the featured image option.  
+* Updated Github Updater for Update warnings. Now checks for updates every 6 hours
 
 **Version 1.1.1**  
 * Added IDs to artist shows and workshops metadata  
