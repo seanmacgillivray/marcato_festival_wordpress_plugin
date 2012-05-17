@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.1.1
+ * Version: 1.1.2
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -242,6 +242,12 @@ class marcatoxml_plugin {
 				<cite><small>Enable this to include photos from Marcato as the featured image of a post instead of embedding the image directly in the post body.</small></cite>
 			</p>
 			<p>
+				Include photos in post body?
+				<input type="hidden" name="include_photos_in_posts" value="0">
+				<input type="checkbox" name="include_photos_in_posts" value="1" <?php echo $this->importer->options["include_photos_in_posts"]=="1" ? "checked='checked'" : "" ?>><br />
+				<cite><small>Enable this to have photos from Marcato included in the post body.</small></cite>
+			</p>
+			<p>
 				Embed links?
 				<input type="hidden" name="embed_video_links" value="0">
 				<input type="checkbox" name="embed_video_links" value="1" <?php echo $this->importer->options["embed_video_links"]=="1" ? "checked='checked'" : "" ?>>
@@ -271,7 +277,7 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0", 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0");
+	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0");
 	public $fields = array("artists","venues","shows","workshops");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
@@ -395,13 +401,15 @@ class marcatoxml_importer {
 			if (!empty($artist->web_photo_url)){
 				if ($this->options['attach_photos']=="1"){
 					$post_attachment = array('url'=>(string)$artist->web_photo_url, 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->web_photo_fingerprint, 'field'=>'web_photo');
-				}else{
+				}
+				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "<img src='".$artist->web_photo_url_root."web.jpg' class='artist_photo'>";
 				}
 			}else if(!empty($artist->photo_url)){
 				if ($this->options['attach_photos']=="1"){
 					$post_attachment = array('url'=>(string)$artist->photo_url, 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->photo_fingerprint, 'field'=>'photo');
-				}else{
+				}
+				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "<img src='".$artist->photo_url_root.".web_compressed.jpg' class='artist_photo'>";
 				}
 			}
@@ -482,7 +490,8 @@ class marcatoxml_importer {
 			if (!empty($venue->photo_url)){
 				if ($this->options['attach_photos']=="1"){
 					$post_attachment = array('url'=>(string)$venue->photo_url, 'name'=>(string)$venue->name, 'fingerprint'=>(string)$venue->photo_fingerprint, 'field'=>'photo');
-				}else{
+				}
+				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "<img src='".$venue->photo_url."' class='venue_photo'>";
 				}
 			}
@@ -528,7 +537,8 @@ class marcatoxml_importer {
 			if (!empty($show->poster_url)){
 				if ($this->options['attach_photos']=="1"){
 					$post_attachment = array('url'=>(string)$show->poster_url, 'name'=>(string)$show->name, 'fingerprint'=>(string)$show->poster_fingerprint, 'field'=>'poster');
-				}else{
+				}
+				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "<img src='".$show->poster_url."' class='show_photo'>";
 				}
 			}
@@ -606,7 +616,8 @@ class marcatoxml_importer {
 			if (!empty($workshop->poster_url)){
 				if ($this->options['attach_photos']=="1"){
 					$post_attachment = array('url'=>(string)$workshop->poster_url, 'name'=>(string)$workshop->name, 'fingerprint'=>(string)$workshop->poster_fingerprint, 'field'=>'poster');
-				}else{
+				}
+				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "<img src='".$workshop->poster_url."' class='workshop_photo'>";
 				}
 			}

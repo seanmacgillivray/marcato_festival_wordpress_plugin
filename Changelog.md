@@ -1,3 +1,6 @@
+**Version 1.1.2**  
+* Added an option to include images in post bodies that is independent of the featured image option.
+
 **Version 1.1.1**  
 * Added IDs to artist shows and workshops metadata  
 * Added missing Street to venue addresses  
