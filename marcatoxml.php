@@ -892,7 +892,7 @@ class marcatoxml_importer {
 				if( !$term = term_exists( $name, $tax ) ){
 					$term = wp_insert_term( $name, $tax, array( 'slug' => sanitize_title_with_dashes( $name ) ) );
 				}
-				print_r( wp_set_post_terms( $post_id, $term['term_id'], $tax ) );
+				wp_set_post_terms( $post_id, $term['term_id'], $tax );
 			}
 		}
 	}
