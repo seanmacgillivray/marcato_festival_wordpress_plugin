@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.1.2
+ * Version: 1.1.1
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -69,9 +69,10 @@ class marcatoxml_plugin {
 				'zip_url' => 'https://github.com/morgancurrie/marcato_festival_wordpress_plugin/zipball/master',
 				'sslverify' => true,
 				'requires' => '3.0',
-				'tested' => '3.3.2'
+				'tested' => '3.3.2',
+				'readme' => 'README.md'
 			);
-			new wp_github_updater($config);
+			new WPGitHubUpdater($config);
 		}
 	}
 		
