@@ -1,3 +1,7 @@
+**Version 1.1.3**  
+* Added seating to the show and workshop posts meta data  
+_In Progress_
+
 **Version 1.1.2**  
 * Added an option to include images in post bodies that is independent of the featured image option.  
 * Updated Github Updater for Update warnings. Now checks for updates every 6 hours
