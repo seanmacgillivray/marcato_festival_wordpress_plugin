@@ -343,6 +343,7 @@ class marcatoxml_importer {
 				if(!$this->import_post($post)){
 					$errors[0] = $post['post_title'];					
 				}
+				
 			}
 		}else{
 			return "Error importing {$field}: Error loading xml file.";
@@ -386,7 +387,10 @@ class marcatoxml_importer {
 					$this->set_featured_image($existing_post_id, $post['post_attachment']);
 				}
 				if(isset($post['post_meta'])){
-					$this->set_post_meta($existing_post_id, $post['post_meta'], $post['post_taxonomy']);
+					$this->set_post_meta($existing_post_id, $post['post_meta']);
+				}
+				if(isset($post['post_taxonomy'])){
+					$this->set_post_taxonomy($existing_post_id, $post['post_taxonomy']);
 				}
 				return $existing_post_id;
 			}else{
@@ -402,7 +406,10 @@ class marcatoxml_importer {
 					$this->set_featured_image($post_id, $post['post_attachment']);
 				}
 				if(isset($post['post_meta'])){
-					$this->set_post_meta($post_id, $post['post_meta'], $post['post_taxonomy']);
+					$this->set_post_meta($post_id, $post['post_meta']);
+				}
+				if(isset($post['post_taxonomy'])){
+					$this->set_post_taxonomy($post_id, $post['post_taxonomy']);
 				}
 				return $post_id;
 			}else{
@@ -468,15 +475,13 @@ class marcatoxml_importer {
 			}else{
 				$post_excerpt = "";
 			}
+			if(!empty($artist->genre)){
+				$post_taxonomy['marcato_genre'] = (String)$artist->genre;
+			}
 			$post_meta = array();
 			if ($this->options["include_meta_data"]=="1"){
 				foreach(array('name','bio_public','bio_limited','homebase','web_photo_url','web_photo_url_root','photo_url','photo_url_root','updated_at') as $field){
 					$post_meta["marcato_artist_".$field] = nl2br((string)$artist->$field);
-				}
-				if(!empty($artist->genre)){
-
-					$post_taxonomy['marcato_genre'] = $artist->genre->asXML();
-					
 				}
 				if(!empty($artist->shows)){
 					$i = 0;
@@ -904,17 +909,16 @@ class marcatoxml_importer {
 			return "";
 		}
 	}
-	private function set_post_meta($post_id, $meta_data, $taxonomy_data){
+	private function set_post_meta($post_id, $meta_data){
 		if($this->options["include_meta_data"]=="1" && !empty($meta_data)){
 			foreach($meta_data as $key=>$value){
 				add_post_meta($post_id, (String)$key, (String)$value, true);
 			}
-			foreach($taxonomy_data as $tax => $name){
-				if( !$term = term_exists( $name, $tax ) ){
-					$term = wp_insert_term( $name, $tax, array( 'slug' => sanitize_title_with_dashes( $name ) ) );
-				}
-				wp_set_post_terms( $post_id, $term['term_id'], $tax );
-			}
+		}
+	}
+	private function set_post_taxonomy($post_id, $taxonomy_data){
+		foreach($taxonomy_data as $tax => $name){
+			wp_set_object_terms($post_id, $name, $tax);
 		}
 	}
 }
