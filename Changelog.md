@@ -1,3 +1,7 @@
+**Version 1.1.4**  
+* Use the web-versions of images instead of the originally uploaded images to avoid memory issues with large filesizes  
+* Sanitize the string that will be used as the image filename
+
 **Version 1.1.3**  
 * Added seating to the show and workshop posts meta data  
 * Added Artist Genres as a custom Taxonomy - From gavinsmith
