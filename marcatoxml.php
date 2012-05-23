@@ -339,11 +339,10 @@ class marcatoxml_importer {
 		$result;
 		$errors = array();
 		if ($posts = $this->get_posts($field)){
-			foreach ($posts as $post){
+			foreach ($posts as $key=>$post){
 				if(!$this->import_post($post)){
 					$errors[0] = $post['post_title'];					
 				}
-				
 			}
 		}else{
 			return "Error importing {$field}: Error loading xml file.";
@@ -433,14 +432,14 @@ class marcatoxml_importer {
 			}
 			if (!empty($artist->web_photo_url)){
 				if ($this->options['attach_photos']=="1"){
-					$post_attachment = array('url'=>(string)$artist->web_photo_url, 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->web_photo_fingerprint, 'field'=>'web_photo');
+					$post_attachment = array('url'=>(string)$artist->web_photo_url_root . "web.jpg", 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->web_photo_fingerprint, 'field'=>'web_photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "<img src='".$artist->web_photo_url_root."web.jpg' class='artist_photo'>";
 				}
 			}else if(!empty($artist->photo_url)){
 				if ($this->options['attach_photos']=="1"){
-					$post_attachment = array('url'=>(string)$artist->photo_url, 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->photo_fingerprint, 'field'=>'photo');
+					$post_attachment = array('url'=>(string)$artist->photo_url_root."web_compressed.jpg", 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->photo_fingerprint, 'field'=>'photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "<img src='".$artist->photo_url_root.".web_compressed.jpg' class='artist_photo'>";
@@ -525,10 +524,10 @@ class marcatoxml_importer {
 			$post_content .= "<div class='venue_community'>" . $venue->community . "</div>";
 			if (!empty($venue->photo_url)){
 				if ($this->options['attach_photos']=="1"){
-					$post_attachment = array('url'=>(string)$venue->photo_url, 'name'=>(string)$venue->name, 'fingerprint'=>(string)$venue->photo_fingerprint, 'field'=>'photo');
+					$post_attachment = array('url'=>(string)$venue->photo_url_root . "web.png", 'name'=>(string)$venue->name, 'fingerprint'=>(string)$venue->photo_fingerprint, 'field'=>'photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
-					$post_content .= "<img src='".$venue->photo_url."' class='venue_photo'>";
+					$post_content .= "<img src='".(string)$venue->photo_url_root . "web.png' class='venue_photo'>";
 				}
 			}
 			$post_content .= "<div class='venue_address'>";
@@ -572,10 +571,10 @@ class marcatoxml_importer {
 			$post_content .= "<div class='show_venue'><a class='show_venue_link' href='".add_query_arg('venue_name',$venue_name,get_post_type_archive_link('marcato_venue'))."'>" . $show->venue_name . "</a></div>";
 			if (!empty($show->poster_url)){
 				if ($this->options['attach_photos']=="1"){
-					$post_attachment = array('url'=>(string)$show->poster_url, 'name'=>(string)$show->name, 'fingerprint'=>(string)$show->poster_fingerprint, 'field'=>'poster');
+					$post_attachment = array('url'=>(string)$show->poster_url_root . "web.png", 'name'=>(string)$show->name, 'fingerprint'=>(string)$show->poster_fingerprint, 'field'=>'poster');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
-					$post_content .= "<img src='".$show->poster_url."' class='show_photo'>";
+					$post_content .= "<img src='".(string)$show->poster_url_root."web.png' class='show_photo'>";
 				}
 			}
 			$post_content .= "<div class='show_ticket_info'>";
@@ -651,10 +650,10 @@ class marcatoxml_importer {
 			$post_content .= "<div class='workshop_venue'><a class='workshop_venue_link' href='".add_query_arg('venue_name',$venue_name,get_post_type_archive_link('marcato_venue'))."'>" . $workshop->venue_name . "</a></div>";
 			if (!empty($workshop->poster_url)){
 				if ($this->options['attach_photos']=="1"){
-					$post_attachment = array('url'=>(string)$workshop->poster_url, 'name'=>(string)$workshop->name, 'fingerprint'=>(string)$workshop->poster_fingerprint, 'field'=>'poster');
+					$post_attachment = array('url'=>(string)$workshop->poster_url_root . "web.png", 'name'=>(string)$workshop->name, 'fingerprint'=>(string)$workshop->poster_fingerprint, 'field'=>'poster');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
-					$post_content .= "<img src='".$workshop->poster_url."' class='workshop_photo'>";
+					$post_content .= "<img src='".(string)$workshop->poster_url_root."web.png' class='workshop_photo'>";
 				}
 			}
 			$post_content .= "<div class='workshop_ticket_info'>";
@@ -853,7 +852,8 @@ class marcatoxml_importer {
 		if (!file_exists($upload_dir['basedir']."/marcato")){
 			mkdir($upload_dir['basedir']."/marcato");
 		}
-		$filename = $upload_dir['basedir']."/marcato/".$object_name.".jpg";
+		$sanitized = preg_replace('/[^a-zA-Z0-9-_\.]/', '', $object_name);
+		$filename = $upload_dir['basedir']."/marcato/".$sanitized.".jpg";
 		$ch = curl_init($image_url);
 		$fp = fopen($filename, 'wb');
 		curl_setopt($ch, CURLOPT_FILE, $fp);
