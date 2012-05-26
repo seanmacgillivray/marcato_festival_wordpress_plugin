@@ -475,7 +475,7 @@ class marcatoxml_importer {
 				$post_excerpt = "";
 			}
 			if(!empty($artist->genre)){
-				$post_taxonomy['marcato_genre'] = (String)$artist->genre;
+				$post_taxonomy['marcato_genre'] = (string)$artist->genre;
 			}
 			$post_meta = array();
 			if ($this->options["include_meta_data"]=="1"){
@@ -611,7 +611,7 @@ class marcatoxml_importer {
 					$post_meta["marcato_show_".$field] = nl2br((string)$show->$field);
 				}
 				foreach($show->venue as $venue){
-					foreach(array('name','city','province_state','community','longitute','latitude','id') as $field){
+					foreach(array('name','street','city','province_state','community','longitute','latitude','id') as $field){
 						$post_meta["marcato_show_venue_".$field] = $venue->$field;
 					}
 				}
@@ -711,7 +711,7 @@ class marcatoxml_importer {
 					}
 				}
 				foreach($workshop->venue as $venue){
-					foreach(array('name','city','province_state','community','longitute','latitude','id') as $field){
+					foreach(array('name','street','city','province_state','community','longitute','latitude','id') as $field){
 						$post_meta["marcato_workshop_venue_".$field] = $venue->$field;
 					}
 				}
@@ -912,7 +912,7 @@ class marcatoxml_importer {
 	private function set_post_meta($post_id, $meta_data){
 		if($this->options["include_meta_data"]=="1" && !empty($meta_data)){
 			foreach($meta_data as $key=>$value){
-				add_post_meta($post_id, (String)$key, (String)$value, true);
+				add_post_meta($post_id, (string)$key, (string)$value, true);
 			}
 		}
 	}
