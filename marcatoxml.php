@@ -912,7 +912,7 @@ class marcatoxml_importer {
 	private function set_post_meta($post_id, $meta_data){
 		if($this->options["include_meta_data"]=="1" && !empty($meta_data)){
 			foreach($meta_data as $key=>$value){
-				add_post_meta($post_id, (string)$key, (string)$value, true);
+				update_post_meta($post_id, (string)$key, (string)$value);
 			}
 		}
 	}

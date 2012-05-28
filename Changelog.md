@@ -1,4 +1,8 @@
 **Version 1.1.4**  
+* Updating of post meta data works now  
+_In Progress_
+
+**Version 1.1.4**  
 * Use the web-versions of images instead of the originally uploaded images to avoid memory issues with large filesizes  
 * Sanitize the string that will be used as the image filename
 
