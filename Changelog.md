@@ -1,6 +1,6 @@
-**Version 1.1.4**  
+**Version 1.1.5**  
 * Updating of post meta data works now  
-_In Progress_
+* Added a marcato-link shortcode that gets used to link between marcato posts. This should avoid the odd bugs resulting from the strange way the linking was currently being done.
 
 **Version 1.1.4**  
 * Use the web-versions of images instead of the originally uploaded images to avoid memory issues with large filesizes  
