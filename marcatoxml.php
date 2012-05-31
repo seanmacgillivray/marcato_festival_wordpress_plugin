@@ -43,9 +43,30 @@ class marcatoxml_plugin {
 		add_action('marcato_update', array($this,'import_all'));
 		add_filter('pre_get_posts', array($this,'query_post_type'));
 		add_filter('mce_css', array($this,'add_mce_css'));
+		add_shortcode('marcato-link',array($this,'marcato_link'));
 		wp_oembed_add_provider('#http://(www\.)?soundcloud.com/.*#i', 'http://www.soundcloud.com/oembed/', true);
 		$this->check_for_updates();
 	}
+	function marcato_link($atts){
+		global $wpdb;
+		extract( shortcode_atts( array(
+			'type' => '',
+			'marcato_id' => ''
+		), $atts) );
+		if (empty($type) || empty($marcato_id)) {
+			return "";
+		} else {
+			$sql = "SELECT p.ID FROM $wpdb->posts p LEFT JOIN $wpdb->postmeta m ON (p.ID = m.post_id) WHERE p.post_type= '$type' AND m.meta_key = '".$type."_id' AND m.meta_value = '$marcato_id' LIMIT 1";
+			$rows = $wpdb->get_results($sql);
+			if(!empty($rows)){
+				$permalink = get_permalink($rows[0]->ID);
+				return $permalink;
+			}else{
+				return "";
+			}
+		}
+	}
+	
 	function query_post_type($query) {
 	  if(is_category() || is_tag()) {
 	    $post_type = get_query_var('post_type');
@@ -568,7 +589,7 @@ class marcatoxml_importer {
 			}
 			$post_content .= "</div>";
 			$venue_name = (string)$show->venue_name;
-			$post_content .= "<div class='show_venue'><a class='show_venue_link' href='".add_query_arg('venue_name',$venue_name,get_post_type_archive_link('marcato_venue'))."'>" . $show->venue_name . "</a></div>";
+			$post_content .= "<div class='show_venue'><a class='show_venue_link' href=\"[marcato-link type='marcato_venue' marcato_id='".$show->venue_id."']\">" . $show->venue_name . "</a></div>";
 			if (!empty($show->poster_url)){
 				if ($this->options['attach_photos']=="1"){
 					$post_attachment = array('url'=>(string)$show->poster_url_root . "web.png", 'name'=>(string)$show->name, 'fingerprint'=>(string)$show->poster_fingerprint, 'field'=>'poster');
@@ -593,7 +614,7 @@ class marcatoxml_importer {
 						$post_content .= "<span class='time_divider'>-</span><span class='performance_end'>".date_i18n(get_option('time_format'), strtotime($show->date . ' ' . $performance->end))."</span>";
 					}
 					$post_content .= "</td>";
-					$post_content .= "<td class='artist'><a class='performance_artist_link' href='".add_query_arg('artist_name',$artist_name,get_post_type_archive_link('marcato_artist'))."'>" .$performance->artist . "</a></td>";
+					$post_content .= "<td class='artist'><a class='performance_artist_link' href=\"[marcato-link type='marcato_artist' marcato_id='" . $performance->artist_id . "']\">" .$performance->artist . "</a></td>";
 					$post_content .= "</tr>";
 				}
 			}
@@ -647,7 +668,7 @@ class marcatoxml_importer {
 			}
 			$post_content .= "</div>";
 			$venue_name = (string)$workshop->venue_name;
-			$post_content .= "<div class='workshop_venue'><a class='workshop_venue_link' href='".add_query_arg('venue_name',$venue_name,get_post_type_archive_link('marcato_venue'))."'>" . $workshop->venue_name . "</a></div>";
+			$post_content .= "<div class='workshop_venue'><a class='workshop_venue_link' href=\"[marcato-link type='marcato_venue' marcato_id='".$workshop->venue_id."']\">" . $workshop->venue_name . "</a></div>";
 			if (!empty($workshop->poster_url)){
 				if ($this->options['attach_photos']=="1"){
 					$post_attachment = array('url'=>(string)$workshop->poster_url_root . "web.png", 'name'=>(string)$workshop->name, 'fingerprint'=>(string)$workshop->poster_fingerprint, 'field'=>'poster');
@@ -682,7 +703,7 @@ class marcatoxml_importer {
 					$post_content .= "</td>";
 					if ($presentation->presenter_type == "artist"){
 						$artist_name = (string)$presentation->presenter;
-						$post_content .= "<td class='presenter'><a class='presentation_presenter_link' href='".add_query_arg('artist_name',$artist_name,get_post_type_archive_link('marcato_artist'))."'>".$presentation->presenter."</a></td>";
+						$post_content .= "<td class='presenter'><a class='presentation_presenter_link' href=\"[marcato-link type='marcato_artist' marcato_id='".$presentation->presenter_id."']\">".$presentation->presenter."</a></td>";
 					}else{
 						$post_content .= "<td class='presenter'>".$presentation->presenter."</td>";
 					}
@@ -771,7 +792,7 @@ class marcatoxml_importer {
 				$link_query = "workshop_id";
 			}
 			$post_content .= "<div class='schedule_event'>";
-			$post_content .= "<div class='schedule_event_title'><a href='".add_query_arg($link_query,(string)$event->id,get_post_type_archive_link($archive_link_type))."'>".$event->name."</a></div>";
+			$post_content .= "<div class='schedule_event_title'><a href=\"[marcato-link type='marcato_".$event->type."' marcato_id='".$event->id."']\">".$event->name."</a></div>";
 			$post_content .= "<div class='schedule_time'>";
 			$post_content .= "<span class='date'>".date_i18n(get_option('date_format'), strtotime($event->date))."</span>";
 			$post_content .= "<span class='start_time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $event->formatted_start_time))."</span>";
@@ -780,12 +801,12 @@ class marcatoxml_importer {
 			}
 			$post_content .= "</div>";
 			$venue_name = (string)$event->venue_name;
-			$post_content .= "<div class='schedule_venue'><a class='schedule_venue_link' href='".add_query_arg('venue_name',$venue_name,get_post_type_archive_link('marcato_venue'))."'>".$venue_name."</a></div>";
+			$post_content .= "<div class='schedule_venue'><a class='schedule_venue_link' href=\"[marcato-link type='marcato_venue' marcato_id='".$event->venue->id."']\">".$venue_name."</a></div>";
 			$post_content .= "<table class='schedule_timeslots'>";
 			foreach($event->$types as $slots){
 				foreach($slots->$type as $timeslot){
 					if($person == "artist" || ($person=="presenter" && (string)$timeslot->presenter_type=="artist")){
-						$post_content .= "<tr><td class='time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $timeslot->start))."</td><td class='artist'><a href='".add_query_arg('artist_name',(string)$timeslot->$person,get_post_type_archive_link('marcato_artist'))."'>".$timeslot->$person."</a></td></tr>";
+						$post_content .= "<tr><td class='time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $timeslot->start))."</td><td class='artist'><a href=\"[marcato-link type='marcato_artist' marcato_id='".($person=="presenter" ? $timeslot->presenter_id : $timeslot->artist_id)."']\">".$timeslot->$person."</a></td></tr>";
 					}else{
 						$post_content .= "<tr><td class='time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $timeslot->start))."</td><td class='artist'>".$timeslot->$person."</td></tr>";
 					}
