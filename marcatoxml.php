@@ -44,8 +44,40 @@ class marcatoxml_plugin {
 		add_filter('pre_get_posts', array($this,'query_post_type'));
 		add_filter('mce_css', array($this,'add_mce_css'));
 		add_shortcode('marcato-link',array($this,'marcato_link'));
+		add_shortcode('marcato-field', array($this,'marcato_field'));
 		wp_oembed_add_provider('#http://(www\.)?soundcloud.com/.*#i', 'http://www.soundcloud.com/oembed/', true);
 		$this->check_for_updates();
+	}
+ 	function marcato_field($atts){
+		global $wpdb;
+		global $post;
+		extract( shortcode_atts( array(
+			'field' => '',
+			'label' => '',
+		), $atts) );
+		if (empty($field)){
+			return "";
+		}else {
+			if ($field=="website" && !empty($label)){
+				$sql = "SELECT m.meta_key FROM $wpdb->postmeta m WHERE m.post_id = $post->ID AND m.meta_value = '$label'";
+				$rows = $wpdb->get_results($sql);
+				if (!empty($rows)){
+					$name = preg_replace("/name/","url", $rows[0]->meta_key);
+					$sql = "SELECT m.meta_value FROM $wpdb->postmeta m WHERE m.post_id = $post->ID AND m.meta_key = '$name'";
+					$rows = $wpdb->get_results($sql);
+					if (!empty($rows)){
+						return $rows[0]->meta_value;
+					}
+				}
+			}else {
+				$sql = "SELECT m.meta_value FROM $wpdb->postmeta m WHERE m.post_id = $post->ID AND m.meta_key = '$field'";
+				$rows = $wpdb->get_results($sql);
+				if(!empty($rows)){
+					return $rows[0]->meta_value;
+				}
+			}
+		}
+		return "";
 	}
 	function marcato_link($atts){
 		global $wpdb;
@@ -720,7 +752,7 @@ class marcatoxml_importer {
 			}
 			$post_meta = array();
 			if ($this->options["include_meta_data"]=="1"){
-				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','event_contact_summary','hosting_organization_title','updated_at','seating') as $field){
+				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','event_contact_summary','event_contact_name','event_contact_phone','event_contact_email','hosting_organization_title','updated_at','seating') as $field){
 					$post_meta["marcato_workshop_".$field] = nl2br((string)$workshop->$field);
 				}
 				if(!empty($workshop->workshop_types)){
