@@ -1,3 +1,6 @@
+**Version 1.1.6**  
+* Fixed bug in artist photos
+
 **Version 1.1.5**  
 * Updating of post meta data works now  
 * Added a marcato-link shortcode that gets used to link between marcato posts. This should avoid the odd bugs resulting from the strange way the linking was currently being done.
