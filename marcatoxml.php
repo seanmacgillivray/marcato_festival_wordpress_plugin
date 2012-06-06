@@ -463,7 +463,7 @@ class marcatoxml_importer {
 					$post_attachment = array('url'=>(string)$artist->photo_url_root."web_compressed.jpg", 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->photo_fingerprint, 'field'=>'photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
-					$post_content .= "<img src='".$artist->photo_url_root.".web_compressed.jpg' class='artist_photo'>";
+					$post_content .= "<img src='".$artist->photo_url_root."web_compressed.jpg' class='artist_photo'>";
 				}
 			}
 			$post_content .= "<div class='artist_bio'>" . nl2br((string)$artist->bio_public) . "</div>";
