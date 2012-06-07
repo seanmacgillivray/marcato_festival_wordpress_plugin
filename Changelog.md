@@ -1,7 +1,9 @@
-**Version 1.1.6**  
+**Version 1.1.7**  
 * Added event contact fields to workshop posts  
 * Added a marcato-field shortcode that accepts field and label attributes that currently works for displaying specific artist websites
-_In Progress_
+
+**Version 1.1.6**  
+* Fixed bug in artist photos
 
 **Version 1.1.5**  
 * Updating of post meta data works now  
