@@ -1,3 +1,6 @@
+**Version 1.1.8**  
+* Added an option to disable the auto-update of marcato data
+
 **Version 1.1.7**  
 * Added event contact fields to workshop posts  
 * Added a marcato-field shortcode that accepts field and label attributes that currently works for displaying specific artist websites

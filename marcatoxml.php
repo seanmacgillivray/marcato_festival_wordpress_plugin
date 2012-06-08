@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.1.7
+ * Version: 1.1.8
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -40,7 +40,7 @@ class marcatoxml_plugin {
 		register_deactivation_hook(__FILE__, array($this, 'flush_rewrites'));
 		register_activation_hook(__FILE__, array($this, 'schedule_updates'));
 		register_deactivation_hook(__FILE__, array($this, 'unschedule_updates'));
-		add_action('marcato_update', array($this,'import_all'));
+		add_action('marcato_update', array($this,'cron_job'));
 		add_filter('pre_get_posts', array($this,'query_post_type'));
 		add_filter('mce_css', array($this,'add_mce_css'));
 		add_shortcode('marcato-link',array($this,'marcato_link'));
@@ -221,6 +221,12 @@ class marcatoxml_plugin {
 		return $this->importer->import($field);
 	}
 	
+	public function cron_job(){
+		if ($this->importer->options["auto_update"]=="1"){
+			$this->import_all();
+		}	
+	}
+	
 	public function import_all(){
 		return $this->importer->import_all();
 	}
@@ -345,6 +351,12 @@ class marcatoxml_plugin {
 				<input type="checkbox" name="include_meta_data" value="1" <?php echo $this->importer->options["include_meta_data"]=="1" ? "checked='checked'" : "" ?>><br />
 				<cite><small>Enable this to include all xml fields as custom fields on posts. This is useful if you use other plugins that make use of post meta data.</small></cite>
 			</p>
+			<p>
+				Auto Update data every hour?
+				<input type="hidden" name="auto_update" value="0">
+				<input type="checkbox" name="auto_update" value="1" <?php echo $this->importer->options["auto_update"]=="1" ? "checked='checked'" : "" ?>><br />
+				<cite><small>Enable this is have a WP cron job run hourly that automatically updates all your marcato data.</small></cite>
+			</p>
 			<hr />
 			<p class="submit">
 				<input type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e('Save Changes') ?>" />
@@ -356,14 +368,14 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0");
+	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1");
 	public $fields = array("artists","venues","shows","workshops");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
 	function marcatoxml_importer(){
 		foreach($this->options as $option=>$value){
 			$set_value = get_option($option);
-			if (!empty($set_value)){
+			if ($set_value=="1" || $set_value=="0"){
 				$this->options[$option] = get_option($option);
 			}
 		}
