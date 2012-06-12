@@ -607,6 +607,20 @@ class marcatoxml_importer {
 			$post_marcato_id = intval($venue->id);
 			$post_meta = array();
 			if ($this->options["include_meta_data"]=="1"){
+				$i = 0;
+				foreach($venue->shows->show as $show){
+					foreach(array('id','name','show_on_website','date','formatted_date','formatted_start_time','formatted_end_time') as $field){
+						$post_meta["marcato_venue_show_".$i."_".$field] = $show->$field;
+					}
+					$i++;
+				}
+				$i = 0;
+				foreach($venue->workshops->workshop as $workshop){
+					foreach(array('id','name','show_on_website','date','formatted_date','formatted_start_time','formatted_end_time') as $field){
+						$post_meta["marcato_venue_workshop_".$i."_".$field] = $workshop->$field;
+					}
+					$i++;
+				}
 				foreach(array('name','street','city','province_state','country','postal_code','community','longitude','latitude','primary_phone_number','photo_url','photo_url_root','updated_at') as $field){
 					$post_meta["marcato_venue_".$field] = $venue->$field;
 				}
