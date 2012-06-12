@@ -81,14 +81,20 @@ class marcatoxml_plugin {
 	}
 	function marcato_link($atts){
 		global $wpdb;
+		global $post;
 		extract( shortcode_atts( array(
 			'type' => '',
-			'marcato_id' => ''
+			'marcato_id' => '',
+			'marcato_field' => ''
 		), $atts) );
-		if (empty($type) || empty($marcato_id)) {
+		if (empty($type) || (empty($marcato_id) && empty($marcato_field))) {
 			return "";
 		} else {
-			$sql = "SELECT p.ID FROM $wpdb->posts p LEFT JOIN $wpdb->postmeta m ON (p.ID = m.post_id) WHERE p.post_type= '$type' AND m.meta_key = '".$type."_id' AND m.meta_value = '$marcato_id' LIMIT 1";
+			if (!empty($marcato_field)){
+				$sql = "SELECT p.ID FROM $wpdb->posts p LEFT JOIN $wpdb->postmeta m ON (p.ID = m.post_id) WHERE p.post_type = '$type' AND m.meta_key = '".$type."_id' AND m.meta_value = (SELECT x.meta_value FROM $wpdb->postmeta x WHERE x.post_id = $post->ID AND x.meta_key = '$marcato_field' LIMIT 1)";
+			}else{
+				$sql = "SELECT p.ID FROM $wpdb->posts p LEFT JOIN $wpdb->postmeta m ON (p.ID = m.post_id) WHERE p.post_type= '$type' AND m.meta_key = '".$type."_id' AND m.meta_value = '$marcato_id' LIMIT 1";
+			}
 			$rows = $wpdb->get_results($sql);
 			if(!empty($rows)){
 				$permalink = get_permalink($rows[0]->ID);
