@@ -1,3 +1,7 @@
+**Version 1.1.9**  
+* Improved marcato-link shortcode with the ability to specify a meta-data field to get the required id  
+* Added show and workshop metadata info to venue posts
+
 **Version 1.1.8**  
 * Added an option to disable the auto-update of marcato data
 
