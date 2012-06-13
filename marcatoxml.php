@@ -590,6 +590,7 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		foreach ($xml->venue as $venue) {
+			$post_attachment = array();
 			$post_title = (string)$venue->name;
 			$post_content = "";
 			$post_content .= "<div class='venue_community'>" . $venue->community . "</div>";
