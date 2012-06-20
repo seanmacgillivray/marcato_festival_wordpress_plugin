@@ -381,7 +381,7 @@ class marcatoxml_importer {
 	function marcatoxml_importer(){
 		foreach($this->options as $option=>$value){
 			$set_value = get_option($option);
-			if ($set_value=="1" || $set_value=="0"){
+			if ($set_value=="1" || $set_value=="0" || $option=="marcato_organization_id"){
 				$this->options[$option] = get_option($option);
 			}
 		}
@@ -913,8 +913,10 @@ class marcatoxml_importer {
 			#Save the image from marcato and set it as the post's featured image and save the fingerprint for future reference
 			if (!empty($post_attachment)){
 				$filename = $this->save_image_locally($post_attachment['url'],$post_attachment['name']);
-				$this->save_attachment($filename,$post_id);
-				update_post_meta($post_id, $post_attachment['field'].'_fingerprint', $post_attachment['fingerprint']);
+				if ($filename != null){
+					$this->save_attachment($filename,$post_id);
+					update_post_meta($post_id, $post_attachment['field'].'_fingerprint', $post_attachment['fingerprint']);
+				}
 			}
 		}
 	}
@@ -935,19 +937,24 @@ class marcatoxml_importer {
 	private function save_image_locally($image_url, $object_name){
 		#Use curl to download the image from marcato and save it to the filesystem
 		$upload_dir = wp_upload_dir();
-		if (!file_exists($upload_dir['basedir']."/marcato")){
-			mkdir($upload_dir['basedir']."/marcato");
+		if(array_key_exists('basedir', $upload_dir)){
+			if (!file_exists($upload_dir['basedir']."/marcato")){
+				mkdir($upload_dir['basedir']."/marcato");
+			}
+			$sanitized = preg_replace('/[^a-zA-Z0-9-_\.]/', '', $object_name);
+			$filename = $upload_dir['basedir']."/marcato/".$sanitized.".jpg";
+			$ch = curl_init($image_url);
+			$fp = fopen($filename, 'wb');
+			curl_setopt($ch, CURLOPT_FILE, $fp);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_exec($ch);
+			curl_close($ch);
+			fclose($fp);
+			return $filename;
+		}else{
+			echo "<br />Could not save image. Upload folder does not exist or is unwritable.";
+			return null;
 		}
-		$sanitized = preg_replace('/[^a-zA-Z0-9-_\.]/', '', $object_name);
-		$filename = $upload_dir['basedir']."/marcato/".$sanitized.".jpg";
-		$ch = curl_init($image_url);
-		$fp = fopen($filename, 'wb');
-		curl_setopt($ch, CURLOPT_FILE, $fp);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_exec($ch);
-		curl_close($ch);
-		fclose($fp);
-		return $filename;
 	}
 	# Taken from user ridgerunner's response to http://stackoverflow.com/questions/5830387/php-regex-find-all-youtube-video-ids-in-string
 	private function is_youtube_link($text) {
