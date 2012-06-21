@@ -1,3 +1,6 @@
+**Version 1.2.0**  
+* Fixed bug where the set organization ID was not being properly remembered
+
 **Version 1.1.9**  
 * Improved marcato-link shortcode with the ability to specify a meta-data field to get the required id  
 * Added show and workshop metadata info to venue posts
