@@ -613,7 +613,13 @@ class marcatoxml_importer {
 			$post_content .= "<span class='country'>" . $venue->country . "</span>";
 			$post_content .= "</div>";
 			$post_content .= "<div class='venue_phone'>" . $venue->primary_phone_number . "</div>";
+			$post_content .= "<div class='venue_description'>" . $venue->description . "</div>";
 			$post_type = "marcato_venue";
+			if($this->options["include_excerpts"]=="1"){
+				$post_excerpt = (string)$venue->description;
+			}else{
+				$post_excerpt = "";
+			}
 			$post_marcato_id = intval($venue->id);
 			$post_meta = array();
 			if ($this->options["include_meta_data"]=="1"){
@@ -635,7 +641,7 @@ class marcatoxml_importer {
 					$post_meta["marcato_venue_".$field] = $venue->$field;
 				}
 			}			
-			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id', 'post_status', 'post_meta','post_attachment');
+			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id', 'post_status', 'post_meta','post_attachment', 'post_excerpt');
 			$index++;
 		}
 		return $posts;
