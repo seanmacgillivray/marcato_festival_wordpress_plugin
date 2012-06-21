@@ -542,6 +542,9 @@ class marcatoxml_importer {
 			$post_marcato_id = intval($artist->id);
 			if($this->options["include_excerpts"]=="1"){
 				$post_excerpt = (string)$artist->bio_limited;
+				if (empty($post_excerpt)){
+					$post_excerpt = (string)$artist->bio_public;
+				}
 			}else{
 				$post_excerpt = "";
 			}
@@ -747,7 +750,11 @@ class marcatoxml_importer {
 			$post_content .= "<span class='ticket_info'>" . $workshop->ticket_info . "</span>";
 			$post_content .= "<a class='ticket_link' href='" . $workshop->ticket_link . "'>".$workshop->ticket_link."</a>";
 			$post_content .= "</div>";
-			$post_content .= "<div class='workshop_description'>" . nl2br((string)$workshop->description_web) . "</div>";
+			$description = (string)$workshop->description_web;
+			if(empty($description)){
+				$description = (string)$workshop->description_public;
+			}
+			$post_content .= "<div class='workshop_description'>" . nl2br($description) . "</div>";
 			
 			$post_content .= "<div class='workshop_types'>";
 			if(!empty($workshop->workshop_types)){
@@ -780,6 +787,12 @@ class marcatoxml_importer {
 			$post_marcato_id = intval($workshop->id);
 			if($this->options["include_excerpts"]=="1"){
 				$post_excerpt = (string)$workshop->description_web;
+				if (empty($post_excerpt)){
+					$post_excerpt = (string)$workshop->description_limited;
+				}
+				if(empty($post_excerpt)){
+					$post_excerpt = (string)$workshop->description_public;
+				}
 			}else{
 				$post_excerpt = "";
 			}
