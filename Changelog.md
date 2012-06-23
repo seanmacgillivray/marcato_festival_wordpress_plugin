@@ -1,3 +1,6 @@
+** Version 1.2.1**  
+* Updated the start time fields to use the new start time unix fields
+
 **Version 1.2.0**  
 * Fixed bug where the set organization ID was not being properly remembered
 
