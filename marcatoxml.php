@@ -559,6 +559,7 @@ class marcatoxml_importer {
 				if(!empty($artist->shows)){
 					$i = 0;
 					foreach($artist->shows->show as $show){
+						if(!$show->show_on_website){continue;}
 						foreach(array('id','name','show_on_website','date','formatted_date','venue_name') as $field){
 							$post_meta["marcato_artist_show_".$i."_".$field] = $show->$field;
 						}
@@ -568,6 +569,7 @@ class marcatoxml_importer {
 				if(!empty($artist->workshops)){
 					$i = 0;
 					foreach($artist->workshops->workshop as $workshop){
+						if(!$workshop->show_on_website){continue;}
 						foreach(array('id','name','show_on_website','date','formatted_date','venue_name') as $field){
 							$post_meta["marcato_artist_workshop_".$i."_".$field] = $workshop->$field;
 						}
@@ -625,6 +627,7 @@ class marcatoxml_importer {
 			if ($this->options["include_meta_data"]=="1"){
 				$i = 0;
 				foreach($venue->shows->show as $show){
+					if(!$show->show_on_website){continue;}
 					foreach(array('id','name','show_on_website','date','formatted_date','formatted_start_time','formatted_end_time') as $field){
 						$post_meta["marcato_venue_show_".$i."_".$field] = $show->$field;
 					}
@@ -632,6 +635,7 @@ class marcatoxml_importer {
 				}
 				$i = 0;
 				foreach($venue->workshops->workshop as $workshop){
+					if(!$workshop->show_on_website){continue;}
 					foreach(array('id','name','show_on_website','date','formatted_date','formatted_start_time','formatted_end_time') as $field){
 						$post_meta["marcato_venue_workshop_".$i."_".$field] = $workshop->$field;
 					}
