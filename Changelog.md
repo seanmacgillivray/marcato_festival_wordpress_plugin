@@ -1,3 +1,6 @@
+**Version 1.2.2**  
+* Don't include shows and workshops in artist and venue posts that are not set to public
+
 ** Version 1.2.1**  
 * Updated the start time fields to use the new start time unix fields
 
