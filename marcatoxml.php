@@ -556,7 +556,7 @@ class marcatoxml_importer {
   			}
   			if(!empty($artist->workshops)){
   				foreach($artist->workshops->workshop as $workshop){
-            // if((string)$workshop->show_on_website=="false"){continue;}
+            if((string)$workshop->show_on_website=="false"){continue;}
   					$workshop->type = 'workshop';
   					$events[] = $workshop;
   				}

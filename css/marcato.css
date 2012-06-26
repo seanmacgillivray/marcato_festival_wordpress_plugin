@@ -7,6 +7,9 @@
 	div.artist_websites{}
 	div.artist_websites a.artist_website{}
 	div.artist_embedded_video{}
+	table.artist_lineup{
+	  margin-top:10px;
+	}
 		
 /* Venues */
 
