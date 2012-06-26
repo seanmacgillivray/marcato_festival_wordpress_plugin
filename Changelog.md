@@ -1,3 +1,7 @@
+**Version 1.2.3**  
+* Add option to include artist schedule at the bottom of artist posts.  
+* Fixed the show and workshop public check  
+
 **Version 1.2.2**  
 * Don't include shows and workshops in artist and venue posts that are not set to public
 
