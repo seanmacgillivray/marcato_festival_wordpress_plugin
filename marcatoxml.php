@@ -358,6 +358,12 @@ class marcatoxml_plugin {
 				<cite><small>Enable this to include all xml fields as custom fields on posts. This is useful if you use other plugins that make use of post meta data.</small></cite>
 			</p>
 			<p>
+			  Include the shows and workshops the artist is performing/presenting at in their post.
+			  <input type="hidden" name="include_artist_lineup" value="0">
+			  <input type="checkbox" name="include_artist_lineup" value="1" <?php echo $this->importer->options["include_artist_lineup"]=="1" ? "checked='checked'" : "" ?>><br />
+			  <cite><small>Enable this to include a table at the bottom of artists posts that displays all of the shows and workshops they are involved in</small></cite>
+			</p>
+			<p>
 				Auto Update data every hour?
 				<input type="hidden" name="auto_update" value="0">
 				<input type="checkbox" name="auto_update" value="1" <?php echo $this->importer->options["auto_update"]=="1" ? "checked='checked'" : "" ?>><br />
@@ -374,7 +380,7 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1");
+	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0");
 	public $fields = array("artists","venues","shows","workshops");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
@@ -538,6 +544,35 @@ class marcatoxml_importer {
 				}
 			}
 			$post_content .= "<div class='artist_websites'>" . $link_content . "</div>";
+			
+			if($this->options["include_artist_lineup"]){
+  			$events = array();
+  			if(!empty($artist->shows)){
+  				foreach($artist->shows->show as $show){
+  					if((string)$show->show_on_website=="false"){continue;}
+  					$show->type = 'show';
+  				  $events[] = $show;
+  				}
+  			}
+  			if(!empty($artist->workshops)){
+  				foreach($artist->workshops->workshop as $workshop){
+            // if((string)$workshop->show_on_website=="false"){continue;}
+  					$workshop->type = 'workshop';
+  					$events[] = $workshop;
+  				}
+  			}
+  			if(!empty($events)){
+  			  usort($events, function($a,$b){
+  			    return intval($a->start_time_unix) - intval($b->start_time_unix);
+  			  });
+    			$post_content .= "<table class='artist_lineup'>";
+    			foreach($events as $event){
+    			  $post_content .= "<tr><td class='time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $event->formatted_start_time))."</td><td class='event'><a href='[marcato-link type='marcato_".$event->type."' marcato_id='".$event->id."']'>".$event->name."</a></td></tr>";
+    			}
+	  			$post_content .= "</table>";
+    		}
+  		}
+			
 			$post_type = "marcato_artist";
 			$post_marcato_id = intval($artist->id);
 			if($this->options["include_excerpts"]=="1"){
@@ -559,7 +594,7 @@ class marcatoxml_importer {
 				if(!empty($artist->shows)){
 					$i = 0;
 					foreach($artist->shows->show as $show){
-						if(!$show->show_on_website){continue;}
+						if((string)$show->show_on_website=="false"){continue;}
 						foreach(array('id','name','show_on_website','date','formatted_date','venue_name') as $field){
 							$post_meta["marcato_artist_show_".$i."_".$field] = $show->$field;
 						}
@@ -569,7 +604,7 @@ class marcatoxml_importer {
 				if(!empty($artist->workshops)){
 					$i = 0;
 					foreach($artist->workshops->workshop as $workshop){
-						if(!$workshop->show_on_website){continue;}
+						if((string)$workshop->show_on_website=="false"){continue;}
 						foreach(array('id','name','show_on_website','date','formatted_date','venue_name') as $field){
 							$post_meta["marcato_artist_workshop_".$i."_".$field] = $workshop->$field;
 						}
@@ -627,7 +662,7 @@ class marcatoxml_importer {
 			if ($this->options["include_meta_data"]=="1"){
 				$i = 0;
 				foreach($venue->shows->show as $show){
-					if(!$show->show_on_website){continue;}
+					if((string)$show->show_on_website=="false"){continue;}
 					foreach(array('id','name','show_on_website','date','formatted_date','formatted_start_time','formatted_end_time') as $field){
 						$post_meta["marcato_venue_show_".$i."_".$field] = $show->$field;
 					}
@@ -635,7 +670,7 @@ class marcatoxml_importer {
 				}
 				$i = 0;
 				foreach($venue->workshops->workshop as $workshop){
-					if(!$workshop->show_on_website){continue;}
+					if((string)$workshop->show_on_website=="false"){continue;}
 					foreach(array('id','name','show_on_website','date','formatted_date','formatted_start_time','formatted_end_time') as $field){
 						$post_meta["marcato_venue_workshop_".$i."_".$field] = $workshop->$field;
 					}
