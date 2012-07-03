@@ -1,3 +1,6 @@
+**Version 1.2.4**  
+* When importing featured images the plugin will now check both the fingerprint AND the existence of a featured image to determine whether a new one should be downloaded.
+
 **Version 1.2.3**  
 * Add option to include artist schedule at the bottom of artist posts.  
 * Fixed the show and workshop public check  
