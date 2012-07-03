@@ -962,9 +962,9 @@ class marcatoxml_importer {
 		}else{
 			$fingerprint = get_post_meta($post_id, $post_attachment['field'].'_fingerprint', true);
 		}
-		if(empty($fingerprint) || $fingerprint!==$post_attachment['fingerprint']){
-			#Find and delete the current featured image if there is one
-			$thumbnail_id = get_post_thumbnail_id($post_id);
+		$thumbnail_id = get_post_thumbnail_id($post_id);
+		if(empty($fingerprint) || empty($thumbnail_id) || $fingerprint!==$post_attachment['fingerprint']){
+			#delete the current featured image if there is one
 			if (!empty($thumbnail_id)){
 				wp_delete_attachment($thumbnail_id, true);
 			}
