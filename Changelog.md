@@ -1,3 +1,6 @@
+**Version 1.2.5**
+* Using a larger version of images to import as featured images to give user more flexibility with image resizing
+
 **Version 1.2.4**  
 * When importing featured images the plugin will now check both the fingerprint AND the existence of a featured image to determine whether a new one should be downloaded.
 
