@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.2.5
+ * Version: 1.2.6
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -562,9 +562,7 @@ class marcatoxml_importer {
   				}
   			}
   			if(!empty($events)){
-  			  usort($events, function($a,$b){
-  			    return intval($a->start_time_unix) - intval($b->start_time_unix);
-  			  });
+  			  usort($events, 'sort_by_unix_time');
     			$post_content .= "<table class='artist_lineup'>";
     			foreach($events as $event){
     			  $post_content .= "<tr><td class='time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $event->formatted_start_time))."</td><td class='event'><a href='[marcato-link type='marcato_".$event->type."' marcato_id='".$event->id."']'>".$event->name."</a></td></tr>";
@@ -1071,6 +1069,9 @@ class marcatoxml_importer {
 		foreach($taxonomy_data as $tax => $name){
 			wp_set_object_terms($post_id, $name, $tax);
 		}
+	}
+	private function sort_by_unix_time($a, $b){
+	  return intval($a->start_time_unix) - intval($b->start_time_unix);
 	}
 }
 ?>

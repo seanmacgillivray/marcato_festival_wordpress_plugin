@@ -1,3 +1,6 @@
+**Version 1.2.6**  
+* Changed usort to not use an anonymous function which is only available in PHP 5.3.0+
+
 **Version 1.2.5**
 * Using a larger version of images to import as featured images to give user more flexibility with image resizing
 
