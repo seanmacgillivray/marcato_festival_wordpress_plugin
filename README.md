@@ -9,17 +9,18 @@ Go to the Plugins section in WordPress and activate Marcato XML Importer.
 Under the settings menu there should now be a Marcato option.
 Enter your Marcato Organization ID in the field and click "Save Changes".
 
+If you get a message "error loading xml file" this likely means that cURL is not enabled on your system. Check the output of phpinfo(); to determine if cURL is disabled and enable it, or contact your system administrator.
+
 When you click to save the changes the plugin will fetch our XML feeds and parse them and save the data to your Wordpress database.
 It also sets up a Wordpress job that will redo this automatically every hour, however it can be done manually whenever you like by clicking "Import now"
 (The Marcato XML feeds are updated every few minutes)
 
 Enabling the "attach photos as featured image" option will cause the plugin to download photos from the Marcato server and save them as the featured image of the posts created in your Wordpress database.
 This is useful if your Wordpress theme makes use of Post Thumbnails/Featured Image.
-Note that enabling this option will result in the image no longer being directly embedded in the post body.
 
 Enabling the "embed video links" option will cause the plugin to automatically embed any YouTube or Vimeo videos that are linked to from the website fields on artists in your Marcato account.
 
-Enabling excerpts will set the Artist's short bio as artist post excerpts and Show/Workshop web descriptions as show/workshop post excerpts
+Enabling excerpts will set the Artist's short bio as artist post excerpts and Show/Workshop web descriptions as show/workshop post excerpts.
 
 Including XML data as custom fields may be useful in conjunction with other plugins or themes.
 
