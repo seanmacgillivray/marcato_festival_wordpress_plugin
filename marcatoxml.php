@@ -422,7 +422,7 @@ class marcatoxml_importer {
 				}
 			}
 		}else{
-			return "Error importing {$field}: Error loading xml file. This likely means that cURL is not enabled in your PHP config. This plugin requires cURL in order to retreive the XML feeds from marcato. Check the output of phpinfo() to determine if cURL is disabled and enable it, or contact your server administrator.";
+			return "Error importing {$field}: Error loading xml file. This likely means that cURL, or simpleXML is not enabled in your PHP config. This plugin requires cURL and simpleXML in order to retreive the XML feeds from marcato. Check the output of phpinfo() to determine if cURL and simpleXML are disabled and enable them, or contact your server administrator.";
 		}
 		return "{$field} Imported.\n" . implode("\n", $errors);
 	}
@@ -431,7 +431,7 @@ class marcatoxml_importer {
 		return $this->marcato_xml_url . '/' . $field . '_' . $this->options['marcato_organization_id'] . '.xml';
 	}
 	private function get_posts($field) {
-		$xml = @simplexml_load_file($this->get_xml_location($field));
+		$xml = simplexml_load_file($this->get_xml_location($field));
 		if ($xml){
 			if($field == 'artists'){
 				return $this->parse_artists($xml);
