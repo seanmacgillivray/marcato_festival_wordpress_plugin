@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.2.6
+ * Version: 1.2.7
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -422,7 +422,7 @@ class marcatoxml_importer {
 				}
 			}
 		}else{
-			return "Error importing {$field}: Error loading xml file. This likely means that cURL, or simpleXML is not enabled in your PHP config. This plugin requires cURL and simpleXML in order to retreive the XML feeds from marcato. Check the output of phpinfo() to determine if cURL and simpleXML are disabled and enable them, or contact your server administrator.";
+			return "Error importing {$field}: Error loading xml file. This plugin requires simpleXML, and curl to be enabled in order to retreive and process the xml feeds from Marcato. Check the output of phpinfo(); to determine if cURL and simpleXML are disabled. If you don't know how to do this, or how to enable them, contact your server administrator.";
 		}
 		return "{$field} Imported.\n" . implode("\n", $errors);
 	}
@@ -431,7 +431,7 @@ class marcatoxml_importer {
 		return $this->marcato_xml_url . '/' . $field . '_' . $this->options['marcato_organization_id'] . '.xml';
 	}
 	private function get_posts($field) {
-		$xml = simplexml_load_file($this->get_xml_location($field));
+	  $xml = $this->load_XML($field);
 		if ($xml){
 			if($field == 'artists'){
 				return $this->parse_artists($xml);
@@ -448,6 +448,19 @@ class marcatoxml_importer {
 		}else{
 			return false;
 		}		
+	}
+	private function load_XML($field){
+    if(ini_get('allow_url_fopen')==true){
+       return simplexml_load_file($this->get_xml_location($field));
+    }else if (function_exists('curl_init')){
+         $curl = curl_init($this->get_xml_location($field));
+         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+         $result = curl_exec($curl);
+         curl_close($curl);
+         return simplexml_load_string($result);
+    }else{
+      return false;
+    }    
 	}
 
 	private function import_post($post){
@@ -874,8 +887,8 @@ class marcatoxml_importer {
 	}
 	
 	public function generate_schedule_page(){
-		$workshop_xml = @simplexml_load_file($this->get_xml_location('workshops'));
-		$show_xml = @simplexml_load_file($this->get_xml_location('shows'));
+		$workshop_xml = $this->load_XML('workshops');
+		$show_xml = $this->load_XML('shows');
 		if(!$workshop_xml && !$show_xml){return false;}
 		if(!$workshop_xml){ $workshop_xml = array(); }
 		if(!$show_xml) { $show_xml = array(); }

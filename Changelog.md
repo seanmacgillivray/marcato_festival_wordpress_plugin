@@ -1,3 +1,6 @@
+**Version 1.2.7**  
+* Loading of xml files now handled by curl if allow\_url\_fopen is disabled. More detailed error message when xml feeds are unable to be loaded.
+
 **Version 1.2.6**  
 * Changed usort to not use an anonymous function which is only available in PHP 5.3.0+
 
