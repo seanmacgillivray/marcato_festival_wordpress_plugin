@@ -422,7 +422,7 @@ class marcatoxml_importer {
 				}
 			}
 		}else{
-			return "Error importing {$field}: Error loading xml file.";
+			return "Error importing {$field}: Error loading xml file. This likely means that cURL is not enabled in your PHP config. This plugin requires cURL in order to retreive the XML feeds from marcato. Check the output of phpinfo() to determine if cURL is disabled and enable it, or contact your server administrator.";
 		}
 		return "{$field} Imported.\n" . implode("\n", $errors);
 	}
