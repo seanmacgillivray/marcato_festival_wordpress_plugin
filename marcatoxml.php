@@ -510,6 +510,9 @@ class marcatoxml_importer {
 		global $wpdb;
    	$index = 0;
 		$posts = array();
+		function sort_by_unix_time($a, $b){
+	 		return intval($a->start_time_unix) - intval($b->start_time_unix);
+		}
 		foreach ($xml->artist as $artist) {
 			$post_attachment = array();
 			$embed_codes = array();
@@ -1082,9 +1085,6 @@ class marcatoxml_importer {
 		foreach($taxonomy_data as $tax => $name){
 			wp_set_object_terms($post_id, $name, $tax);
 		}
-	}
-	private function sort_by_unix_time($a, $b){
-	  return intval($a->start_time_unix) - intval($b->start_time_unix);
 	}
 }
 ?>
