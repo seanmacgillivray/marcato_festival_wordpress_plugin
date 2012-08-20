@@ -46,6 +46,7 @@ class WPGitHubUpdater {
 
 		$defaults = array(
 			'slug' => plugin_basename(__FILE__),
+			'transient_slug' => plugin_basename(__FILE__),
 			'proper_folder_name' => dirname( plugin_basename(__FILE__) ),
 			'api_url' => 'https://api.github.com/repos/jkudish/WordPress-GitHub-Plugin-Updater',
 			'raw_url' => 'https://raw.github.com/jkudish/WordPress-GitHub-Plugin-Updater/master',
@@ -60,8 +61,8 @@ class WPGitHubUpdater {
 
 		$this->set_defaults();
 
-		// if ( ( defined('WP_DEBUG') && WP_DEBUG ) || ( defined('WP_GITHUB_FORCE_UPDATE') || WP_GITHUB_FORCE_UPDATE ) )
-		// 	add_action( 'init', array( $this, 'delete_transients' ) );
+		if ( ( defined('WP_DEBUG') && WP_DEBUG ) || ( defined('WP_GITHUB_FORCE_UPDATE') || WP_GITHUB_FORCE_UPDATE ) )
+			add_action( 'init', array( $this, 'delete_transients' ) );
 
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'api_check' ) );
 
@@ -144,8 +145,8 @@ class WPGitHubUpdater {
 	public function get_new_version() {
 		$version = get_site_transient( $this->config['transient_slug'].'_new_version' );
 
-		if ( !isset( $version ) ) {
-			
+		if ( !isset( $version ) || false == $version || '' == $version) {
+
 			$raw_response = wp_remote_get(
 				trailingslashit($this->config['raw_url']).$this->config['readme'],
 				array(
@@ -180,8 +181,8 @@ class WPGitHubUpdater {
 	 */
 	public function get_github_data() {
 		$github_data = get_site_transient( $this->config['transient_slug'].'_github_data' );
-
-		if ( ! isset( $github_data ) ) {
+		
+		if ( ! isset( $github_data ) || false == $github_data || '' == $github_data ) {
 			
 			$github_data = wp_remote_get(
 				 $this->config['api_url']
@@ -281,7 +282,6 @@ class WPGitHubUpdater {
 	 * @return object $response the plugin info
 	 */
 	public function get_plugin_info( $false, $action, $response ) {
-
 		// Check if this call API is for the right plugin
 		if ( $response->slug != $this->config['slug'] )
 			return false;
@@ -297,7 +297,6 @@ class WPGitHubUpdater {
 		$response->last_updated = $this->config['last_updated'];
 		$response->sections = array( 'description' => $this->config['description'] );
 		$response->download_link = $this->config['zip_url'];
-
 		return $response;
 	}
 

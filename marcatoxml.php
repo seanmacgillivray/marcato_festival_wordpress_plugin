@@ -29,7 +29,7 @@ include_once('updater.php');
 if (is_admin()){
 	$config = array(
 		'slug' => plugin_basename(__FILE__),
-		'transient_slug' => plugin_basename(__FILE__),
+		'transient_slug' => "marcato",
 		'proper_folder_name' => plugin_dir_path(__FILE__),
 		'api_url' => 'https://api.github.com/repos/morgancurrie/marcato_festival_wordpress_plugin',
 		'raw_url' => 'https://raw.github.com/morgancurrie/marcato_festival_wordpress_plugin/master',
@@ -42,7 +42,6 @@ if (is_admin()){
 	);
 	new WPGitHubUpdater($config);
 }
-
 //Initialize the plugin
 $marcatoxml = new marcatoxml_plugin();
 class marcatoxml_plugin {
@@ -65,8 +64,8 @@ class marcatoxml_plugin {
 		add_shortcode('marcato-link',array($this,'marcato_link'));
 		add_shortcode('marcato-field', array($this,'marcato_field'));
 		wp_oembed_add_provider('#http://(www\.)?soundcloud.com/.*#i', 'http://www.soundcloud.com/oembed/', true);
-		// $this->check_for_updates();
 	}
+
  	function marcato_field($atts){
 		global $wpdb;
 		global $post;
@@ -149,6 +148,7 @@ class marcatoxml_plugin {
 		$mce_css .= plugins_url("", __FILE__)."/css/marcato.css";
 		return $mce_css;
 	}
+
 	public function register_custom_post_types(){
 		$supports = array("title","editor","thumbnail");
 		if ($this->importer->options["include_meta_data"]=="1"){
