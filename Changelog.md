@@ -1,3 +1,6 @@
+**Version 1.2.8**  
+* The Updater should no longer check on every page load for an update to the plugin.
+
 **Version 1.2.7**  
 * Loading of xml files now handled by curl if allow\_url\_fopen is disabled. More detailed error message when xml feeds are unable to be loaded.
 
