@@ -60,8 +60,8 @@ class WPGitHubUpdater {
 
 		$this->set_defaults();
 
-		if ( ( defined('WP_DEBUG') && WP_DEBUG ) || ( defined('WP_GITHUB_FORCE_UPDATE') || WP_GITHUB_FORCE_UPDATE ) )
-			add_action( 'init', array( $this, 'delete_transients' ) );
+		// if ( ( defined('WP_DEBUG') && WP_DEBUG ) || ( defined('WP_GITHUB_FORCE_UPDATE') || WP_GITHUB_FORCE_UPDATE ) )
+		// 	add_action( 'init', array( $this, 'delete_transients' ) );
 
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'api_check' ) );
 
@@ -129,9 +129,9 @@ class WPGitHubUpdater {
 	 */
 	public function delete_transients() {
 		delete_site_transient( 'update_plugins' );
-		delete_site_transient( $this->config['slug'].'_new_version' );
-		delete_site_transient( $this->config['slug'].'_github_data' );
-		delete_site_transient( $this->config['slug'].'_changelog' );
+		delete_site_transient( $this->config['transient_slug'].'_new_version' );
+		delete_site_transient( $this->config['transient_slug'].'_github_data' );
+		delete_site_transient( $this->config['transient_slug'].'_changelog' );
 	}
 
 
@@ -142,10 +142,10 @@ class WPGitHubUpdater {
 	 * @return int $version the version number
 	 */
 	public function get_new_version() {
-		$version = get_site_transient( $this->config['slug'].'_new_version' );
+		$version = get_site_transient( $this->config['transient_slug'].'_new_version' );
 
-		if ( !isset( $version ) || !$version || '' == $version ) {
-
+		if ( !isset( $version ) ) {
+			
 			$raw_response = wp_remote_get(
 				trailingslashit($this->config['raw_url']).$this->config['readme'],
 				array(
@@ -165,7 +165,7 @@ class WPGitHubUpdater {
 			$version	= $_version[0];
 
 			// refresh every 6 hours
-			set_site_transient( $this->config['slug'].'_new_version', $version, 60*60*6 );
+			set_site_transient( $this->config['transient_slug'].'_new_version', $version, 60*60*6 );
 		}
 
 		return $version;
@@ -179,9 +179,10 @@ class WPGitHubUpdater {
 	 * @return array $github_data the data
 	 */
 	public function get_github_data() {
-		$github_data = get_site_transient( $this->config['slug'].'_github_data' );
+		$github_data = get_site_transient( $this->config['transient_slug'].'_github_data' );
 
-		if ( ! isset( $github_data ) || ! $github_data || '' == $github_data ) {
+		if ( ! isset( $github_data ) ) {
+			
 			$github_data = wp_remote_get(
 				 $this->config['api_url']
 				,$this->config['sslverify']
@@ -193,7 +194,7 @@ class WPGitHubUpdater {
 			$github_data = json_decode( $github_data['body'] );
 
 			// refresh every 6 hours
-			set_site_transient( $this->config['slug'].'_github_data', $github_data, 60*60*6);
+			set_site_transient( $this->config['transient_slug'].'_github_data', $github_data, 60*60*6);
 		}
 
 		return $github_data;
