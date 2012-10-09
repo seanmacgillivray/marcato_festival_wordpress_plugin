@@ -363,6 +363,10 @@ class marcatoxml_plugin {
 			  <input type="hidden" name="include_artist_lineup" value="0">
 			  <input type="checkbox" name="include_artist_lineup" value="1" <?php echo $this->importer->options["include_artist_lineup"]=="1" ? "checked='checked'" : "" ?>><br />
 			  <cite><small>Enable this to include a table at the bottom of artists posts that displays all of the shows and workshops they are involved in</small></cite>
+			  <br />
+				Set the show and workshop times listed in the artist post to their performance times instead, if available.
+				<input type="hidden" name="artist_lineup_set_times" value="0">
+				<input type="checkbox" name="artist_lineup_set_times" value="1" <?php echo $this->importer->options["artist_lineup_set_times"]=="1" ? "checked='checked'" : "" ?>>
 			</p>
 			<p>
 				Auto Update data every hour?
@@ -381,7 +385,7 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0");
+	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0","artist_lineup_set_times"=>"0");
 	public $fields = array("artists","venues","shows","workshops");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
@@ -450,6 +454,36 @@ class marcatoxml_importer {
 			return false;
 		}		
 	}
+	private function load_performances(){
+		$map = array();
+		$xml = $this->load_XML('performances');
+		foreach($xml->performance as $performance){
+			if(!isset($map[(string)$performance->performer_id])){
+				$map[(string)$performance->performer_id] = array();
+			}
+			$map[(string)$performance->performer_id][] = $performance;
+			$performance->type = 'performance';
+			$performance->name = $performance->show_name;
+			$performance->formatted_dtstart = date_i18n(get_option('time_format'),(integer)$performance->set_time);
+		}
+		return $map;
+	}
+	private function load_presentations(){
+		$map = array();
+		$xml = $this->load_XML('presentations');
+		foreach($xml->presentation as $presentation){
+			if($presentation->presenter_type == 'Artist'){
+				if(!isset($map[(string)$presentation->presenter_id])){
+					$map[(string)$presentation->presenter_id] = array();
+				}
+				$map[(string)$presentation->presenter_id][] = $presentation;
+				$presentation->type = 'presentation';
+				$presentation->name = $presentation->workshop_name;
+				$presentation->formatted_dtstart = date_i18n(get_option('time_format'),(integer)$presentation->set_time);
+			}
+		}
+		return $map;
+	}
 	private function load_XML($field){
     if(ini_get('allow_url_fopen')==true){
        return simplexml_load_file($this->get_xml_location($field));
@@ -511,8 +545,9 @@ class marcatoxml_importer {
 		global $wpdb;
    	$index = 0;
 		$posts = array();
-		function sort_by_unix_time($a, $b){
-	 		return intval($a->start_time_unix) - intval($b->start_time_unix);
+		if($this->options['artist_lineup_set_times']=="1"){
+			$performance_map = $this->load_performances();
+			$presentation_map = $this->load_presentations();
 		}
 		foreach ($xml->artist as $artist) {
 			$post_attachment = array();
@@ -563,29 +598,39 @@ class marcatoxml_importer {
 			$post_content .= "<div class='artist_websites'>" . $link_content . "</div>";
 			
 			if($this->options["include_artist_lineup"]){
-  			$events = array();
-  			if(!empty($artist->shows)){
-  				foreach($artist->shows->show as $show){
-  					if((string)$show->show_on_website=="false"){continue;}
-  					$show->type = 'show';
-  				  $events[] = $show;
-  				}
-  			}
-  			if(!empty($artist->workshops)){
-  				foreach($artist->workshops->workshop as $workshop){
-            if((string)$workshop->show_on_website=="false"){continue;}
-  					$workshop->type = 'workshop';
-  					$events[] = $workshop;
-  				}
-  			}
+				$events = array();
+				if($this->options['artist_lineup_set_times']=="0"){
+	  			if(!empty($artist->shows)){
+	  				foreach($artist->shows->show as $show){
+	  					if((string)$show->show_on_website=="false"){continue;}
+	  					$show->type = 'show';
+	  					$show->formatted_dtstart = date_i18n(get_option('time_format'), strtotime($show->date . ' ' . $show->formatted_start_time));
+	  				  $events[] = $show;
+	  				}
+	  			}
+	  			if(!empty($artist->workshops)){
+	  				foreach($artist->workshops->workshop as $workshop){
+	            if((string)$workshop->show_on_website=="false"){continue;}
+	  					$workshop->type = 'workshop';
+	  					$workshop->formatted_dtstart = date_i18n(get_option('time_format'), strtotime($workshop->date . ' ' . $workshop->formatted_start_time));
+	  					$events[] = $workshop;
+	  				}
+	  			}
+	  		}else{
+	  			$array1 = $performance_map[(string)$artist->id];
+	  			$array2 = $presentation_map[(string)$artist->id];
+	  			if(!isset($array1)){$array1 = array();}
+	  			if(!isset($array2)){$array2 = array();}
+	    		$events = array_merge($array1, $array2);
+	  		}
   			if(!empty($events)){
-  			  usort($events, 'sort_by_unix_time');
+  			  usort($events, array($this, 'sort_by_unix_time'));
     			$post_content .= "<table class='artist_lineup'>";
     			foreach($events as $event){
-    			  $post_content .= "<tr><td class='time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $event->formatted_start_time))."</td><td class='event'><a href='[marcato-link type='marcato_".$event->type."' marcato_id='".$event->id."']'>".$event->name."</a></td></tr>";
+    			  $post_content .= "<tr><td class='time'>".$event->formatted_dtstart."</td><td class='event'><a href='[marcato-link type='marcato_".$event->type."' marcato_id='".$event->id."']'>".$event->name."</a></td></tr>";
     			}
 	  			$post_content .= "</table>";
-    		}
+	    	}
   		}
 			
 			$post_type = "marcato_artist";
@@ -1086,6 +1131,12 @@ class marcatoxml_importer {
 		foreach($taxonomy_data as $tax => $name){
 			wp_set_object_terms($post_id, $name, $tax);
 		}
+	}
+	private function sort_by_unix_time($a, $b){
+		return intval($a->start_time_unix) - intval($b->start_time_unix);
+	}
+	private function sort_timeslots_by_set_time($a,$b){
+		return intval($a->set_time) - intval($b->set_time);
 	}
 }
 ?>

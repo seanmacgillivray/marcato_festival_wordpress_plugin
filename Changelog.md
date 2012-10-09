@@ -1,3 +1,6 @@
+**Version 1.2.9**  
+* Added an option to include individual timeslot times in artist profiles instead of the show/performance times.
+
 **Version 1.2.8**  
 * The Updater should no longer check on every page load for an update to the plugin.
 
