@@ -497,7 +497,17 @@ class marcatoxml_importer {
       return false;
     }    
 	}
-
+	private function remove_posts_missing_from_xml_feed($xml_ids, $post_type){
+		if(!empty($xml_ids)){
+			global $wpdb;
+			$id_list = implode(",",$xml_ids);
+			$sql = "SELECT p.id FROM $wpdb->posts p WHERE p.post_type = '$post_type' AND EXISTS(SELECT * FROM $wpdb->postmeta m WHERE m.post_id = p.id AND m.meta_key = '{$post_type}_id') AND NOT EXISTS(SELECT * FROM $wpdb->postmeta m WHERE m.post_id = p.id AND m.meta_key = '{$post_type}_id' AND m.meta_value IN ($id_list))";
+			$rows = $wpdb->get_results($sql);
+			foreach($rows as $row){
+				wp_delete_post($row->id, true);
+			}
+		}
+	}
 	private function import_post($post){
 	 	global $wpdb;
 		extract($post);
@@ -545,11 +555,13 @@ class marcatoxml_importer {
 		global $wpdb;
    	$index = 0;
 		$posts = array();
+		$ids = array();
 		if($this->options['artist_lineup_set_times']=="1"){
 			$performance_map = $this->load_performances();
 			$presentation_map = $this->load_presentations();
 		}
 		foreach ($xml->artist as $artist) {
+			$ids[] = (string)$artist->id;
 			$post_attachment = array();
 			$embed_codes = array();
 			$link_content = "";
@@ -683,13 +695,16 @@ class marcatoxml_importer {
 			$posts[$index] = compact('post_content', 'post_title','post_type', 'post_taxonomy', 'post_marcato_id','post_status','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
+		$this->remove_posts_missing_from_xml_feed($ids, $post_type);
 		return $posts;
-	}		
+	}
 	private function parse_venues($xml){
 		global $wpdb;
    	$index = 0;
+   	$ids = array();
 		$posts = array();
 		foreach ($xml->venue as $venue) {
+			$ids[] = (string)$venue->id;
 			$post_attachment = array();
 			$post_title = (string)$venue->name;
 			$post_content = "";
@@ -743,14 +758,17 @@ class marcatoxml_importer {
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id', 'post_status', 'post_meta','post_attachment', 'post_excerpt');
 			$index++;
 		}
+		$this->remove_posts_missing_from_xml_feed($ids, $post_type);
 		return $posts;
 	}
 	
 	private function parse_shows($xml){
 		global $wpdb;
    	$index = 0;
+   	$ids = array();
 		$posts = array();
 		foreach ($xml->show as $show) {
+			$ids[] = (string)$show->id;
 			$post_attachment = array();
 			$post_title = (string)$show->name;			
 			$post_content = "";
@@ -822,14 +840,17 @@ class marcatoxml_importer {
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
+		$this->remove_posts_missing_from_xml_feed($ids, $post_type);
 		return $posts;
 	}
 	
 	private function parse_workshops($xml){
 		global $wpdb;
    	$index = 0;
+   	$ids = array();
 		$posts = array();
 		foreach ($xml->workshop as $workshop) {
+			$ids[] = (string)$workshop->id;
 			$post_attachment = array();
 			$post_title = (string)$workshop->name;
 			$post_content = "";
@@ -932,6 +953,7 @@ class marcatoxml_importer {
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
+		$this->remove_posts_missing_from_xml_feed($ids, $post_type);
 		return $posts;
 	}
 	
