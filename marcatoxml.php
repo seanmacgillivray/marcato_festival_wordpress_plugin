@@ -462,9 +462,10 @@ class marcatoxml_importer {
 				$map[(string)$performance->performer_id] = array();
 			}
 			$map[(string)$performance->performer_id][] = $performance;
-			$performance->type = 'performance';
+			$performance->type = 'show';
+			$performance->link_id = $performance->show_id;
 			$performance->name = $performance->show_name;
-			$performance->formatted_dtstart = date_i18n(get_option('time_format'),(integer)$performance->set_time);
+			$performance->formatted_dtstart = date_i18n(get_option('date_format'),(integer)$performance->set_time) . " " . date_i18n(get_option('time_format'),(integer)$performance->set_time);
 		}
 		return $map;
 	}
@@ -477,9 +478,10 @@ class marcatoxml_importer {
 					$map[(string)$presentation->presenter_id] = array();
 				}
 				$map[(string)$presentation->presenter_id][] = $presentation;
-				$presentation->type = 'presentation';
+				$presentation->type = 'workshop';
+				$presentation->link_id = $presentation->workshop_id;
 				$presentation->name = $presentation->workshop_name;
-				$presentation->formatted_dtstart = date_i18n(get_option('time_format'),(integer)$presentation->set_time);
+				$presentation->formatted_dtstart = date_i18n(get_option('date_format'),(integer)$presentation->set_time) . " " . date_i18n(get_option('time_format'),(integer)$presentation->set_time);
 			}
 		}
 		return $map;
@@ -616,7 +618,8 @@ class marcatoxml_importer {
 	  				foreach($artist->shows->show as $show){
 	  					if((string)$show->show_on_website=="false"){continue;}
 	  					$show->type = 'show';
-	  					$show->formatted_dtstart = date_i18n(get_option('time_format'), strtotime($show->date . ' ' . $show->formatted_start_time));
+	  					$show->link_id = $show->id;
+	  					$show->formatted_dtstart = date_i18n(get_option('date_format'), strtotime($show->date . ' ' . $show->formatted_start_time)) . " " . date_i18n(get_option('time_format'), strtotime($show->date . ' ' . $show->formatted_start_time));
 	  				  $events[] = $show;
 	  				}
 	  			}
@@ -624,22 +627,24 @@ class marcatoxml_importer {
 	  				foreach($artist->workshops->workshop as $workshop){
 	            if((string)$workshop->show_on_website=="false"){continue;}
 	  					$workshop->type = 'workshop';
-	  					$workshop->formatted_dtstart = date_i18n(get_option('time_format'), strtotime($workshop->date . ' ' . $workshop->formatted_start_time));
+	  					$workshop->link_id = $workshop->id;
+	  					$workshop->formatted_dtstart = date_i18n(get_option('date_format'), strtotime($workshop->date . ' ' . $workshop->formatted_start_time)) . " " . date_i18n(get_option('time_format'), strtotime($workshop->date . ' ' . $workshop->formatted_start_time));
 	  					$events[] = $workshop;
 	  				}
 	  			}
+	  			usort($events, array($this, 'sort_by_unix_time'));
 	  		}else{
 	  			$array1 = $performance_map[(string)$artist->id];
 	  			$array2 = $presentation_map[(string)$artist->id];
 	  			if(!isset($array1)){$array1 = array();}
 	  			if(!isset($array2)){$array2 = array();}
 	    		$events = array_merge($array1, $array2);
+	    		usort($events, array($this, 'sort_timeslots_by_set_time'));
 	  		}
   			if(!empty($events)){
-  			  usort($events, array($this, 'sort_by_unix_time'));
     			$post_content .= "<table class='artist_lineup'>";
     			foreach($events as $event){
-    			  $post_content .= "<tr><td class='time'>".$event->formatted_dtstart."</td><td class='event'><a href='[marcato-link type='marcato_".$event->type."' marcato_id='".$event->id."']'>".$event->name."</a></td></tr>";
+    			  $post_content .= "<tr><td class='time'>".$event->formatted_dtstart."</td><td class='event'><a href='[marcato-link type='marcato_".$event->type."' marcato_id='".$event->link_id."']'>".$event->name."</a></td></tr>";
     			}
 	  			$post_content .= "</table>";
 	    	}
