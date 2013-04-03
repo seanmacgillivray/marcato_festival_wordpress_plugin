@@ -63,7 +63,17 @@ class marcatoxml_plugin {
 		add_filter('mce_css', array($this,'add_mce_css'));
 		add_shortcode('marcato-link',array($this,'marcato_link'));
 		add_shortcode('marcato-field', array($this,'marcato_field'));
+		add_shortcode('marcato-thumbnail', array($this,'marcato_thumbnail'));
 		wp_oembed_add_provider('#http://(www\.)?soundcloud.com/.*#i', 'http://www.soundcloud.com/oembed/', true);
+	}
+
+	function marcato_thumbnail($str){
+		$args = wp_parse_args($str);
+		$result = "";
+		if(!$atts['size']){
+			$atts['size'] = 'full';
+		}
+		echo "<span class='post_thumbnail " . $atts['class'] . "'>" . get_the_post_thumbnail(null,$atts['size']) . "</span>";
 	}
 
  	function marcato_field($atts){
@@ -337,6 +347,15 @@ class marcatoxml_plugin {
 				Include photos in post body?
 				<input type="hidden" name="include_photos_in_posts" value="0">
 				<input type="checkbox" name="include_photos_in_posts" value="1" <?php echo $this->importer->options["include_photos_in_posts"]=="1" ? "checked='checked'" : "" ?>><br />
+				<label for="post_photo_size">Size:</label>
+				<select name="post_photo_size">
+					<?php 
+						$options = array("thumbnail","medium","large","full");
+						foreach($options as $option){
+							echo "<option value='".$option."' ".($this->importer->options["post_photo_size"]==$option ? "selected='selected'" : "").">".$option."</option>";
+						}
+					?>
+				</select><br />
 				<cite><small>Enable this to have photos from Marcato included in the post body.</small></cite>
 			</p>
 			<p>
@@ -385,14 +404,14 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0","artist_lineup_set_times"=>"0");
+	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0","artist_lineup_set_times"=>"0","post_photo_size"=>"full");
 	public $fields = array("artists","venues","shows","workshops");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
 	function marcatoxml_importer(){
 		foreach($this->options as $option=>$value){
 			$set_value = get_option($option);
-			if ($set_value=="1" || $set_value=="0" || $option=="marcato_organization_id"){
+			if ($set_value=="1" || $set_value=="0" || $option=="marcato_organization_id" || $option=="post_photo_size"){
 				$this->options[$option] = get_option($option);
 			}
 		}
@@ -574,18 +593,20 @@ class marcatoxml_importer {
 				$post_content .= "<div class='artist_genre'>" . $artist->genre . "</div>";
 			}
 			if (!empty($artist->web_photo_url)){
-				if ($this->options['attach_photos']=="1"){
+				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_post']=="1"){
 					$post_attachment = array('url'=>(string)$artist->web_photo_url_root . "large.jpg", 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->web_photo_fingerprint, 'field'=>'web_photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
-					$post_content .= "<img src='".$artist->web_photo_url_root."web.jpg' class='artist_photo'>";
+					$post_content .= "[marcato-thumbnail size='".$this->options['post_photo_size']."']";
+					// <img src='".$artist->web_photo_url_root."web.jpg' class='artist_photo'>
 				}
 			}else if(!empty($artist->photo_url)){
-				if ($this->options['attach_photos']=="1"){
+				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_posts']=="1"){
 					$post_attachment = array('url'=>(string)$artist->photo_url_root."large.jpg", 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->photo_fingerprint, 'field'=>'photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
-					$post_content .= "<img src='".$artist->photo_url_root."web_compressed.jpg' class='artist_photo'>";
+					$post_content .= "[marcato-thumbnail size='".$this->options['post_photo_size']."']";
+					// $post_content .= "<img src='".$artist->photo_url_root."web_compressed.jpg' class='artist_photo'>";
 				}
 			}
 			$post_content .= "<div class='artist_bio'>" . nl2br((string)$artist->bio_public) . "</div>";
@@ -715,11 +736,12 @@ class marcatoxml_importer {
 			$post_content = "";
 			$post_content .= "<div class='venue_community'>" . $venue->community . "</div>";
 			if (!empty($venue->photo_url)){
-				if ($this->options['attach_photos']=="1"){
+				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_posts']=="1"){
 					$post_attachment = array('url'=>(string)$venue->photo_url_root . "web.png", 'name'=>(string)$venue->name, 'fingerprint'=>(string)$venue->photo_fingerprint, 'field'=>'photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
-					$post_content .= "<img src='".(string)$venue->photo_url_root . "web.png' class='venue_photo'>";
+					$post_content .= "[marcato-thumbnail size='".$this->options['post_photo_size']."']";
+					// $post_content .= "<img src='".(string)$venue->photo_url_root . "web.png' class='venue_photo'>";
 				}
 			}
 			$post_content .= "<div class='venue_address'>";
@@ -787,11 +809,12 @@ class marcatoxml_importer {
 			$venue_name = (string)$show->venue_name;
 			$post_content .= "<div class='show_venue'><a class='show_venue_link' href=\"[marcato-link type='marcato_venue' marcato_id='".$show->venue_id."']\">" . $show->venue_name . "</a></div>";
 			if (!empty($show->poster_url)){
-				if ($this->options['attach_photos']=="1"){
+				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_posts']=="1"){
 					$post_attachment = array('url'=>(string)$show->poster_url_root . "web.png", 'name'=>(string)$show->name, 'fingerprint'=>(string)$show->poster_fingerprint, 'field'=>'poster');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
-					$post_content .= "<img src='".(string)$show->poster_url_root."web.png' class='show_photo'>";
+					$post_content .= "[marcato-thumbnail size='".$this->options["post_photo_size"]."']";
+					// $post_content .= "<img src='".(string)$show->poster_url_root."web.png' class='show_photo'>";
 				}
 			}
 			$post_content .= "<div class='show_ticket_info'>";
@@ -869,11 +892,12 @@ class marcatoxml_importer {
 			$venue_name = (string)$workshop->venue_name;
 			$post_content .= "<div class='workshop_venue'><a class='workshop_venue_link' href=\"[marcato-link type='marcato_venue' marcato_id='".$workshop->venue_id."']\">" . $workshop->venue_name . "</a></div>";
 			if (!empty($workshop->poster_url)){
-				if ($this->options['attach_photos']=="1"){
+				if ($this->options['attach_photos']=="1" || $this->options["include_photos_in_posts"]){
 					$post_attachment = array('url'=>(string)$workshop->poster_url_root . "web.png", 'name'=>(string)$workshop->name, 'fingerprint'=>(string)$workshop->poster_fingerprint, 'field'=>'poster');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
-					$post_content .= "<img src='".(string)$workshop->poster_url_root."web.png' class='workshop_photo'>";
+					$post_content .= "[marcato-thumbnail size='".$this->options["post_photo_size"]."']";
+					// $post_content .= "<img src='".(string)$workshop->poster_url_root."web.png' class='workshop_photo'>";
 				}
 			}
 			$post_content .= "<div class='workshop_ticket_info'>";
