@@ -621,7 +621,7 @@ class marcatoxml_importer {
 					if ($this->options["embed_video_links"]=="1" && !empty($embed_code)){
 						$embed_codes[] = $embed_code;
 					}else{
-						$link_content .= "<a class='artist_website ".strtolower(ereg_replace("[^A-Za-z0-9_]","",str_replace(" ","_", $website->name)))."' href='".$url."'>".$website->name."</a><br>";
+						$link_content .= "<a class='artist_website ".strtolower(ereg_replace("[^A-Za-z0-9_]","",str_replace(" ","_", $website->name)))."' href='".$url."' target='_blank'>".$website->name."</a><br>";
 					}
 				}
 			}
@@ -820,7 +820,7 @@ class marcatoxml_importer {
 			$post_content .= "<div class='show_ticket_info'>";
 			$post_content .= "<span class='price'>" . $show->price . "</span>";
 			$post_content .= "<span class='ticket_info'>" . $show->ticket_info . "</span>";
-			$post_content .= "<a class='ticket_link' href='" . $show->ticket_link . "'>".$show->ticket_link."</a>";
+			$post_content .= "<a class='ticket_link' href='" . $show->ticket_link . "' target='_blank'>".$show->ticket_link."</a>";
 			$post_content .= "</div>";
 			$post_content .= "<div class='show_description'>" . nl2br((string)$show->description_web) . "</div>";
 			$post_content .= "<table class='show_lineup'>";
@@ -903,7 +903,7 @@ class marcatoxml_importer {
 			$post_content .= "<div class='workshop_ticket_info'>";
 			$post_content .= "<span class='price'>" . $workshop->price . "</span>";
 			$post_content .= "<span class='ticket_info'>" . $workshop->ticket_info . "</span>";
-			$post_content .= "<a class='ticket_link' href='" . $workshop->ticket_link . "'>".$workshop->ticket_link."</a>";
+			$post_content .= "<a class='ticket_link' href='" . $workshop->ticket_link . "' target='_blank'>".$workshop->ticket_link."</a>";
 			$post_content .= "</div>";
 			$description = (string)$workshop->description_web;
 			if(empty($description)){
