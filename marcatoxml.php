@@ -37,7 +37,7 @@ if (is_admin()){
 		'zip_url' => 'https://github.com/morgancurrie/marcato_festival_wordpress_plugin/zipball/master',
 		'sslverify' => true,
 		'requires' => '3.0',
-		'tested' => '3.3.2',
+		'tested' => '3.5.1',
 		'readme' => 'README.md'
 	);
 	new WPGitHubUpdater($config);
