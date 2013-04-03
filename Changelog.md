@@ -1,3 +1,6 @@
+**Version 1.3.0**  
+* Added an option to select the image size of the photo included in the post body when using that option.
+
 **Version 1.2.9**  
 * Added an option to include individual timeslot times in artist profiles instead of the show/performance times.  
 * Posts in wordpress will now be removed if their data is no longer present in the xml feed when importing (they were deleted in marcato or are no longer public).
