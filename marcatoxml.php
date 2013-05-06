@@ -612,7 +612,7 @@ class marcatoxml_importer {
 			$post_content .= "<div class='artist_bio'>" . nl2br((string)$artist->bio_public) . "</div>";
 			if(!empty($artist->websites)){
 				foreach($artist->websites->website as $website){
-					if(strpos($website->url,'http://')===false){
+					if(strpos($website->url,'http://')===false && strpos($website->url,'https://')===false){
 						$url = 'http://'.$website->url;
 					}else{
 						$url = $website->url;
@@ -1139,7 +1139,7 @@ class marcatoxml_importer {
 	    )                 # End host alternatives.
 	    ([\w\-]{11})      # $1: VIDEO_ID is exactly 11 chars.
 	    (?=[^\w\-]|$)     # Assert next char is non-ID or EOS.
-	    [?=&+%\w]*        # Consume any URL (query) remainder.
+	    [?=&+%\w\-]*        # Consume any URL (query) remainder.
 	    ~ix', $text) > 0){
 			return true;
 		}else{
