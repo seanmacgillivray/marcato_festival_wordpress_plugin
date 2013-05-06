@@ -1,3 +1,7 @@
+**Version 1.3.1**  
+* Updated Youtube URL detection  
+* Imported websites with https:// instead of http:// will now work
+
 **Version 1.3.0**  
 * Added an option to select the image size of the photo included in the post body when using that option.
 
