@@ -1,3 +1,6 @@
+**Version 1.3.2**  
+* Fixed venue link on show and workshop pages
+
 **Version 1.3.1**  
 * Updated Youtube URL detection  
 * Imported websites with https:// instead of http:// will now work

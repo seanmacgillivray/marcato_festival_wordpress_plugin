@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.3.1
+ * Version: 1.3.2
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -807,7 +807,7 @@ class marcatoxml_importer {
 			}
 			$post_content .= "</div>";
 			$venue_name = (string)$show->venue_name;
-			$post_content .= "<div class='show_venue'><a class='show_venue_link' href=\"[marcato-link type='marcato_venue' marcato_id='".$show->venue_id."']\">" . $show->venue_name . "</a></div>";
+			$post_content .= "<div class='show_venue'><a class='show_venue_link' href=\"[marcato-link type='marcato_venue' marcato_id='".$show->venue->id."']\">" . $show->venue_name . "</a></div>";
 			if (!empty($show->poster_url)){
 				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_posts']=="1"){
 					$post_attachment = array('url'=>(string)$show->poster_url_root . "web.png", 'name'=>(string)$show->name, 'fingerprint'=>(string)$show->poster_fingerprint, 'field'=>'poster');
@@ -890,7 +890,7 @@ class marcatoxml_importer {
 			}
 			$post_content .= "</div>";
 			$venue_name = (string)$workshop->venue_name;
-			$post_content .= "<div class='workshop_venue'><a class='workshop_venue_link' href=\"[marcato-link type='marcato_venue' marcato_id='".$workshop->venue_id."']\">" . $workshop->venue_name . "</a></div>";
+			$post_content .= "<div class='workshop_venue'><a class='workshop_venue_link' href=\"[marcato-link type='marcato_venue' marcato_id='".$workshop->venue->id."']\">" . $workshop->venue_name . "</a></div>";
 			if (!empty($workshop->poster_url)){
 				if ($this->options['attach_photos']=="1" || $this->options["include_photos_in_posts"]){
 					$post_attachment = array('url'=>(string)$workshop->poster_url_root . "web.png", 'name'=>(string)$workshop->name, 'fingerprint'=>(string)$workshop->poster_fingerprint, 'field'=>'poster');
