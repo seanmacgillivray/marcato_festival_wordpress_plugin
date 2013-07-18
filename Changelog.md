@@ -1,3 +1,6 @@
+**HEAD**  
+* Add venue directions to post_meta (from tflight)
+
 **Version 1.3.2**  
 * Fixed venue link on show and workshop pages
 
