@@ -407,6 +407,7 @@ class marcatoxml_importer {
 	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0","artist_lineup_set_times"=>"0","post_photo_size"=>"full");
 	public $fields = array("artists","venues","shows","workshops");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
+	public $artist_rank_map;
 		
 	function marcatoxml_importer(){
 		foreach($this->options as $option=>$value){
@@ -415,8 +416,7 @@ class marcatoxml_importer {
 				$this->options[$option] = get_option($option);
 			}
 		}
-	}	
-	
+	}
 	public function import_all(){
 		$org_id = $this->options['marcato_organization_id'];
 		if (empty($org_id)){
@@ -458,6 +458,9 @@ class marcatoxml_importer {
 	  $xml = $this->load_XML($field);
 		if ($xml){
 			if($field == 'artists'){
+				if(!isset($this->artist_rank_map)){
+					$this->artist_rank_map = $this->get_artist_rank_map();
+				}
 				return $this->parse_artists($xml);
 			}if($field == 'venues'){
 				return $this->parse_venues($xml);
@@ -501,6 +504,38 @@ class marcatoxml_importer {
 				$presentation->link_id = $presentation->workshop_id;
 				$presentation->name = $presentation->workshop_name;
 				$presentation->formatted_dtstart = date_i18n(get_option('date_format'),(integer)$presentation->set_time) . " " . date_i18n(get_option('time_format'),(integer)$presentation->set_time);
+			}
+		}
+		return $map;
+	}
+	private function get_artist_rank_map(){
+		$map = array();
+		$show_xml = $this->load_XML('shows');		
+		$workshop_xml = $this->load_XML('workshops');
+		foreach($show_xml->show as $show){
+			if(!empty($show->performances)){
+				foreach($show->performances->performance as $performance){
+					if(!isset($map[(string)$performance->artist_id])){
+						$map[(string)$performance->artist_id] = array();
+					}
+					if(!empty($performance->rank)){
+						$map[(string)$performance->artist_id]['show_' . (string)$show->id] = (string)$performance->rank;
+					}
+				}
+			}
+		}
+		foreach($workshop_xml->workshop as $workshop){
+			if(!empty($workshop->presentations)){
+				foreach($workshop->presentations->presentation as $presentation){
+					if((string)$presentation->presenter_type=='artist'){
+						if(!isset($map[(string)$presentation->artist_id])){
+							$map[(string)$presentation->artist_id] = array();
+						}
+						if(!empty($presentation->rank)){
+							$map[(string)$presentation->presenter_id]['workshop_' . (string)$workshop->id] = (string)$presentation->rank;
+						}
+					}
+				}
 			}
 		}
 		return $map;
@@ -571,7 +606,7 @@ class marcatoxml_importer {
 				return "Error creating {$post_title}.";
 			}
 		}
-	}	
+	}
 	private function parse_artists($xml){
 		global $wpdb;
    	$index = 0;
@@ -637,6 +672,7 @@ class marcatoxml_importer {
 				if($this->options['artist_lineup_set_times']=="0"){
 	  			if(!empty($artist->shows)){
 	  				foreach($artist->shows->show as $show){
+	  					if(empty($this->artist_rank_map[(string)$artist->id]['show_' . (string)$show->id])){continue;}
 	  					if((string)$show->show_on_website=="false"){continue;}
 	  					$show->type = 'show';
 	  					$show->link_id = $show->id;
@@ -646,6 +682,7 @@ class marcatoxml_importer {
 	  			}
 	  			if(!empty($artist->workshops)){
 	  				foreach($artist->workshops->workshop as $workshop){
+	  					if(empty($this->artist_rank_map[(string)$artist->id]['workshop_' . (string)$workshop->id])){continue;}
 	            if((string)$workshop->show_on_website=="false"){continue;}
 	  					$workshop->type = 'workshop';
 	  					$workshop->link_id = $workshop->id;
@@ -692,6 +729,7 @@ class marcatoxml_importer {
 				if(!empty($artist->shows)){
 					$i = 0;
 					foreach($artist->shows->show as $show){
+						if(empty($this->artist_rank_map[(string)$artist->id]['show_' . (string)$show->id])){continue;}
 						if((string)$show->show_on_website=="false"){continue;}
 						foreach(array('id','name','show_on_website','date','formatted_date','venue_name') as $field){
 							$post_meta["marcato_artist_show_".$i."_".$field] = $show->$field;
@@ -702,6 +740,7 @@ class marcatoxml_importer {
 				if(!empty($artist->workshops)){
 					$i = 0;
 					foreach($artist->workshops->workshop as $workshop){
+						if(empty($this->artist_rank_map[(string)$artist->id]['workshop_' . (string)$workshop->id])){continue;}
 						if((string)$workshop->show_on_website=="false"){continue;}
 						foreach(array('id','name','show_on_website','date','formatted_date','venue_name') as $field){
 							$post_meta["marcato_artist_workshop_".$i."_".$field] = $workshop->$field;
