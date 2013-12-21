@@ -686,7 +686,7 @@ class marcatoxml_importer {
 			}
 			$post_meta = array();
 			if ($this->options["include_meta_data"]=="1"){
-				foreach(array('name','bio_public','bio_limited','homebase','web_photo_url','web_photo_url_root','photo_url','photo_url_root','updated_at') as $field){
+				foreach(array('name','bio_public','bio_limited','secondary_language_bio','homebase','web_photo_url','web_photo_url_root','photo_url','photo_url_root','updated_at') as $field){
 					$post_meta["marcato_artist_".$field] = nl2br((string)$artist->$field);
 				}
 				if(!empty($artist->shows)){
@@ -778,7 +778,7 @@ class marcatoxml_importer {
 					}
 					$i++;
 				}
-				foreach(array('name','street','city','province_state','country','postal_code','community','directions','longitude','latitude','primary_phone_number','photo_url','photo_url_root','updated_at') as $field){
+				foreach(array('name','description','street','city','province_state','country','postal_code','community','directions','longitude','latitude','primary_phone_number','photo_url','photo_url_root','updated_at') as $field){
 					$post_meta["marcato_venue_".$field] = $venue->$field;
 				}
 			}			
@@ -858,7 +858,7 @@ class marcatoxml_importer {
 				if(!empty($show->performances)){
 					$i = 0;
 					foreach($show->performances->performance as $performance){
-						foreach(array('id','artist','artist_id','start','end','rank') as $field){
+						foreach(array('id','artist','performance_type','artist_id','start','end','rank') as $field){
 							$post_meta["marcato_show_performance_".$i."_".$field] = $performance->$field;
 						}
 						$i++;
@@ -965,7 +965,7 @@ class marcatoxml_importer {
 					}
 				}
 				foreach($workshop->venue as $venue){
-					foreach(array('name','street','city','province_state','community','longitute','latitude','id') as $field){
+					foreach(array('name','street','city','province_state','community','longitude','latitude','id') as $field){
 						$post_meta["marcato_workshop_venue_".$field] = $venue->$field;
 					}
 				}
