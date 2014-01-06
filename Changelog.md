@@ -1,5 +1,7 @@
 **HEAD**  
 * Add venue directions to post_meta (from tflight)
+* Can now import contacts and vendors (tflight)
+* Added additional post meta fields and fixed longitude typo in venue meta data. (tflight)
 
 **Version 1.3.2**  
 * Fixed venue link on show and workshop pages
