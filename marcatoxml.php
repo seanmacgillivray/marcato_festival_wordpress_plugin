@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.3.2
+ * Version: 1.3.3
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -729,7 +729,12 @@ class marcatoxml_importer {
 				}
 				if(!empty($artist->shows)){
 					$i = 0;
+					$shows = array();
 					foreach($artist->shows->show as $show){
+						$shows[] = $show;
+					}
+					usort($shows, array($this, 'sort_by_unix_time'));
+					foreach($shows as $show){
 						if((string)$show->show_on_website=="false"){continue;}
 						foreach(array('id','name','show_on_website','date','formatted_date','venue_name') as $field){
 							$post_meta["marcato_artist_show_".$i."_".$field] = $show->$field;
@@ -739,7 +744,12 @@ class marcatoxml_importer {
 				}
 				if(!empty($artist->workshops)){
 					$i = 0;
+					$workshops = array();
 					foreach($artist->workshops->workshop as $workshop){
+						$workshops[] = $workshop;
+					}
+					usort($workshops, array($this, 'sort_by_unix_time'));
+					foreach($workshops as $workshop){
 						if((string)$workshop->show_on_website=="false"){continue;}
 						foreach(array('id','name','show_on_website','date','formatted_date','venue_name') as $field){
 							$post_meta["marcato_artist_workshop_".$i."_".$field] = $workshop->$field;
