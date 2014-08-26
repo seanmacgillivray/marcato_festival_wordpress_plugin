@@ -889,7 +889,7 @@ class marcatoxml_importer {
 			$post_type = "marcato_show";
 			$post_marcato_id = intval($show->id);
 			if($this->options["include_excerpts"]=="1"){
-				$post_excerpt = (string)$show->description_web;
+				$post_excerpt = (string)$show->description_limited;
 			}else{
 				$post_excerpt = "";
 			}
