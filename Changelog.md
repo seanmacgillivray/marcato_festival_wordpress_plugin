@@ -1,5 +1,8 @@
+**Version 1.3.5**
+* Version numbers not consistent throughout plugin.
+
 **Version 1.3.4**
-* Shows excerpt is no pulling from the correct xml value.
+* Shows excerpt is now pulling from the correct xml value.
 
 **Version 1.3.3**
 * Add venue directions to post_meta (from tflight)  
