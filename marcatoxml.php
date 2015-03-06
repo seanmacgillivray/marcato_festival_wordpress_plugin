@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.3.5
+ * Version: 1.3.6
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -703,7 +703,7 @@ class marcatoxml_importer {
   			if(!empty($events)){
     			$post_content .= "<table class='artist_lineup'>";
     			foreach($events as $event){
-    			  $post_content .= "<tr><td class='time'>".$event->formatted_dtstart."</td><td class='event'><a href='[marcato-link type='marcato_".$event->type."' marcato_id='".$event->link_id."']'>".$event->name."</a></td></tr>";
+    			  $post_content .= "<tr><td class='time'>".$event->formatted_dtstart."</td><td class='event'><a href=\"[marcato-link type='marcato_".$event->type."' marcato_id='".$event->link_id."']\">".$event->name."</a></td></tr>";
     			}
 	  			$post_content .= "</table>";
 	    	}

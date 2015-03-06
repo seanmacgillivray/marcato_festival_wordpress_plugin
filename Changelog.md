@@ -1,3 +1,6 @@
+**Version 1.3.6**
+* Fixed bug in links within artist schedules
+
 **Version 1.3.5**
 * Version numbers not consistent throughout plugin.
 
