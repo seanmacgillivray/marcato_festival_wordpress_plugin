@@ -1,3 +1,6 @@
+**Version 1.3.7**
+* Use original image uploaded as show poster instead of a smaller resized version
+
 **Version 1.3.6**
 * Fixed bug in links within artist schedules
 
