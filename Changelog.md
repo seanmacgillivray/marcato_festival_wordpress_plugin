@@ -1,3 +1,6 @@
+**Version 1.3.8**
+* Contact profile photos will now be attached to posts as featured images if the featured image option is enabled
+
 **Version 1.3.7**
 * Use original image uploaded as show poster instead of a smaller resized version
 

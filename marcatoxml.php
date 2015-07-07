@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.3.7
+ * Version: 1.3.8
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -1049,6 +1049,11 @@ class marcatoxml_importer {
 			$post_marcato_id = intval($contact->id);
 			$post_excerpt = "";
 			$post_meta = array();
+			if (!empty($contact->photo_url)){
+				if ($this->options['attach_photos']=="1"){
+					$post_attachment = array('url'=>(string)$contact->photo_url . "large.jpg", 'name'=>(string)$contact->name, 'fingerprint'=>(string)$contact->photo_fingerprint, 'field'=>'photo');
+				}
+			}
 			if(!empty($contact->categories)){
 				$i = 0;
 				foreach($contact->categories->category as $category){
