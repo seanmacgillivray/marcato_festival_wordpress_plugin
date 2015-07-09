@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.3.8
+ * Version: 1.3.9
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -727,6 +727,9 @@ class marcatoxml_importer {
 				foreach(array('name','bio_public','bio_limited','secondary_language_bio','homebase','web_photo_url','web_photo_url_root','photo_url','photo_url_root','updated_at') as $field){
 					$post_meta["marcato_artist_".$field] = nl2br((string)$artist->$field);
 				}
+				foreach($artist->{'custom-fields'}->{'custom-field'} as $field){
+					$post_meta["marcato_artist_custom_field_".$field->{'form-section-name'}."_".$field->label] = nl2br((string)$field->value);
+				}
 				if(!empty($artist->shows)){
 					$i = 0;
 					$shows = array();
@@ -829,6 +832,9 @@ class marcatoxml_importer {
 				foreach(array('name','description','street','city','province_state','country','postal_code','community','directions','longitude','latitude','primary_phone_number','photo_url','photo_url_root','updated_at') as $field){
 					$post_meta["marcato_venue_".$field] = $venue->$field;
 				}
+				foreach($venue->{'custom-fields'}->{'custom-field'} as $field){
+					$post_meta["marcato_venue_custom_field_".$field->{'form-section-name'}."_".$field->label] = nl2br((string)$field->value);
+				}
 			}			
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id', 'post_status', 'post_meta','post_attachment', 'post_excerpt');
 			$index++;
@@ -897,6 +903,9 @@ class marcatoxml_importer {
 			if ($this->options["include_meta_data"]=="1"){
 				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','start_time_unix','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','updated_at','seating') as $field){
 					$post_meta["marcato_show_".$field] = nl2br((string)$show->$field);
+				}
+				foreach($show->{'custom-fields'}->{'custom-field'} as $field){
+					$post_meta["marcato_show_custom_field_".$field->{'form-section-name'}."_".$field->label] = nl2br((string)$field->value);
 				}
 				foreach($show->venue as $venue){
 					foreach(array('name','street','city','province_state','community','longitute','latitude','id') as $field){
@@ -1004,6 +1013,9 @@ class marcatoxml_importer {
 				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','start_time_unix','end_time','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','event_contact_summary','event_contact_name','event_contact_phone','event_contact_email','hosting_organization_title','updated_at','seating') as $field){
 					$post_meta["marcato_workshop_".$field] = nl2br((string)$workshop->$field);
 				}
+				foreach($workshop->{'custom-fields'}->{'custom-field'} as $field){
+					$post_meta["marcato_workshop_custom_field_".$field->{'form-section-name'}."_".$field->label] = nl2br((string)$field->value);
+				}
 				if(!empty($workshop->workshop_types)){
 					$i = 0;
 					foreach($workshop->workshop_types->workshop_type as $workshop_type){
@@ -1080,6 +1092,9 @@ class marcatoxml_importer {
 			if ($this->options["include_meta_data"]=="1"){
 				foreach(array('bio','company','id','industry','name','position','updated_at','photo_url','photo_url_root','photo_fingerprint','email') as $field){
 					$post_meta["marcato_contact_".$field] = nl2br((string)$contact->$field);
+				}
+				foreach($contact->{'custom-fields'}->{'custom-field'} as $field){
+					$post_meta["marcato_contact_custom_field_".$field->{'form-section-name'}."_".$field->label] = nl2br((string)$field->value);
 				}
 			}			
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');

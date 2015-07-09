@@ -1,3 +1,6 @@
+**Version 1.3.9**
+* Custom fields from the xml feeds will now be added as meta data to posts
+
 **Version 1.3.8**
 * Contact profile photos will now be attached to posts as featured images if the featured image option is enabled
 
