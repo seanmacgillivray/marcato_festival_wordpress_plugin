@@ -1,3 +1,6 @@
+**Version 1.3.10**
+* Fixed a bug in artist parsing with "include photo in post body" selected but not the featured image option which resulted in the image not working
+
 **Version 1.3.9**
 * Custom fields from the xml feeds will now be added as meta data to posts
 
