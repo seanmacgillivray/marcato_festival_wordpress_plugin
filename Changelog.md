@@ -2,6 +2,7 @@
 * Check to see if there is a performance/presentation map before attempting to use them as a map to avoid some php warnings
 * Updated copy in unable to load xml file error message as it is now possible to turn feeds on and off within marcato
 * Check if custom fields array isn't there before trying to use it
+* Suppressing error messages when attempting to load xml files from marcato to avoid confusion.
 
 **Version 1.3.10**
 * Fixed a bug in artist parsing with "include photo in post body" selected but not the featured image option which resulted in the image not working

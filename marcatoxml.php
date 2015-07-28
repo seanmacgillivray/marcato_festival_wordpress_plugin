@@ -545,7 +545,7 @@ class marcatoxml_importer {
 	}
 	private function load_XML($field){
     if(ini_get('allow_url_fopen')==true){
-      return simplexml_load_file($this->get_xml_location($field));
+      return @simplexml_load_file($this->get_xml_location($field));
     }else if (function_exists('curl_init')){
       $curl = curl_init($this->get_xml_location($field));
       curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
