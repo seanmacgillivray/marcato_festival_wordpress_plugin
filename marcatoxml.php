@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.3.10
+ * Version: 1.3.11
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -480,7 +480,7 @@ class marcatoxml_importer {
 				}
 			}
 		}else{
-			return "Error importing {$field}: Error loading xml file. This plugin requires simpleXML, and curl to be enabled in order to retreive and process the xml feeds from Marcato. Check the output of phpinfo(); to determine if cURL and simpleXML are disabled. If you don't know how to do this, or how to enable them, contact your server administrator.";
+			return "Error importing {$field}: Error loading xml file. First, ensure that this feed is enabled within your marcato account. If so, this plugin requires simpleXML, and curl to be enabled in order to retreive and process the xml feeds from Marcato. Check the output of phpinfo(); to determine if cURL and simpleXML are disabled. If you don't know how to do this, or how to enable them, contact your server administrator.";
 		}
 		return "{$field} Imported.\n" . implode("\n", $errors);
 	}
@@ -545,13 +545,13 @@ class marcatoxml_importer {
 	}
 	private function load_XML($field){
     if(ini_get('allow_url_fopen')==true){
-       return simplexml_load_file($this->get_xml_location($field));
+      return simplexml_load_file($this->get_xml_location($field));
     }else if (function_exists('curl_init')){
-         $curl = curl_init($this->get_xml_location($field));
-         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-         $result = curl_exec($curl);
-         curl_close($curl);
-         return simplexml_load_string($result);
+      $curl = curl_init($this->get_xml_location($field));
+      curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+      $result = curl_exec($curl);
+      curl_close($curl);
+      return simplexml_load_string($result);
     }else{
       return false;
     }    
@@ -693,8 +693,12 @@ class marcatoxml_importer {
 	  			}
 	  			usort($events, array($this, 'sort_by_unix_time'));
 	  		}else{
-	  			$array1 = $performance_map[(string)$artist->id];
-	  			$array2 = $presentation_map[(string)$artist->id];
+	  			if($performance_map){
+	  				$array1 = $performance_map[(string)$artist->id];	
+	  			}
+	  			if($presentation_map){
+	  				$array2 = $presentation_map[(string)$artist->id];	
+	  			}
 	  			if(!isset($array1)){$array1 = array();}
 	  			if(!isset($array2)){$array2 = array();}
 	    		$events = array_merge($array1, $array2);
