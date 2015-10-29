@@ -995,12 +995,7 @@ class marcatoxml_importer {
 						$post_content .= "<span class='time_divider'>-</span><span class='presentation_end'>".date_i18n(get_option('time_format'), strtotime($workshop->date . ' ' . $presentation->end))."</span>";
 					}
 					$post_content .= "</td>";
-					if ($presentation->presenter_type == "artist"){
-						$artist_name = (string)$presentation->presenter;
-						$post_content .= "<td class='presenter'><a class='presentation_presenter_link' href=\"[marcato-link type='marcato_artist' marcato_id='".$presentation->presenter_id."']\">".$presentation->presenter."</a></td>";
-					}else{
-						$post_content .= "<td class='presenter'>".$presentation->presenter."</td>";
-					}
+					$post_content .= "<td class='presenter'><a class='presentation_presenter_link' href=\"[marcato-link type='marcato_".$presentation->presenter_type."' marcato_id='".$presentation->presenter_id."']\">".$presentation->presenter."</a></td>";
 					$post_content .= "</tr>";
 				}
 			}

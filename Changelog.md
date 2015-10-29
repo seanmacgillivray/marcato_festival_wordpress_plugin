@@ -1,3 +1,6 @@
+**Version 1.3.12**
+* Workshop schedule table will now link to imported contacts
+
 **Version 1.3.11**
 * Check to see if there is a performance/presentation map before attempting to use them as a map to avoid some php warnings
 * Updated copy in unable to load xml file error message as it is now possible to turn feeds on and off within marcato
