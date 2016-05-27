@@ -1,3 +1,7 @@
+**Version 1.3.13**
+* Fixed bug causing an error message while importing if a feed existed but was empty
+* Fixed ereg_replace deprecation warning
+
 **Version 1.3.12**
 * Workshop schedule table will now link to imported contacts
 
