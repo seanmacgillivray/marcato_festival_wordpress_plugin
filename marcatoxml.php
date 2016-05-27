@@ -615,11 +615,15 @@ class marcatoxml_importer {
    	$index = 0;
 		$posts = array();
 		$ids = array();
+		$post_type = "marcato_artist";
 		if($this->options['artist_lineup_set_times']=="1"){
 			$performance_map = $this->load_performances();
 			$presentation_map = $this->load_presentations();
 		}
 		foreach ($xml->artist as $artist) {
+			if(empty((string)$artist->id)){
+				continue;
+			}
 			$ids[] = (string)$artist->id;
 			$post_attachment = array();
 			$embed_codes = array();
@@ -659,7 +663,7 @@ class marcatoxml_importer {
 					if ($this->options["embed_video_links"]=="1" && !empty($embed_code)){
 						$embed_codes[] = $embed_code;
 					}else{
-						$link_content .= "<a class='artist_website ".strtolower(ereg_replace("[^A-Za-z0-9_]","",str_replace(" ","_", $website->name)))."' href='".$url."' target='_blank'>".$website->name."</a><br>";
+						$link_content .= "<a class='artist_website ".strtolower(preg_replace("[^A-Za-z0-9_]","",str_replace(" ","_", $website->name)))."' href='".$url."' target='_blank'>".$website->name."</a><br>";
 					}
 				}
 			}
@@ -712,8 +716,6 @@ class marcatoxml_importer {
 	  			$post_content .= "</table>";
 	    	}
   		}
-			
-			$post_type = "marcato_artist";
 			$post_marcato_id = intval($artist->id);
 			if($this->options["include_excerpts"]=="1"){
 				$post_excerpt = (string)$artist->bio_limited;
@@ -786,7 +788,11 @@ class marcatoxml_importer {
    	$index = 0;
    	$ids = array();
 		$posts = array();
+		$post_type = "marcato_venue";
 		foreach ($xml->venue as $venue) {
+			if(empty((string)$venue->id)){
+				continue;
+			}
 			$ids[] = (string)$venue->id;
 			$post_attachment = array();
 			$post_title = (string)$venue->name;
@@ -810,7 +816,6 @@ class marcatoxml_importer {
 			$post_content .= "</div>";
 			$post_content .= "<div class='venue_phone'>" . $venue->primary_phone_number . "</div>";
 			$post_content .= "<div class='venue_description'>" . $venue->description . "</div>";
-			$post_type = "marcato_venue";
 			if($this->options["include_excerpts"]=="1"){
 				$post_excerpt = (string)$venue->description;
 			}else{
@@ -856,7 +861,11 @@ class marcatoxml_importer {
    	$index = 0;
    	$ids = array();
 		$posts = array();
+		$post_type = "marcato_show";
 		foreach ($xml->show as $show) {
+			if(empty((string)$show->id)){
+				continue;
+			}
 			$ids[] = (string)$show->id;
 			$post_attachment = array();
 			$post_title = (string)$show->name;			
@@ -900,7 +909,6 @@ class marcatoxml_importer {
 				}
 			}
 			$post_content .= "</table>";
-			$post_type = "marcato_show";
 			$post_marcato_id = intval($show->id);
 			if($this->options["include_excerpts"]=="1"){
 				$post_excerpt = (string)$show->description_limited;
@@ -944,7 +952,11 @@ class marcatoxml_importer {
    	$index = 0;
    	$ids = array();
 		$posts = array();
+		$post_type = "marcato_workshop";
 		foreach ($xml->workshop as $workshop) {
+			if(empty((string)$workshop->id)){
+				continue;
+			}
 			$ids[] = (string)$workshop->id;
 			$post_attachment = array();
 			$post_title = (string)$workshop->name;
@@ -1000,7 +1012,6 @@ class marcatoxml_importer {
 				}
 			}
 			$post_content .= "</table>";
-			$post_type = "marcato_workshop";
 			$post_marcato_id = intval($workshop->id);
 			if($this->options["include_excerpts"]=="1"){
 				$post_excerpt = (string)$workshop->description_web;
@@ -1058,13 +1069,16 @@ class marcatoxml_importer {
    	$index = 0;
    	$ids = array();
 		$posts = array();
+		$post_type = "marcato_contact";
 		foreach ($xml->contact as $contact) {
+			if(empty((string)$contact->id)){
+				continue;
+			}
 			$ids[] = (string)$contact->id;
 			$post_attachment = array();
 			$post_title = (string)$contact->name;
 			$post_content = "";
 			$post_content .= (string)$contact->bio;
-			$post_type = "marcato_contact";
 			$post_marcato_id = intval($contact->id);
 			$post_excerpt = "";
 			$post_meta = array();
@@ -1118,13 +1132,16 @@ class marcatoxml_importer {
    	$index = 0;
    	$ids = array();
 		$posts = array();
+		$post_type = "marcato_vendor";
 		foreach ($xml->vendor as $vendor) {
+			if(empty((string)$vendor->id)){
+				continue;
+			}
 			$ids[] = (string)$vendor->id;
 			$post_attachment = array();
 			$post_title = (string)$vendor->company;
 			$post_content = "";
 			$post_content .= (string)$vendor->service_description;
-			$post_type = "marcato_vendor";
 			$post_marcato_id = intval($vendor->id);
 			$post_excerpt = "";
 			$post_meta = array();
