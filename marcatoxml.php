@@ -621,7 +621,7 @@ class marcatoxml_importer {
 			$presentation_map = $this->load_presentations();
 		}
 		foreach ($xml->artist as $artist) {
-			if(empty((string)$artist->id)){
+			if(empty($artist->id)){
 				continue;
 			}
 			$ids[] = (string)$artist->id;
@@ -790,7 +790,7 @@ class marcatoxml_importer {
 		$posts = array();
 		$post_type = "marcato_venue";
 		foreach ($xml->venue as $venue) {
-			if(empty((string)$venue->id)){
+			if(empty($venue->id)){
 				continue;
 			}
 			$ids[] = (string)$venue->id;
@@ -863,7 +863,7 @@ class marcatoxml_importer {
 		$posts = array();
 		$post_type = "marcato_show";
 		foreach ($xml->show as $show) {
-			if(empty((string)$show->id)){
+			if(empty($show->id)){
 				continue;
 			}
 			$ids[] = (string)$show->id;
@@ -954,7 +954,7 @@ class marcatoxml_importer {
 		$posts = array();
 		$post_type = "marcato_workshop";
 		foreach ($xml->workshop as $workshop) {
-			if(empty((string)$workshop->id)){
+			if(empty($workshop->id)){
 				continue;
 			}
 			$ids[] = (string)$workshop->id;
@@ -1071,7 +1071,7 @@ class marcatoxml_importer {
 		$posts = array();
 		$post_type = "marcato_contact";
 		foreach ($xml->contact as $contact) {
-			if(empty((string)$contact->id)){
+			if(empty($contact->id)){
 				continue;
 			}
 			$ids[] = (string)$contact->id;
@@ -1134,7 +1134,7 @@ class marcatoxml_importer {
 		$posts = array();
 		$post_type = "marcato_vendor";
 		foreach ($xml->vendor as $vendor) {
-			if(empty((string)$vendor->id)){
+			if(empty($vendor->id)){
 				continue;
 			}
 			$ids[] = (string)$vendor->id;
