@@ -1,3 +1,6 @@
+**Version 1.3.14**
+* Fix compatibility issue with PHP versions < 5.5
+
 **Version 1.3.13**
 * Fixed bug causing an error message while importing if a feed existed but was empty
 * Fixed ereg_replace deprecation warning
