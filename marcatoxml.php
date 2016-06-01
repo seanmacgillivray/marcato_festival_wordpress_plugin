@@ -480,7 +480,7 @@ class marcatoxml_importer {
 				}
 			}
 		}else{
-			return "Error importing {$field}: Error loading xml file. First, ensure that this feed is enabled within your marcato account. If so, this plugin requires simpleXML, and curl to be enabled in order to retreive and process the xml feeds from Marcato. Check the output of phpinfo(); to determine if cURL and simpleXML are disabled. If you don't know how to do this, or how to enable them, contact your server administrator.";
+			return "Error importing {$field}: Error loading xml file. The feed either does not exist, is empty, or there is a problem with your php settings. Ensure simpleXML and curl are enabled if you are not sure if they are enabled, or don't know how to enable them, contact your server administrator.";
 		}
 		return "{$field} Imported.\n" . implode("\n", $errors);
 	}
