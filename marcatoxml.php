@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.3.14
+ * Version: 1.3.15
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -1163,6 +1163,11 @@ class marcatoxml_importer {
 			if ($this->options["include_meta_data"]=="1"){
 				foreach(array('company','id','name','product_description','service_description','vendor_category_name','street','city','province_state','country','postal_code','primary_phone_number','photo_url','photo_url_root','photo_fingerprint','web_photo_url','web_photo_url_root','web_photo_fingerprint','website','longitude','latitude') as $field){
 					$post_meta["marcato_vendor_".$field] = nl2br((string)$vendor->$field);
+				}
+				if(!empty($vendor->{'custom-fields'})){
+					foreach($vendor->{'custom-fields'}->{'custom-field'} as $field){
+						$post_meta["marcato_vendor_custom_field_".$field->{'form-section-name'}."_".$field->label] = nl2br((string)$field->value);
+					}
 				}
 			}			
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');

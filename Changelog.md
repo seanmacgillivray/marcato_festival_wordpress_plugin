@@ -1,3 +1,6 @@
+**Version 1.3.15**
+* Vendors now include custom field data as meta data on posts when enabled
+
 **Version 1.3.14**
 * Fix compatibility issue with PHP versions < 5.5
 
