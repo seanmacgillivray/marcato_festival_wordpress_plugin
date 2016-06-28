@@ -1,3 +1,7 @@
+**Version 1.4.0**
+* Added an additional meta data item for websites pulled in from xml feeds in the style of marcato\_artist\_website\_Website Label\_url as the marcato\_artist\_website\_index\_url + marcato\_artist\_website\_index\_label was not easy to use.
+* Now using MAJOR.MINOR.PATCH versioning
+
 **Version 1.3.15**
 * Vendors now include custom field data as meta data on posts when enabled
 

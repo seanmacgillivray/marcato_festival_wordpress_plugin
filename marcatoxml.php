@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.3.15
+ * Version: 1.4.0
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -773,6 +773,7 @@ class marcatoxml_importer {
 					foreach($artist->websites->website as $website){
 						$post_meta["marcato_artist_website_".$i."_name"] = $website->name;
 						$post_meta["marcato_artist_website_".$i."_url"] = $website->url;
+						$post_meta["marcato_artist_website_".$website->name."_url"] = $website->url;
 						$i++;
 					}
 				}
@@ -1107,6 +1108,7 @@ class marcatoxml_importer {
 				foreach($contact->websites->website as $website){
 					$post_meta["marcato_contact_website_".$i."_name"] = $website->name;
 					$post_meta["marcato_contact_website_".$i."_url"] = $website->url;
+					$post_meta["marcato_contact_website_".$website->name."_url"] = $website->url;
 					$i++;
 				}
 			}
@@ -1157,6 +1159,7 @@ class marcatoxml_importer {
 				foreach($vendor->websites->website as $website){
 					$post_meta["marcato_vendor_website_".$i."_name"] = $website->name;
 					$post_meta["marcato_vendor_website_".$i."_url"] = $website->url;
+					$post_meta["marcato_vendor_website_".$website->name."_url"] = $website->url;
 					$i++;
 				}
 			}	
