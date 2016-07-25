@@ -544,14 +544,21 @@ class marcatoxml_importer {
 		return $map;
 	}
 	private function load_XML($field){
-    if(ini_get('allow_url_fopen')==true){
+		if(ini_get('allow_url_fopen')==true){
       return @simplexml_load_file($this->get_xml_location($field));
-    }else if (function_exists('curl_init')){
+    }elseif(function_exists('curl_init')){
       $curl = curl_init($this->get_xml_location($field));
       curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
       $result = curl_exec($curl);
       curl_close($curl);
-      return simplexml_load_string($result);
+      
+      libxml_use_internal_errors(true);
+			$doc = simplexml_load_string($result);
+			libxml_clear_errors();
+			if(!$doc){
+				return false;
+			}
+      return $doc;
     }else{
       return false;
     }    
@@ -1184,19 +1191,21 @@ class marcatoxml_importer {
 		$workshop_xml = $this->load_XML('workshops');
 		$show_xml = $this->load_XML('shows');
 		if(!$workshop_xml && !$show_xml){return false;}
-		if(!$workshop_xml){ $workshop_xml = array(); }
-		if(!$show_xml) { $show_xml = array(); }
 	
 		$post_title = "Schedule";
 		$post_content = "";
 		$events = array();
-		foreach($workshop_xml->workshop as $workshop){
-			$workshop->type = "workshop";
-			$events[] = $workshop; 
+		if($workshop_xml){
+			foreach($workshop_xml->workshop as $workshop){
+				$workshop->type = "workshop";
+				$events[] = $workshop; 
+			}
 		}
-		foreach($show_xml->show as $show){
-			$show->type = "show";
-			$events[] = $show; 
+		if($show_xml){
+			foreach($show_xml->show as $show){
+				$show->type = "show";
+				$events[] = $show; 
+			}
 		}
 		function sort_by_datetime($a, $b){
 			$a_date = strtotime($a->date . ' ' . $a->formatted_start_time);
