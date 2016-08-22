@@ -1,5 +1,7 @@
-**MASTER**
+**1.5.0**
 * Suppress some confusing xml errors
+* Fix image shortcode parsing to avoid php warnings
+* Vendor posts will now pull in web/press photos from xml feed like artists do already
 
 **Version 1.4.0**
 * Added an additional meta data item for websites pulled in from xml feeds in the style of marcato\_artist\_website\_Website Label\_url as the marcato\_artist\_website\_index\_url + marcato\_artist\_website\_index\_label was not easy to use.

@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.4.0
+ * Version: 1.5.0
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -70,10 +70,13 @@ class marcatoxml_plugin {
 	function marcato_thumbnail($str){
 		$args = wp_parse_args($str);
 		$result = "";
-		if(!$atts['size']){
-			$atts['size'] = 'full';
+		if(empty($args['size'])){
+			$args['size'] = 'full';
 		}
-		echo "<span class='post_thumbnail " . $atts['class'] . "'>" . get_the_post_thumbnail(null,$atts['size']) . "</span>";
+		if(empty($args['class'])){
+			$args['class'] = 'marcato_image';
+		}
+		echo "<span class='post_thumbnail " . $args['class'] . "'>" . get_the_post_thumbnail(null,$args['size']) . "</span>";
 	}
 
  	function marcato_field($atts){
@@ -1150,6 +1153,21 @@ class marcatoxml_importer {
 			$post_attachment = array();
 			$post_title = (string)$vendor->company;
 			$post_content = "";
+			if (!empty($vendor->web_photo_url)){
+				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_posts']=="1"){
+					$post_attachment = array('url'=>(string)$vendor->web_photo_url_root . "large.jpg", 'name'=>(string)$vendor->name, 'fingerprint'=>(string)$vendor->web_photo_fingerprint, 'field'=>'web_photo');
+				}
+				if($this->options['include_photos_in_posts']=="1"){
+					$post_content .= "[marcato-thumbnail size='".$this->options['post_photo_size']."']";
+				}
+			}else if(!empty($vendor->photo_url)){
+				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_posts']=="1"){
+					$post_attachment = array('url'=>(string)$vendor->photo_url_root."large.jpg", 'name'=>(string)$vendor->name, 'fingerprint'=>(string)$vendor->photo_fingerprint, 'field'=>'photo');
+				}
+				if($this->options['include_photos_in_posts']=="1"){
+					$post_content .= "[marcato-thumbnail size='".$this->options['post_photo_size']."']";
+				}
+			}
 			$post_content .= (string)$vendor->service_description;
 			$post_marcato_id = intval($vendor->id);
 			$post_excerpt = "";
