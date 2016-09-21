@@ -1,3 +1,6 @@
+**1.6.0**
+* Vendor post bodies will now include websites
+
 **1.5.0**
 * Suppress some confusing xml errors
 * Fix image shortcode parsing to avoid php warnings

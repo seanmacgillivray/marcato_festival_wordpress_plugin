@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.5.0
+ * Version: 1.6.0
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -1179,6 +1179,31 @@ class marcatoxml_importer {
 					$i++;
 				}
 			}	
+
+			$link_content = "";
+			$embed_codes = array();
+			if(!empty($vendor->websites)){
+				foreach($vendor->websites->website as $website){
+					if(strpos($website->url,'http://')===false && strpos($website->url,'https://')===false){
+						$url = 'http://'.$website->url;
+					}else{
+						$url = $website->url;
+					}
+					$embed_code = $this->get_video_embed_code($url);
+					if ($this->options["embed_video_links"]=="1" && !empty($embed_code)){
+						$embed_codes[] = $embed_code;
+					}else{
+						$link_content .= "<a class='vendor_website ".strtolower(preg_replace("[^A-Za-z0-9_]","",str_replace(" ","_", $website->name)))."' href='".$url."' target='_blank'>".$website->name."</a><br>";
+					}
+				}
+			}
+			if (!empty($embed_codes)){
+				foreach($embed_codes as $embed_code){
+					$post_content .= "<div class='vendor_embedded_video'>".$embed_code."</div>";
+				}
+			}
+			$post_content .= "<div class='vendor_websites'>" . $link_content . "</div>";
+
 			if(!empty($vendor->websites)){
 				$i = 0;
 				foreach($vendor->websites->website as $website){
@@ -1187,7 +1212,8 @@ class marcatoxml_importer {
 					$post_meta["marcato_vendor_website_".$website->name."_url"] = $website->url;
 					$i++;
 				}
-			}	
+			}
+
 			if ($this->options["include_meta_data"]=="1"){
 				foreach(array('company','id','name','product_description','service_description','vendor_category_name','street','city','province_state','country','postal_code','primary_phone_number','photo_url','photo_url_root','photo_fingerprint','web_photo_url','web_photo_url_root','web_photo_fingerprint','website','longitude','latitude') as $field){
 					$post_meta["marcato_vendor_".$field] = nl2br((string)$vendor->$field);
