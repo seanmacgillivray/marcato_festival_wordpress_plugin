@@ -1168,7 +1168,7 @@ class marcatoxml_importer {
 					$post_content .= "[marcato-thumbnail size='".$this->options['post_photo_size']."']";
 				}
 			}
-			$post_content .= (string)$vendor->service_description;
+			$post_content .= "<div class='vendor_description'>" . (string)$vendor->service_description . "</div>";
 			$post_marcato_id = intval($vendor->id);
 			$post_excerpt = "";
 			$post_meta = array();
