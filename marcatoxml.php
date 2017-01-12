@@ -371,8 +371,9 @@ class marcatoxml_plugin {
 		<form name="marcatoxmlsettings" method="post" action="">
 			<input type="hidden" name="marcato_submit_hidden" value="Y">
 			<p>
-				Marcato Organization ID
-				<input type="text" name="marcato_organization_id" value="<?php echo $this->importer->options["marcato_organization_id"] ?>">
+				Marcato Organization ID<br />
+				You can enter multiple ids if you have more than one marcato festival account. Each post will be tagged with the id entered.<br/>
+				<textarea name='marcato_organization_ids' rows="3" width="150"><?php echo $this->importer->options["marcato_organization_ids"] ?></textarea>
 			</p>
 			<p>
 				Include photos as featured images on posts?
@@ -441,49 +442,54 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0","artist_lineup_set_times"=>"0","post_photo_size"=>"full");
+	public $options = array('marcato_organization_id' => '0', 'marcato_organization_ids'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0","artist_lineup_set_times"=>"0","post_photo_size"=>"full");
 	public $fields = array("artists","venues","shows","workshops","contacts","vendors");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
 	function marcatoxml_importer(){
 		foreach($this->options as $option=>$value){
 			$set_value = get_option($option);
-			if ($set_value=="1" || $set_value=="0" || $option=="marcato_organization_id" || $option=="post_photo_size"){
+			if ($set_value=="1" || $set_value=="0" || $option=="marcato_organization_ids" || $option=="post_photo_size"){
 				$this->options[$option] = get_option($option);
 			}
+		}
+		if(!empty($this->options['marcato_organization_id'])){
+			$this->options['marcato_organization_ids'] = $this->options['marcato_organization_id'];
+			unset($this->options['marcato_organization_id']);
 		}
 	}	
 	
 	public function import_all(){
-		$org_id = $this->options['marcato_organization_id'];
-		if (empty($org_id)){
+		if(empty($this->options['marcato_organization_ids'])){
 			return array("Organization ID is not set.");
 		}
+		
 		$results = array();
 		foreach($this->fields as $field){
 			$results[] = $this->import($field);
 		}
 		if($this->generate_schedule_page()){
 			$results[]="Schedule page generated successfully.";
-		};
+		}
 		return $results;
 	}
 	
 	public function import($field) {
-		$org_id = $this->options['marcato_organization_id'];
-		if (empty($org_id)){
-			return "Error importing {$field}: Organization ID is not set";
-		}
-		$result;
+		$org_ids = explode(',', $this->options['marcato_organization_ids']);
 		$errors = array();
-		if ($posts = $this->get_posts($field)){
-			foreach ($posts as $key=>$post){
-				if(!$this->import_post($post)){
-					$errors[0] = $post['post_title'];					
-				}
+		foreach($org_ids as $org_id){
+			if (empty($org_id)){
+				return "Error importing {$field}: Organization ID is not set";
 			}
-		}else{
-			return "Error importing {$field}: Error loading xml file. The feed either does not exist, is empty, or there is a problem with your php settings. Ensure simpleXML and curl are enabled if you are not sure if they are enabled, or don't know how to enable them, contact your server administrator.";
+			if ($posts = $this->get_posts($field)){
+				foreach ($posts as $key=>$post){
+					if(!$this->import_post($post, $org_id)){
+						$errors[0] = $post['post_title'];					
+					}
+				}
+			}else{
+				return "Error importing {$field}: Error loading xml file. The feed either does not exist, is empty, or there is a problem with your php settings. Ensure simpleXML and curl are enabled if you are not sure if they are enabled, or don't know how to enable them, contact your server administrator.";
+			}
 		}
 		return "{$field} Imported.\n" . implode("\n", $errors);
 	}
@@ -577,7 +583,7 @@ class marcatoxml_importer {
 			}
 		}
 	}
-	private function import_post($post){
+	private function import_post($post, $org_id){
 	 	global $wpdb;
 		extract($post);
 		$meta = $wpdb->get_row("SELECT * FROM $wpdb->postmeta WHERE meta_key = '{$post_type}_id' AND meta_value = '$post_marcato_id'");
@@ -595,6 +601,7 @@ class marcatoxml_importer {
 				if(isset($post['post_taxonomy'])){
 					$this->set_post_taxonomy($existing_post_id, $post['post_taxonomy']);
 				}
+				wp_set_object_terms($existing_post_id, 'org_id', $org_id);
 				return $existing_post_id;
 			}else{
 				return "Error updating {$post_title}.";
@@ -614,6 +621,7 @@ class marcatoxml_importer {
 				if(isset($post['post_taxonomy'])){
 					$this->set_post_taxonomy($post_id, $post['post_taxonomy']);
 				}
+				wp_set_object_terms($post_id, 'org_id', $org_id);
 				return $post_id;
 			}else{
 				return "Error creating {$post_title}.";
