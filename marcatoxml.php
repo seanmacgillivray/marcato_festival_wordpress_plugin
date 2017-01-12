@@ -449,13 +449,14 @@ class marcatoxml_importer {
 	function marcatoxml_importer(){
 		foreach($this->options as $option=>$value){
 			$set_value = get_option($option);
-			if ($set_value=="1" || $set_value=="0" || $option=="marcato_organization_ids" || $option=="post_photo_size"){
+			if ($set_value=="1" || $set_value=="0" || $option=="marcato_organization_ids" || $option=="marcato_organization_ids" || $option=="post_photo_size"){
 				$this->options[$option] = get_option($option);
 			}
 		}
+		echo("<br/><br/><br/>" . $this->options['marcato_organization_id']);
 		if(!empty($this->options['marcato_organization_id'])){
 			$this->options['marcato_organization_ids'] = $this->options['marcato_organization_id'];
-			unset($this->options['marcato_organization_id']);
+			update_option('marcato_organization_id');
 		}
 	}	
 	
