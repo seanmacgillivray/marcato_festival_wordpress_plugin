@@ -453,7 +453,6 @@ class marcatoxml_importer {
 				$this->options[$option] = get_option($option);
 			}
 		}
-		echo("<br/><br/><br/>" . $this->options['marcato_organization_id']);
 		if(!empty($this->options['marcato_organization_id'])){
 			$this->options['marcato_organization_ids'] = $this->options['marcato_organization_id'];
 			update_option('marcato_organization_id');
@@ -476,9 +475,10 @@ class marcatoxml_importer {
 	}
 	
 	public function import($field) {
-		$org_ids = explode(',', $this->options['marcato_organization_ids']);
+		$org_ids = explode("\n", $this->options['marcato_organization_ids']);
 		$errors = array();
 		foreach($org_ids as $org_id){
+			$org_id = trim($org_id);
 			if (empty($org_id)){
 				return "Error importing {$field}: Organization ID is not set";
 			}
@@ -489,7 +489,7 @@ class marcatoxml_importer {
 					}
 				}
 			}else{
-				return "Error importing {$field}: Error loading xml file. The feed either does not exist, is empty, or there is a problem with your php settings. Ensure simpleXML and curl are enabled if you are not sure if they are enabled, or don't know how to enable them, contact your server administrator.";
+				return "Error importing {$field} for {$org_id}. Error loading xml file. The feed either does not exist, is empty, or there is a problem with your php settings. Ensure simpleXML and curl are enabled if you are not sure if they are enabled, or don't know how to enable them, contact your server administrator.";
 			}
 		}
 		return "{$field} Imported.\n" . implode("\n", $errors);
