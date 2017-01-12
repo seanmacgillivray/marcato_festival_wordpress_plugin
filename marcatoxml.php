@@ -333,9 +333,11 @@ class marcatoxml_plugin {
 		}
 		if( isset($_POST['marcato_submit_hidden']) && $_POST['marcato_submit_hidden'] == 'Y'){
 			foreach($this->importer->options as $option=>$value){
-				$field_value = $_POST[$option];
-				update_option($option, $field_value);
-				$this->importer->options[$option] = $field_value;
+				if(isset($_POST[$option])){
+					$field_value = $_POST[$option];
+					update_option($option, $field_value);
+					$this->importer->options[$option] = $field_value;
+				}
 			}
 			if (isset($_POST['Submit'])){
 				?>
@@ -343,7 +345,7 @@ class marcatoxml_plugin {
 				<?php
 			}
 			if (isset($_POST['marcato_import'])){
-				echo "IMPORTING...<br>NOTE: If you are importing featured images this could take a while. If you get a maximum execution time exceeded message, please try the import again.";
+				echo("IMPORTING...<br>NOTE: If you are importing featured images this could take a while. If you get a maximum execution time exceeded message, please try the import again.");
 				$results = $this->import_all();
 				$errors = array();
 				foreach($results as $result){
@@ -364,8 +366,8 @@ class marcatoxml_plugin {
 				<?php
 			}	
 		}
-		echo '<div class="wrap">';
-		echo "<h2>" . __('Marcato XML Plugin Settings', 'marcatoxml-options') . "</h2>";
+		echo('<div class="wrap">');
+		echo("<h2>" . __('Marcato XML Plugin Settings', 'marcatoxml-options') . "</h2>");
 		?>
 		
 		<form name="marcatoxmlsettings" method="post" action="">
@@ -373,6 +375,7 @@ class marcatoxml_plugin {
 			<p>
 				Marcato Organization ID<br />
 				You can enter multiple ids if you have more than one marcato festival account. Each post will be tagged with the id entered.<br/>
+				<strong>Enter each id on it's own line</strong><br/>
 				<textarea name='marcato_organization_ids' rows="3" width="150"><?php echo $this->importer->options["marcato_organization_ids"] ?></textarea>
 			</p>
 			<p>
@@ -482,7 +485,7 @@ class marcatoxml_importer {
 			if (empty($org_id)){
 				return "Error importing {$field}: Organization ID is not set";
 			}
-			if ($posts = $this->get_posts($field)){
+			if ($posts = $this->get_posts($field, $org_id)){
 				foreach ($posts as $key=>$post){
 					if(!$this->import_post($post, $org_id)){
 						$errors[0] = $post['post_title'];					
@@ -495,11 +498,11 @@ class marcatoxml_importer {
 		return "{$field} Imported.\n" . implode("\n", $errors);
 	}
 	
-	private function get_xml_location($field){
-		return $this->marcato_xml_url . '/' . $field . '_' . $this->options['marcato_organization_id'] . '.xml';
+	private function get_xml_location($field, $org_id){
+		return $this->marcato_xml_url . '/' . $field . '_' . $org_id . '.xml';
 	}
-	private function get_posts($field) {
-	  $xml = $this->load_XML($field);
+	private function get_posts($field, $org_id) {
+	  $xml = $this->load_XML($field, $org_id);
 		if ($xml){
 			if($field == 'artists'){
 				return $this->parse_artists($xml);
@@ -553,11 +556,11 @@ class marcatoxml_importer {
 		}
 		return $map;
 	}
-	private function load_XML($field){
+	private function load_XML($field, $org_id){
 		if(ini_get('allow_url_fopen')==true){
-      return @simplexml_load_file($this->get_xml_location($field));
+      return @simplexml_load_file($this->get_xml_location($field, $org_id));
     }elseif(function_exists('curl_init')){
-      $curl = curl_init($this->get_xml_location($field));
+      $curl = curl_init($this->get_xml_location($field, $org_id));
       curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
       $result = curl_exec($curl);
       curl_close($curl);
