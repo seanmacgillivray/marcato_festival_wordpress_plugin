@@ -378,62 +378,111 @@ class marcatoxml_plugin {
 				<strong>Enter each id separated by a comma</strong><br/>
 				<input type='text' name='marcato_organization_ids' value="<?php echo $this->importer->options["marcato_organization_ids"] ?>" />
 			</p>
-			<p>
-				Include photos as featured images on posts?
-				<input type="hidden" name="attach_photos" value="0">
-				<input type="checkbox" name="attach_photos" value="1" <?php echo $this->importer->options["attach_photos"]=="1" ? "checked='checked'" : "" ?>><br />
-				<cite><small>Enable this to include photos from Marcato as the featured image of a post instead of embedding the image directly in the post body.</small></cite>
-			</p>
-			<p>
-				Include photos in post body?
-				<input type="hidden" name="include_photos_in_posts" value="0">
-				<input type="checkbox" name="include_photos_in_posts" value="1" <?php echo $this->importer->options["include_photos_in_posts"]=="1" ? "checked='checked'" : "" ?>><br />
-				<label for="post_photo_size">Size:</label>
-				<select name="post_photo_size">
-					<?php 
-						$options = array("thumbnail","medium","large","full");
-						foreach($options as $option){
-							echo "<option value='".$option."' ".($this->importer->options["post_photo_size"]==$option ? "selected='selected'" : "").">".$option."</option>";
-						}
-					?>
-				</select><br />
-				<cite><small>Enable this to have photos from Marcato included in the post body.</small></cite>
-			</p>
-			<p>
-				Embed links?
-				<input type="hidden" name="embed_video_links" value="0">
-				<input type="checkbox" name="embed_video_links" value="1" <?php echo $this->importer->options["embed_video_links"]=="1" ? "checked='checked'" : "" ?>>
-				<br />
-				<cite><small>Enable this to automatically embed any YouTube, Vimeo, or Soundcloud links that have been entered into the Marcato website fields on artists.</small></cite>
-			</p>
-			<p>
-				Include Short Bio/Descriptions as excerpts?
-				<input type="hidden" name="include_excerpts" value="0">
-				<input type="checkbox" name="include_excerpts" value="1" <?php echo $this->importer->options["include_excerpts"]=="1" ? "checked='checked'" : "" ?>>
-				<br />
-				<cite><small>Enable this to include the shorter versions of things like Artist Bios and Show Descriptions from Marcato as post excerpts</small></cite>
-			<p>
-				Include XML fields as post Meta-data?
-				<input type="hidden" name="include_meta_data" value="0">
-				<input type="checkbox" name="include_meta_data" value="1" <?php echo $this->importer->options["include_meta_data"]=="1" ? "checked='checked'" : "" ?>><br />
-				<cite><small>Enable this to include all xml fields as custom fields on posts. This is useful if you use other plugins that make use of post meta data.</small></cite>
-			</p>
-			<p>
-			  Include the shows and workshops the artist is performing/presenting at in their post.
-			  <input type="hidden" name="include_artist_lineup" value="0">
-			  <input type="checkbox" name="include_artist_lineup" value="1" <?php echo $this->importer->options["include_artist_lineup"]=="1" ? "checked='checked'" : "" ?>><br />
-			  <cite><small>Enable this to include a table at the bottom of artists posts that displays all of the shows and workshops they are involved in</small></cite>
-			  <br />
-				Set the show and workshop times listed in the artist post to their performance times instead, if available.
-				<input type="hidden" name="artist_lineup_set_times" value="0">
-				<input type="checkbox" name="artist_lineup_set_times" value="1" <?php echo $this->importer->options["artist_lineup_set_times"]=="1" ? "checked='checked'" : "" ?>>
-			</p>
-			<p>
-				Auto Update data every hour?
-				<input type="hidden" name="auto_update" value="0">
-				<input type="checkbox" name="auto_update" value="1" <?php echo $this->importer->options["auto_update"]=="1" ? "checked='checked'" : "" ?>><br />
-				<cite><small>Enable this is have a WP cron job run hourly that automatically updates all your marcato data.</small></cite>
-			</p>
+
+			<table>
+				<tbody>
+					<tr>
+						<td>
+							<input type="hidden" name="attach_photos" value="0"/>
+							<input type="checkbox" name="attach_photos" value="1" <?php echo $this->importer->options["attach_photos"]=="1" ? "checked='checked'" : "" ?> />
+						</td>
+						<td>
+							Include photos as featured images on posts?<br/>
+							<cite><small>Enable this to include photos from Marcato as the featured image of a post instead of embedding the image directly in the post body.</small></cite>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="hidden" name="include_photos_in_posts" value="0" />
+							<input type="checkbox" name="include_photos_in_posts" value="1" <?php echo $this->importer->options["include_photos_in_posts"]=="1" ? "checked='checked'" : "" ?> />
+						</td>
+						<td>
+							Include photos in post body?<br/>
+							<label for="post_photo_size">Size:</label>
+							<select name="post_photo_size">
+								<?php 
+									$options = array("thumbnail","medium","large","full");
+									foreach($options as $option){
+										echo "<option value='".$option."' ".($this->importer->options["post_photo_size"]==$option ? "selected='selected'" : "").">".$option."</option>";
+									}
+								?>
+							</select><br />
+							<cite><small>Enable this to have photos from Marcato included in the post body.</small></cite>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="hidden" name="embed_video_links" value="0">
+							<input type="checkbox" name="embed_video_links" value="1" <?php echo $this->importer->options["embed_video_links"]=="1" ? "checked='checked'" : "" ?>>
+						</td>
+						<td>
+							Embed links?<br/>
+							<cite><small>Enable this to automatically embed any YouTube, Vimeo, or Soundcloud links that have been entered into the Marcato website fields on artists.</small></cite>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="hidden" name="include_excerpts" value="0">
+							<input type="checkbox" name="include_excerpts" value="1" <?php echo $this->importer->options["include_excerpts"]=="1" ? "checked='checked'" : "" ?>>
+						</td>
+						<td>
+							Include Short Bio/Descriptions as excerpts?<br />
+							<cite><small>Enable this to include the shorter versions of things like Artist Bios and Show Descriptions from Marcato as post excerpts</small></cite>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="hidden" name="include_meta_data" value="0">
+							<input type="checkbox" name="include_meta_data" value="1" <?php echo $this->importer->options["include_meta_data"]=="1" ? "checked='checked'" : "" ?>>
+						</td>
+						<td>
+							Include XML fields as post Meta-data?<br />
+							<cite><small>Enable this to include all xml fields as custom fields on posts. This is useful if you use other plugins that make use of post meta data.</small></cite>
+						</td>
+					</tr>
+
+					<tr>
+						<td>
+							<input type="hidden" name="use_xml_label" value="0">
+							<input type="checkbox" name="use_xml_label" value="1" <?php echo $this->importer->options["use_xml_label"]=="1" ? "checked='checked'" : "" ?> ?>
+						</td>
+						<td>
+							Use the xml-labels set on marcato custom fields instead of the normal label in the label of meta data set in wordpress?
+						</td>
+					</tr>
+
+					<tr>
+						<td>
+							<input type="hidden" name="include_artist_lineup" value="0">
+			  			<input type="checkbox" name="include_artist_lineup" value="1" <?php echo $this->importer->options["include_artist_lineup"]=="1" ? "checked='checked'" : "" ?>>
+						</td>
+						<td>
+							Include the shows and workshops the artist is performing/presenting at in their post.<br />
+			  			<cite><small>Enable this to include a table at the bottom of artists posts that displays all of the shows and workshops they are involved in</small></cite>
+			  		</td>
+			  	</tr>
+			  	<tr>
+			  		<td>
+			  			<input type="hidden" name="artist_lineup_set_times" value="0">
+							<input type="checkbox" name="artist_lineup_set_times" value="1" <?php echo $this->importer->options["artist_lineup_set_times"]=="1" ? "checked='checked'" : "" ?>>
+						</td>
+						<td>
+							Set the show and workshop times listed in the artist post to their performance times instead, if available?
+						</td>
+					</tr>
+
+					<tr>
+						<td>
+							<input type="hidden" name="auto_update" value="0">
+							<input type="checkbox" name="auto_update" value="1" <?php echo $this->importer->options["auto_update"]=="1" ? "checked='checked'" : "" ?>>
+						</td>
+						<td>
+							Auto Update data every hour?
+							<cite><small>Enable this is have a WP cron job run hourly that automatically updates all your marcato data.</small></cite>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 			<hr />
 			<p class="submit">
 				<input type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e('Save Changes') ?>" />
@@ -445,7 +494,7 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $options = array('marcato_organization_id' => '0', 'marcato_organization_ids'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0","artist_lineup_set_times"=>"0","post_photo_size"=>"full");
+	public $options = array('marcato_organization_id' => '0', 'marcato_organization_ids'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0","artist_lineup_set_times"=>"0","post_photo_size"=>"full","use_xml_label"=>"0");
 	public $fields = array("artists","venues","shows","workshops","contacts","vendors");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
@@ -755,11 +804,9 @@ class marcatoxml_importer {
 				foreach(array('name','bio_public','bio_limited','secondary_language_bio','homebase','web_photo_url','web_photo_url_root','photo_url','photo_url_root','updated_at') as $field){
 					$post_meta["marcato_artist_".$field] = nl2br((string)$artist->$field);
 				}
-				if(!empty($artist->{'custom-fields'})){
-					foreach($artist->{'custom-fields'}->{'custom-field'} as $field){
-						$post_meta["marcato_artist_custom_field_".$field->{'form-section-name'}."_".$field->label] = nl2br((string)$field->value);
-					}
-				}
+
+				$post_meta = array_merge($post_meta, $this->parse_custom_fields('artist', $artist));
+
 				if(!empty($artist->shows)){
 					$i = 0;
 					$shows = array();
@@ -866,11 +913,7 @@ class marcatoxml_importer {
 				foreach(array('name','description','street','city','province_state','country','postal_code','community','directions','longitude','latitude','primary_phone_number','photo_url','photo_url_root','updated_at') as $field){
 					$post_meta["marcato_venue_".$field] = $venue->$field;
 				}
-				if(!empty($venue->{'custom-fields'})){
-					foreach($venue->{'custom-fields'}->{'custom-field'} as $field){
-						$post_meta["marcato_venue_custom_field_".$field->{'form-section-name'}."_".$field->label] = nl2br((string)$field->value);
-					}
-				}
+				$post_meta = array_merge($post_meta, $this->parse_custom_fields('venue', $venue));
 			}			
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id', 'post_status', 'post_meta','post_attachment', 'post_excerpt');
 			$index++;
@@ -943,11 +986,9 @@ class marcatoxml_importer {
 				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','start_time_unix','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','updated_at','seating') as $field){
 					$post_meta["marcato_show_".$field] = nl2br((string)$show->$field);
 				}
-				if(!empty($show->{'custom-fields'})){
-					foreach($show->{'custom-fields'}->{'custom-field'} as $field){
-						$post_meta["marcato_show_custom_field_".$field->{'form-section-name'}."_".$field->label] = nl2br((string)$field->value);
-					}
-				}
+				
+				$post_meta = array_merge($post_meta, $this->parse_custom_fields('show', $show));
+				
 				foreach($show->venue as $venue){
 					foreach(array('name','street','city','province_state','community','longitute','latitude','id') as $field){
 						$post_meta["marcato_show_venue_".$field] = $venue->$field;
@@ -1052,11 +1093,9 @@ class marcatoxml_importer {
 				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','start_time_unix','end_time','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','event_contact_summary','event_contact_name','event_contact_phone','event_contact_email','hosting_organization_title','updated_at','seating') as $field){
 					$post_meta["marcato_workshop_".$field] = nl2br((string)$workshop->$field);
 				}
-				if(!empty($workshop->{'custom-fields'})){
-					foreach($workshop->{'custom-fields'}->{'custom-field'} as $field){
-						$post_meta["marcato_workshop_custom_field_".$field->{'form-section-name'}."_".$field->label] = nl2br((string)$field->value);
-					}
-				}
+				
+				$post_meta = array_merge($post_meta, $this->parse_custom_fields('workshop', $workshop));
+				
 				if(!empty($workshop->workshop_types)){
 					$i = 0;
 					foreach($workshop->workshop_types->workshop_type as $workshop_type){
@@ -1138,11 +1177,7 @@ class marcatoxml_importer {
 				foreach(array('bio','company','id','industry','name','position','updated_at','photo_url','photo_url_root','photo_fingerprint','email') as $field){
 					$post_meta["marcato_contact_".$field] = nl2br((string)$contact->$field);
 				}
-				if(!empty($contact->{'custom-fields'})){
-					foreach($contact->{'custom-fields'}->{'custom-field'} as $field){
-						$post_meta["marcato_contact_custom_field_".$field->{'form-section-name'}."_".$field->label] = nl2br((string)$field->value);
-					}
-				}
+				$post_meta = array_merge($post_meta, $this->parse_custom_fields('contact', $contact));
 			}			
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
@@ -1230,11 +1265,7 @@ class marcatoxml_importer {
 				foreach(array('company','id','name','product_description','service_description','vendor_category_name','street','city','province_state','country','postal_code','primary_phone_number','photo_url','photo_url_root','photo_fingerprint','web_photo_url','web_photo_url_root','web_photo_fingerprint','website','longitude','latitude') as $field){
 					$post_meta["marcato_vendor_".$field] = nl2br((string)$vendor->$field);
 				}
-				if(!empty($vendor->{'custom-fields'})){
-					foreach($vendor->{'custom-fields'}->{'custom-field'} as $field){
-						$post_meta["marcato_vendor_custom_field_".$field->{'form-section-name'}."_".$field->label] = nl2br((string)$field->value);
-					}
-				}
+				$post_meta = array_merge($post_meta, $this->parse_custom_fields('vendor', $vendor));
 			}			
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
@@ -1451,6 +1482,20 @@ class marcatoxml_importer {
 	}
 	private function sort_timeslots_by_set_time($a,$b){
 		return intval($a->set_time) - intval($b->set_time);
+	}
+	private function parse_custom_fields($type, $object){
+		$data = array();
+		if(!empty($object->{'custom-fields'})){
+			foreach($object->{'custom-fields'}->{'custom-field'} as $field){
+				if($this->options['use_xml_label']=="1" && !empty($field->{'xml-label'})){
+					$label = (string)"marcato_".$type."_custom_field_".$field->{'form-section-name'}."_".$field->{'xml-label'};
+				} else {
+					$label = (string)"marcato_".$type."_custom_field_".$field->{'form-section-name'}."_".$field->label;
+				}
+				$data[$label] = nl2br((string)$field->value);
+			}
+		}
+		return $data;
 	}
 }
 ?>
