@@ -1,3 +1,6 @@
+**1.7.0**
+* Now supports pulling data from multiple organizations
+
 **1.6.0**
 * Vendor post bodies will now include websites
 
