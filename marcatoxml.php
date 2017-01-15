@@ -863,6 +863,15 @@ class marcatoxml_importer {
 					}
 					$i++;
 				}
+				if(!empty($venue->websites)){
+					$i = 0;
+					foreach($venue->websites->website as $website){
+						$post_meta["marcato_venue_website_".$i."_name"] = $website->name;
+						$post_meta["marcato_venue_website_".$i."_url"] = $website->url;
+						$post_meta["marcato_venue_website_".$website->name."_url"] = $website->url;
+						$i++;
+					}
+				}
 				foreach(array('name','description','street','city','province_state','country','postal_code','community','directions','longitude','latitude','primary_phone_number','photo_url','photo_url_root','updated_at') as $field){
 					$post_meta["marcato_venue_".$field] = $venue->$field;
 				}
