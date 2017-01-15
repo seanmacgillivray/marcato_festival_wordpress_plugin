@@ -12,7 +12,6 @@
 4. Enter your Marcato Organization ID in the field and click "Save Changes".
 
 Clicking Import Now will download and parse marcato's xml feeds creating posts representing your marcato data.
-A wordpress job is also created that will redo this automatically every hour.
 
 All NEW records added this way will be set as Pending, and you will need to publish them from within Wordpress to make them appear on the site.
 
@@ -40,6 +39,10 @@ Enabling excerpts will set the Artist's short bio as artist post excerpts and Sh
 ### Include Custom Fields
 
 Including XML data as custom fields may be useful in conjunction with other plugins or themes.
+
+### Auto Update
+
+Enabling auto updating will set up a wordpress job that will perform an import every hour.
 
 ## Customization
 
