@@ -29,9 +29,9 @@ With type being artist, venue, show, or workshop.
 Enabling the "attach photos as featured image" option will cause the plugin to download photos from the Marcato server and save them as the featured images of the posts created in your Wordpress database.
 This is useful if your Wordpress theme makes use of Post Thumbnails/Featured Image.
 
-### Auto Embed Video Links
+### Auto Embed Links
 
-Enabling the "embed video links" option will cause the plugin to automatically embed any YouTube or Vimeo videos that are linked to from the website fields on artists in your Marcato account.
+Enabling the "embed links" option will cause the plugin to automatically embed any embedable YouTube, Vimeo, or Soundcloud links coming from the websites on artists in your Marcato account.
 
 ### Excerpts
 
