@@ -541,7 +541,7 @@ class marcatoxml_importer {
 					}
 				}
 			}else{
-				return "Error importing {$field} for {$org_id}. Error loading xml file. The feed either does not exist, is empty, or there is a problem with your php settings. Ensure simpleXML and curl are enabled if you are not sure if they are enabled, or don't know how to enable them, contact your server administrator.";
+				$errors[] = "Error importing {$field} for {$org_id}. Error loading xml file. The feed either does not exist, is empty, or there is a problem with your php settings. Ensure simpleXML and curl are enabled if you are not sure if they are enabled, or don't know how to enable them, contact your server administrator.";
 			}
 		}
 		return "{$field} Imported.\n" . implode("\n", $errors);
