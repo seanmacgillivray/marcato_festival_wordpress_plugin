@@ -1,5 +1,6 @@
 **1.7.0**
 * Now supports pulling data from multiple organizations
+* Now have the option to use the xml labels set for custom fields in marcato as part of the meta data labels in wordpress, instead of the regular label
 
 **1.6.0**
 * Vendor post bodies will now include websites
