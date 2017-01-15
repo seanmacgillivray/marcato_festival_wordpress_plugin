@@ -333,9 +333,11 @@ class marcatoxml_plugin {
 		}
 		if( isset($_POST['marcato_submit_hidden']) && $_POST['marcato_submit_hidden'] == 'Y'){
 			foreach($this->importer->options as $option=>$value){
-				$field_value = $_POST[$option];
-				update_option($option, $field_value);
-				$this->importer->options[$option] = $field_value;
+				if(isset($_POST[$option])){
+					$field_value = $_POST[$option];
+					update_option($option, $field_value);
+					$this->importer->options[$option] = $field_value;
+				}
 			}
 			if (isset($_POST['Submit'])){
 				?>
@@ -343,7 +345,7 @@ class marcatoxml_plugin {
 				<?php
 			}
 			if (isset($_POST['marcato_import'])){
-				echo "IMPORTING...<br>NOTE: If you are importing featured images this could take a while. If you get a maximum execution time exceeded message, please try the import again.";
+				echo("IMPORTING...<br>NOTE: If you are importing featured images this could take a while. If you get a maximum execution time exceeded message, please try the import again.");
 				$results = $this->import_all();
 				$errors = array();
 				foreach($results as $result){
@@ -364,15 +366,17 @@ class marcatoxml_plugin {
 				<?php
 			}	
 		}
-		echo '<div class="wrap">';
-		echo "<h2>" . __('Marcato XML Plugin Settings', 'marcatoxml-options') . "</h2>";
+		echo('<div class="wrap">');
+		echo("<h2>" . __('Marcato XML Plugin Settings', 'marcatoxml-options') . "</h2>");
 		?>
 		
 		<form name="marcatoxmlsettings" method="post" action="">
 			<input type="hidden" name="marcato_submit_hidden" value="Y">
 			<p>
-				Marcato Organization ID
-				<input type="text" name="marcato_organization_id" value="<?php echo $this->importer->options["marcato_organization_id"] ?>">
+				Marcato Organization ID<br />
+				You can enter multiple ids if you have more than one marcato festival account. Each post will be tagged with the id entered.<br/>
+				<strong>Enter each id separated by a comma</strong><br/>
+				<input type='text' name='marcato_organization_ids' value="<?php echo $this->importer->options["marcato_organization_ids"] ?>" />
 			</p>
 			<p>
 				Include photos as featured images on posts?
@@ -441,71 +445,77 @@ class marcatoxml_plugin {
 }
 class marcatoxml_importer {		
 
-	public $options = array('marcato_organization_id'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0","artist_lineup_set_times"=>"0","post_photo_size"=>"full");
+	public $options = array('marcato_organization_id' => '0', 'marcato_organization_ids'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0","artist_lineup_set_times"=>"0","post_photo_size"=>"full");
 	public $fields = array("artists","venues","shows","workshops","contacts","vendors");
 	public $marcato_xml_url = "http://marcatoweb.com/xml";
 		
 	function marcatoxml_importer(){
 		foreach($this->options as $option=>$value){
 			$set_value = get_option($option);
-			if ($set_value=="1" || $set_value=="0" || $option=="marcato_organization_id" || $option=="post_photo_size"){
+			if ($set_value=="1" || $set_value=="0" || $option=="marcato_organization_ids" || $option=="marcato_organization_ids" || $option=="post_photo_size"){
 				$this->options[$option] = get_option($option);
 			}
+		}
+		if(!empty($this->options['marcato_organization_id'])){
+			$this->options['marcato_organization_ids'] = $this->options['marcato_organization_id'];
+			update_option('marcato_organization_id');
 		}
 	}	
 	
 	public function import_all(){
-		$org_id = $this->options['marcato_organization_id'];
-		if (empty($org_id)){
+		if(empty($this->options['marcato_organization_ids'])){
 			return array("Organization ID is not set.");
 		}
+		
 		$results = array();
 		foreach($this->fields as $field){
 			$results[] = $this->import($field);
 		}
 		if($this->generate_schedule_page()){
 			$results[]="Schedule page generated successfully.";
-		};
+		}
 		return $results;
 	}
 	
 	public function import($field) {
-		$org_id = $this->options['marcato_organization_id'];
-		if (empty($org_id)){
-			return "Error importing {$field}: Organization ID is not set";
-		}
-		$result;
+		$org_ids = explode(',', $this->options['marcato_organization_ids']);
 		$errors = array();
-		if ($posts = $this->get_posts($field)){
-			foreach ($posts as $key=>$post){
-				if(!$this->import_post($post)){
-					$errors[0] = $post['post_title'];					
-				}
+		foreach($org_ids as $org_id){
+			$org_id = trim($org_id);
+			if (empty($org_id)){
+				return "Error importing {$field}: Organization ID is not set";
 			}
-		}else{
-			return "Error importing {$field}: Error loading xml file. The feed either does not exist, is empty, or there is a problem with your php settings. Ensure simpleXML and curl are enabled if you are not sure if they are enabled, or don't know how to enable them, contact your server administrator.";
+			if ($posts = $this->get_posts($field, $org_id)){
+				foreach ($posts as $key=>$post){
+					if(!$this->import_post($post, $org_id)){
+						$errors[0] = $post['post_title'];					
+					}
+				}
+			}else{
+				return "Error importing {$field} for {$org_id}. Error loading xml file. The feed either does not exist, is empty, or there is a problem with your php settings. Ensure simpleXML and curl are enabled if you are not sure if they are enabled, or don't know how to enable them, contact your server administrator.";
+			}
 		}
 		return "{$field} Imported.\n" . implode("\n", $errors);
 	}
 	
-	private function get_xml_location($field){
-		return $this->marcato_xml_url . '/' . $field . '_' . $this->options['marcato_organization_id'] . '.xml';
+	private function get_xml_location($field, $org_id){
+		return $this->marcato_xml_url . '/' . $field . '_' . $org_id . '.xml';
 	}
-	private function get_posts($field) {
-	  $xml = $this->load_XML($field);
+	private function get_posts($field, $org_id) {
+	  $xml = $this->load_XML($field, $org_id);
 		if ($xml){
 			if($field == 'artists'){
-				return $this->parse_artists($xml);
+				return $this->parse_artists($xml, $org_id);
 			}if($field == 'venues'){
-				return $this->parse_venues($xml);
+				return $this->parse_venues($xml, $org_id);
 			}else if ($field == "shows"){
-				return $this->parse_shows($xml);
+				return $this->parse_shows($xml, $org_id);
 			}else if ($field == "workshops"){
-				return $this->parse_workshops($xml);
+				return $this->parse_workshops($xml, $org_id);
 			}else if ($field == "contacts"){
-				return $this->parse_contacts($xml);
+				return $this->parse_contacts($xml, $org_id);
 			}else if ($field == "vendors"){
-				return $this->parse_vendors($xml);
+				return $this->parse_vendors($xml, $org_id);
 			}else{
 				return array();
 			}
@@ -514,9 +524,9 @@ class marcatoxml_importer {
 			return false;
 		}		
 	}
-	private function load_performances(){
+	private function load_performances($org_id){
 		$map = array();
-		$xml = $this->load_XML('performances');
+		$xml = $this->load_XML('performances',$org_id);
 		foreach($xml->performance as $performance){
 			if(!isset($map[(string)$performance->performer_id])){
 				$map[(string)$performance->performer_id] = array();
@@ -529,9 +539,9 @@ class marcatoxml_importer {
 		}
 		return $map;
 	}
-	private function load_presentations(){
+	private function load_presentations($org_id){
 		$map = array();
-		$xml = $this->load_XML('presentations');
+		$xml = $this->load_XML('presentations',$org_id);
 		foreach($xml->presentation as $presentation){
 			if($presentation->presenter_type == 'Artist'){
 				if(!isset($map[(string)$presentation->presenter_id])){
@@ -546,11 +556,11 @@ class marcatoxml_importer {
 		}
 		return $map;
 	}
-	private function load_XML($field){
+	private function load_XML($field, $org_id){
 		if(ini_get('allow_url_fopen')==true){
-      return @simplexml_load_file($this->get_xml_location($field));
+      return @simplexml_load_file($this->get_xml_location($field, $org_id));
     }elseif(function_exists('curl_init')){
-      $curl = curl_init($this->get_xml_location($field));
+      $curl = curl_init($this->get_xml_location($field, $org_id));
       curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
       $result = curl_exec($curl);
       curl_close($curl);
@@ -566,18 +576,18 @@ class marcatoxml_importer {
       return false;
     }    
 	}
-	private function remove_posts_missing_from_xml_feed($xml_ids, $post_type){
+	private function remove_posts_missing_from_xml_feed($xml_ids, $post_type, $org_id){
 		if(!empty($xml_ids)){
 			global $wpdb;
 			$id_list = implode(",",$xml_ids);
-			$sql = "SELECT p.id FROM $wpdb->posts p WHERE p.post_type = '$post_type' AND EXISTS(SELECT * FROM $wpdb->postmeta m WHERE m.post_id = p.id AND m.meta_key = '{$post_type}_id') AND NOT EXISTS(SELECT * FROM $wpdb->postmeta m WHERE m.post_id = p.id AND m.meta_key = '{$post_type}_id' AND m.meta_value IN ($id_list))";
+			$sql = "SELECT p.id FROM $wpdb->posts p WHERE p.post_type = '$post_type' AND EXISTS(SELECT * FROM $wpdb->postmeta m WHERE m.post_id = p.id AND m.meta_key = '{$post_type}_id') AND EXISTS(SELECT * FROM $wpdb->postmeta m WHERE m.post_id = p.id AND m.meta_key = 'marcato_organization_id' AND m.meta_value = '$org_id') AND NOT EXISTS(SELECT * FROM $wpdb->postmeta m WHERE m.post_id = p.id AND m.meta_key = '{$post_type}_id' AND m.meta_value IN ($id_list))";
 			$rows = $wpdb->get_results($sql);
 			foreach($rows as $row){
 				wp_delete_post($row->id, true);
 			}
 		}
 	}
-	private function import_post($post){
+	private function import_post($post, $org_id){
 	 	global $wpdb;
 		extract($post);
 		$meta = $wpdb->get_row("SELECT * FROM $wpdb->postmeta WHERE meta_key = '{$post_type}_id' AND meta_value = '$post_marcato_id'");
@@ -590,6 +600,7 @@ class marcatoxml_importer {
 					$this->set_featured_image($existing_post_id, $post['post_attachment']);
 				}
 				if(isset($post['post_meta'])){
+					$post['post_meta']['marcato_organization_id'] = $org_id;
 					$this->set_post_meta($existing_post_id, $post['post_meta']);
 				}
 				if(isset($post['post_taxonomy'])){
@@ -605,6 +616,7 @@ class marcatoxml_importer {
 			$post['comment_status'] = 'closed';
 			if($post_id = wp_insert_post($post)){
 				add_post_meta($post_id, "{$post_type}_id", $post_marcato_id, true);
+				add_post_meta($post_id, "marcato_organization_id", $org_id, true);
 				if(isset($post['post_attachment'])){
 					$this->set_featured_image($post_id, $post['post_attachment']);
 				}
@@ -620,15 +632,15 @@ class marcatoxml_importer {
 			}
 		}
 	}	
-	private function parse_artists($xml){
+	private function parse_artists($xml, $org_id){
 		global $wpdb;
    	$index = 0;
 		$posts = array();
 		$ids = array();
 		$post_type = "marcato_artist";
 		if($this->options['artist_lineup_set_times']=="1"){
-			$performance_map = $this->load_performances();
-			$presentation_map = $this->load_presentations();
+			$performance_map = $this->load_performances($org_id);
+			$presentation_map = $this->load_presentations($org_id);
 		}
 		foreach ($xml->artist as $artist) {
 			if(empty($artist->id)){
@@ -791,10 +803,10 @@ class marcatoxml_importer {
 			$posts[$index] = compact('post_content', 'post_title','post_type', 'post_taxonomy', 'post_marcato_id','post_status','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
-		$this->remove_posts_missing_from_xml_feed($ids, $post_type);
+		$this->remove_posts_missing_from_xml_feed($ids, $post_type, $org_id);
 		return $posts;
 	}
-	private function parse_venues($xml){
+	private function parse_venues($xml, $org_id){
 		global $wpdb;
    	$index = 0;
    	$ids = array();
@@ -863,11 +875,11 @@ class marcatoxml_importer {
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id', 'post_status', 'post_meta','post_attachment', 'post_excerpt');
 			$index++;
 		}
-		$this->remove_posts_missing_from_xml_feed($ids, $post_type);
+		$this->remove_posts_missing_from_xml_feed($ids, $post_type, $org_id);
 		return $posts;
 	}
 	
-	private function parse_shows($xml){
+	private function parse_shows($xml, $org_id){
 		global $wpdb;
    	$index = 0;
    	$ids = array();
@@ -954,11 +966,11 @@ class marcatoxml_importer {
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
-		$this->remove_posts_missing_from_xml_feed($ids, $post_type);
+		$this->remove_posts_missing_from_xml_feed($ids, $post_type, $org_id);
 		return $posts;
 	}
 	
-	private function parse_workshops($xml){
+	private function parse_workshops($xml, $org_id){
 		global $wpdb;
    	$index = 0;
    	$ids = array();
@@ -1071,11 +1083,11 @@ class marcatoxml_importer {
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
-		$this->remove_posts_missing_from_xml_feed($ids, $post_type);
+		$this->remove_posts_missing_from_xml_feed($ids, $post_type, $org_id);
 		return $posts;
 	}
 	
-	private function parse_contacts($xml){
+	private function parse_contacts($xml, $org_id){
 		global $wpdb;
    	$index = 0;
    	$ids = array();
@@ -1135,11 +1147,11 @@ class marcatoxml_importer {
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
-		$this->remove_posts_missing_from_xml_feed($ids, $post_type);
+		$this->remove_posts_missing_from_xml_feed($ids, $post_type, $org_id);
 		return $posts;
 	}
 		
-	private function parse_vendors($xml){
+	private function parse_vendors($xml, $org_id){
 		global $wpdb;
    	$index = 0;
    	$ids = array();
@@ -1227,89 +1239,87 @@ class marcatoxml_importer {
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
-		$this->remove_posts_missing_from_xml_feed($ids, $post_type);
+		$this->remove_posts_missing_from_xml_feed($ids, $post_type, $org_id);
 		return $posts;
 	}
 
 	public function generate_schedule_page(){
-		$workshop_xml = $this->load_XML('workshops');
-		$show_xml = $this->load_XML('shows');
-		if(!$workshop_xml && !$show_xml){return false;}
-	
-		$post_title = "Schedule";
-		$post_content = "";
-		$events = array();
-		if($workshop_xml){
-			foreach($workshop_xml->workshop as $workshop){
-				$workshop->type = "workshop";
-				$events[] = $workshop; 
-			}
-		}
-		if($show_xml){
-			foreach($show_xml->show as $show){
-				$show->type = "show";
-				$events[] = $show; 
-			}
-		}
-		function sort_by_datetime($a, $b){
-			$a_date = strtotime($a->date . ' ' . $a->formatted_start_time);
-			$b_date = strtotime($b->date . ' ' . $b->formatted_start_time);
-			if ($a_date == $b_date){return 0;}
-			return ($a_date < $b_date) ? -1 : 1;
-		}
-		usort($events, 'sort_by_datetime');
-		foreach($events as $event){
-			if ($event->type=="show"){
-				$types = 'performances';
-				$type = 'performance';
-				$person = "artist";
-				$archive_link_type = "marcato_show";
-				$link_query = "show_id";
-			}else if ($event->type=="workshop"){
-				$types = 'presentations';
-				$type = 'presentation';
-				$person = "presenter";
-				$archive_link_type = "marcato_workshop";
-				$link_query = "workshop_id";
-			}
-			$post_content .= "<div class='schedule_event'>";
-			$post_content .= "<div class='schedule_event_title'><a href=\"[marcato-link type='marcato_".$event->type."' marcato_id='".$event->id."']\">".$event->name."</a></div>";
-			$post_content .= "<div class='schedule_time'>";
-			$post_content .= "<span class='date'>".date_i18n(get_option('date_format'), strtotime($event->date))."</span>";
-			$post_content .= "<span class='start_time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $event->formatted_start_time))."</span>";
-			if (!empty($event->formatted_end_time)){
-				$post_content .= "<span class='time_divider'>-</span><span class='end_time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $event->formatted_end_time))."</span>";
-			}
-			$post_content .= "</div>";
-			$venue_name = (string)$event->venue_name;
-			$post_content .= "<div class='schedule_venue'><a class='schedule_venue_link' href=\"[marcato-link type='marcato_venue' marcato_id='".$event->venue->id."']\">".$venue_name."</a></div>";
-			$post_content .= "<table class='schedule_timeslots'>";
-			foreach($event->$types as $slots){
-				foreach($slots->$type as $timeslot){
-					if($person == "artist" || ($person=="presenter" && (string)$timeslot->presenter_type=="artist")){
-						$post_content .= "<tr><td class='time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $timeslot->start))."</td><td class='artist'><a href=\"[marcato-link type='marcato_artist' marcato_id='".($person=="presenter" ? $timeslot->presenter_id : $timeslot->artist_id)."']\">".$timeslot->$person."</a></td></tr>";
-					}else{
-						$post_content .= "<tr><td class='time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $timeslot->start))."</td><td class='artist'>".$timeslot->$person."</td></tr>";
-					}
+		$org_ids = explode(',', $this->options['marcato_organization_ids']);
+		$errors = array();
+		foreach($org_ids as $org_id){
+			$workshop_xml = $this->load_XML('workshops', $org_id);
+			$show_xml = $this->load_XML('shows', $org_id);
+			if(!$workshop_xml && !$show_xml){return false;}
+		
+			$post_title = "Schedule";
+			$post_content = "";
+			$events = array();
+			if($workshop_xml){
+				foreach($workshop_xml->workshop as $workshop){
+					$workshop->type = "workshop";
+					$events[] = $workshop; 
 				}
 			}
-			$post_content .= "</table>";
-			$post_content .= "</div>";
-		}
-		$post_type = 'page';
-		$post_name = 'schedule';
-		$page = compact('post_content', 'post_title', 'post_type','post_name');
-		$post_marcato_id = 'marcato_schedule';
-		global $wpdb;
-		$meta = $wpdb->get_row("SELECT * FROM $wpdb->postmeta WHERE meta_key = '{$post_type}_id' AND meta_value = '$post_marcato_id'");
-		if ($meta){
-			$existing_page_id = $meta->post_id;
-			$page['ID'] = $existing_page_id;
-			wp_update_post($page);
-		}else{
-			$page['post_status'] = 'pending';
-			$page_id = wp_insert_post($page, true);
-			add_post_meta($page_id, "{$post_type}_id", $post_marcato_id, true);
+			if($show_xml){
+				foreach($show_xml->show as $show){
+					$show->type = "show";
+					$events[] = $show; 
+				}
+			}
+			usort($events, array($this, 'sort_by_datetime'));
+			foreach($events as $event){
+				if ($event->type=="show"){
+					$types = 'performances';
+					$type = 'performance';
+					$person = "artist";
+					$archive_link_type = "marcato_show";
+					$link_query = "show_id";
+				}else if ($event->type=="workshop"){
+					$types = 'presentations';
+					$type = 'presentation';
+					$person = "presenter";
+					$archive_link_type = "marcato_workshop";
+					$link_query = "workshop_id";
+				}
+				$post_content .= "<div class='schedule_event'>";
+				$post_content .= "<div class='schedule_event_title'><a href=\"[marcato-link type='marcato_".$event->type."' marcato_id='".$event->id."']\">".$event->name."</a></div>";
+				$post_content .= "<div class='schedule_time'>";
+				$post_content .= "<span class='date'>".date_i18n(get_option('date_format'), strtotime($event->date))."</span>";
+				$post_content .= "<span class='start_time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $event->formatted_start_time))."</span>";
+				if (!empty($event->formatted_end_time)){
+					$post_content .= "<span class='time_divider'>-</span><span class='end_time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $event->formatted_end_time))."</span>";
+				}
+				$post_content .= "</div>";
+				$venue_name = (string)$event->venue_name;
+				$post_content .= "<div class='schedule_venue'><a class='schedule_venue_link' href=\"[marcato-link type='marcato_venue' marcato_id='".$event->venue->id."']\">".$venue_name."</a></div>";
+				$post_content .= "<table class='schedule_timeslots'>";
+				foreach($event->$types as $slots){
+					foreach($slots->$type as $timeslot){
+						if($person == "artist" || ($person=="presenter" && (string)$timeslot->presenter_type=="artist")){
+							$post_content .= "<tr><td class='time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $timeslot->start))."</td><td class='artist'><a href=\"[marcato-link type='marcato_artist' marcato_id='".($person=="presenter" ? $timeslot->presenter_id : $timeslot->artist_id)."']\">".$timeslot->$person."</a></td></tr>";
+						}else{
+							$post_content .= "<tr><td class='time'>".date_i18n(get_option('time_format'), strtotime($event->date . ' ' . $timeslot->start))."</td><td class='artist'>".$timeslot->$person."</td></tr>";
+						}
+					}
+				}
+				$post_content .= "</table>";
+				$post_content .= "</div>";
+			}
+			$post_type = 'page';
+			$post_name = 'schedule';
+			$page = compact('post_content', 'post_title', 'post_type','post_name');
+			$post_marcato_id = 'marcato_schedule';
+			global $wpdb;
+			$meta = $wpdb->get_row("SELECT * FROM $wpdb->postmeta WHERE meta_key = '{$post_type}_id' AND meta_value = '$post_marcato_id'");
+			if ($meta){
+				$existing_page_id = $meta->post_id;
+				$page['ID'] = $existing_page_id;
+				wp_update_post($page);
+			}else{
+				$page['post_status'] = 'pending';
+				$page_id = wp_insert_post($page, true);
+				add_post_meta($page_id, "{$post_type}_id", $post_marcato_id, true);
+			}
 		}
 		return true;
 	}
@@ -1432,6 +1442,12 @@ class marcatoxml_importer {
 	}
 	private function sort_by_unix_time($a, $b){
 		return intval($a->start_time_unix) - intval($b->start_time_unix);
+	}
+	private function sort_by_datetime($a, $b){
+		$a_date = strtotime($a->date . ' ' . $a->formatted_start_time);
+		$b_date = strtotime($b->date . ' ' . $b->formatted_start_time);
+		if ($a_date == $b_date){return 0;}
+		return ($a_date < $b_date) ? -1 : 1;
 	}
 	private function sort_timeslots_by_set_time($a,$b){
 		return intval($a->set_time) - intval($b->set_time);
