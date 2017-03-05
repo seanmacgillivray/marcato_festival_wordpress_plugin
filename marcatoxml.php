@@ -56,8 +56,6 @@ class marcatoxml_plugin {
 		add_action('init',array($this, 'enqueue_styles'));
 		register_activation_hook(__FILE__, array($this,'flush_rewrites'));
 		register_deactivation_hook(__FILE__, array($this, 'flush_rewrites'));
-		register_activation_hook(__FILE__, array($this, 'schedule_updates'));
-		register_deactivation_hook(__FILE__, array($this, 'unschedule_updates'));
 		add_action('marcato_update', array($this,'cron_job'));
 		add_filter('pre_get_posts', array($this,'query_post_type'));
 		add_filter('mce_css', array($this,'add_mce_css'));
@@ -65,6 +63,7 @@ class marcatoxml_plugin {
 		add_shortcode('marcato-field', array($this,'marcato_field'));
 		add_shortcode('marcato-thumbnail', array($this,'marcato_thumbnail'));
 		wp_oembed_add_provider('#http://(www\.)?soundcloud.com/.*#i', 'http://www.soundcloud.com/oembed/', true);
+		add_action('admin_init', array($this, 'manage_update_schedule'));
 	}
 
 	function marcato_thumbnail($str){
@@ -273,13 +272,12 @@ class marcatoxml_plugin {
 		return $this->importer->import_all();
 	}
 	
-	public function schedule_updates(){
-		if (!wp_next_scheduled('marcato_update')){
+	public function manage_update_schedule(){
+		if (!wp_next_scheduled('marcato_update') && $this->importer->options["auto_update"]=="1"){
 			wp_schedule_event( time(), 'hourly', 'marcato_update' );
+		} else if (wp_next_scheduled('marcato_update') && $this->importer->options["auto_update"]!="1") {
+			wp_clear_scheduled_hook('marcato_update');
 		}
-	}
-	public function unschedule_updates(){
-		wp_clear_scheduled_hook('marcato_update');
 	}
 	
 	public function posts_where($where){
