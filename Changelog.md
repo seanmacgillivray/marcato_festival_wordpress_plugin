@@ -1,3 +1,6 @@
+**1.7.1**
+* Changed how the auto-update wordpress cron job gets set up, to make it more reliable
+
 **1.7.0**
 * Now supports pulling data from multiple organizations
 * Now have the option to use the xml labels set for custom fields in marcato as part of the meta data labels in wordpress, instead of the regular label
