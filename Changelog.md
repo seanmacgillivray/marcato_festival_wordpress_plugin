@@ -1,3 +1,6 @@
+**1.7.2**
+* Now pulling mp3_attachment fields on artists into custom fields on the artist posts
+
 **1.7.1**
 * Changed how the auto-update wordpress cron job gets set up, to make it more reliable
 

@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.7.1
+ * Version: 1.7.2
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
@@ -804,6 +804,7 @@ class marcatoxml_importer {
 				}
 
 				$post_meta = array_merge($post_meta, $this->parse_custom_fields('artist', $artist));
+				$post_meta = array_merge($post_meta, $this->parse_mp3_attachments('artist', $artist));
 
 				if(!empty($artist->shows)){
 					$i = 0;
@@ -1500,6 +1501,18 @@ class marcatoxml_importer {
 					$label = (string)"marcato_".$type."_custom_field_".$field->{'form-section-name'}."_".$field->label;
 				}
 				$data[$label] = nl2br((string)$field->value);
+			}
+		}
+		return $data;
+	}
+	private function parse_mp3_attachments($type, $object){
+		$data = array();
+		if(!empty($object->{'mp3_attachments'})){
+			$count = 0;
+			foreach($object->{'mp3_attachments'}->{'mp3_attachment'} as $field){
+				$label = (string)"marcato_".$type."_mp3_attachment_".$count;
+				$data[$label] = nl2br((string)$field->url);
+				$count++;
 			}
 		}
 		return $data;
