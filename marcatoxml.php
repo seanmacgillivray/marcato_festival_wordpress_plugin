@@ -376,7 +376,7 @@ class marcatoxml_plugin {
 				<strong>Enter each id separated by a comma</strong><br/>
 				<input type='text' name='marcato_organization_ids' value="<?php echo $this->importer->options["marcato_organization_ids"] ?>" />
 			</p>
-
+			
 			<table>
 				<tbody>
 					<tr>
@@ -582,7 +582,7 @@ class marcatoxml_importer {
 			$performance->type = 'show';
 			$performance->link_id = $performance->show_id;
 			$performance->name = $performance->show_name;
-			$performance->formatted_dtstart = date_i18n(get_option('date_format'),(integer)$performance->set_time) . " " . date_i18n(get_option('time_format'),(integer)$performance->set_time);
+			$performance->formatted_dtstart = $this->format_floating_datetime_string($performance->formatted_set_date . " " . $performance->formatted_set_time);
 		}
 		return $map;
 	}
@@ -598,7 +598,7 @@ class marcatoxml_importer {
 				$presentation->type = 'workshop';
 				$presentation->link_id = $presentation->workshop_id;
 				$presentation->name = $presentation->workshop_name;
-				$presentation->formatted_dtstart = date_i18n(get_option('date_format'),(integer)$presentation->set_time) . " " . date_i18n(get_option('time_format'),(integer)$presentation->set_time);
+				$presentation->formatted_dtstart = $this->format_floating_datetime_string($presentation->formatted_set_date . " " . $presentation->formatted_set_time);
 			}
 		}
 		return $map;
@@ -751,7 +751,7 @@ class marcatoxml_importer {
 	  					if((string)$show->show_on_website=="false"){continue;}
 	  					$show->type = 'show';
 	  					$show->link_id = $show->id;
-	  					$show->formatted_dtstart = date_i18n(get_option('date_format'), strtotime($show->date . ' ' . $show->formatted_start_time)) . " " . date_i18n(get_option('time_format'), strtotime($show->date . ' ' . $show->formatted_start_time));
+	  					$show->formatted_dtstart = $this->format_floating_datetime_string($show->date . ' ' . $show->formatted_start_time);
 	  				  $events[] = $show;
 	  				}
 	  			}
@@ -760,7 +760,7 @@ class marcatoxml_importer {
 	            if((string)$workshop->show_on_website=="false"){continue;}
 	  					$workshop->type = 'workshop';
 	  					$workshop->link_id = $workshop->id;
-	  					$workshop->formatted_dtstart = date_i18n(get_option('date_format'), strtotime($workshop->date . ' ' . $workshop->formatted_start_time)) . " " . date_i18n(get_option('time_format'), strtotime($workshop->date . ' ' . $workshop->formatted_start_time));
+	  					$workshop->formatted_dtstart = $this->format_floating_datetime_string($workshop->date . ' ' . $workshop->formatted_start_time);
 	  					$events[] = $workshop;
 	  				}
 	  			}
@@ -945,7 +945,7 @@ class marcatoxml_importer {
 			$post_title = (string)$show->name;			
 			$post_content = "";
 			$post_content .= "<div class='show_time'>";
-			$post_content .= "<span class='date'>" .date_i18n(get_option('date_format'), strtotime($show->date)) . "</span>";
+			$post_content .= "<span class='date'>" . date_i18n(get_option('date_format'), strtotime($show->date)) . "</span>";
 			$post_content .= "<span class='show_time'><span class='start_time'>".date_i18n(get_option('time_format'), strtotime($show->date . ' ' . $show->formatted_start_time))."</span>";
 			if (!empty($show->formatted_end_time)){
 				$post_content .= "<span class='time_divider'>-</span><span class='end_time'>".date_i18n(get_option('time_format'), strtotime($show->date . ' ' . $show->formatted_end_time))."</span>";
@@ -1516,6 +1516,14 @@ class marcatoxml_importer {
 			}
 		}
 		return $data;
+	}
+	
+	private function format_floating_datetime_string($string){
+		$timestamp = strtotime($string);
+		$format = get_option('date_format') . ' ' . get_option('time_format');
+		echo $timestamp;
+		echo $format;
+		return date_i18n($format, $timestamp);
 	}
 }
 ?>
