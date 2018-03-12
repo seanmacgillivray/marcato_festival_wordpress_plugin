@@ -1521,8 +1521,6 @@ class marcatoxml_importer {
 	private function format_floating_datetime_string($string){
 		$timestamp = strtotime($string);
 		$format = get_option('date_format') . ' ' . get_option('time_format');
-		echo $timestamp;
-		echo $format;
 		return date_i18n($format, $timestamp);
 	}
 }
