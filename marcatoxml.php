@@ -5,7 +5,7 @@
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
  * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.7.2
+ * Version: 1.7.3
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)

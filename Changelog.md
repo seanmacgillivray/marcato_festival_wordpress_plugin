@@ -1,3 +1,6 @@
+**1.7.3**
+* When the "Set the show and workshop times listed in the artist post to their performance times instead, if available?" option was checked, artist performance times were being effected by the php timezone, and showing as incorrect if it was not UTC. Now using different xml fields to avoid this issue.
+
 **1.7.2**
 * Now pulling mp3_attachment fields on artists into custom fields on the artist posts
 
