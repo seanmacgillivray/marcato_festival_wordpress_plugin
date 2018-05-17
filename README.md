@@ -1,8 +1,10 @@
-~Current Version:1.7.3~
+Current Version:1.7.3
 
 # Marcato Festival's XML WordPress Importer
 
-**NOTE: _This tool is provided open source, as is, and free of charge. Its purpose is to give Wordpress web developers a head start importing data from Marcato Festival XML Feeds into a website's Wordpress database. It is recommended for developers who are familiar with Wordpress, PHP and CSS. We welcome code contributions as pull requests. Feature requests, feedback and recommendations can be submitted to support@marcatodigital.com. The Marcato Festival team does not provide technical support for this plugin._** 
+NOTE: _This tool is provided open source, as is, and free of charge. Its purpose is to give Wordpress web developers a head start importing data from Marcato Festival XML Feeds into a website's Wordpress database. It is recommended for developers who are familiar with Wordpress, PHP and CSS. We welcome code contributions as pull requests._
+
+**The Marcato Festival team does not provide technical support for this plugin.** 
 
 ## Installation and Setup
 
