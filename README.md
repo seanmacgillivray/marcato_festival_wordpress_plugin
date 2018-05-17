@@ -6,6 +6,7 @@ NOTE: _This tool is provided open source, as is, and free of charge. Its purpose
 
 **The Marcato Festival team does not provide technical support for this plugin.** 
 
+&nbsp;
 ## Installation and Setup
 
 1. Place these files into your WordPress plugins folder
