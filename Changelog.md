@@ -1,3 +1,6 @@
+**1.7.4**
+* A sql injection vulnerability was discovered (thanks dark-panda). It was contained in code that was no longer necessary for the plugin to function and was removed.
+
 **1.7.3**
 * When the "Set the show and workshop times listed in the artist post to their performance times instead, if available?" option was checked, artist performance times were being effected by the php timezone, and showing as incorrect if it was not UTC. Now using different xml fields to avoid this issue.
 

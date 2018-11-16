@@ -1,4 +1,6 @@
-~Current Version:1.7.3~
+~Current Version:1.7.4~
+
+**Versions lower than 1.7.4 contain a sql injection vulnerability. If you are using a version older than this, please update immediately**
 
 # Marcato Festival's XML WordPress Importer
 
