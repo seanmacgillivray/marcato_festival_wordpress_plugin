@@ -51,7 +51,6 @@ class marcatoxml_plugin {
 	function marcatoxml_plugin(){
 		$this->importer = new marcatoxml_importer();
 		add_action('admin_menu',array($this, 'build_menus'));
-		add_filter('posts_where', array($this, 'posts_where'));
 		add_action('init',array($this, 'register_custom_post_types'));
 		add_action('init',array($this, 'enqueue_styles'));
 		register_activation_hook(__FILE__, array($this,'flush_rewrites'));
@@ -278,48 +277,6 @@ class marcatoxml_plugin {
 		} else if (wp_next_scheduled('marcato_update') && $this->importer->options["auto_update"]!="1") {
 			wp_clear_scheduled_hook('marcato_update');
 		}
-	}
-	
-	public function posts_where($where){
-		global $wpdb;
-		if (isset($_GET['artist_name']) && !empty($_GET['artist_name'])){
-			$where = " AND {$wpdb->posts}.post_type = 'marcato_artist' AND {$wpdb->posts}.post_status = 'publish' AND LOWER({$wpdb->posts}.post_title) = LOWER('{$_GET['artist_name']}')";
-		}
-		else if (isset($_GET['artist_id']) && !empty($_GET['artist_id'])){
-			$where = " AND {$wpdb->posts}.post_type = 'marcato_artist' AND {$wpdb->posts}.post_status = 'publish' AND EXISTS (SELECT * FROM {$wpdb->postmeta} WHERE {$wpdb->postmeta}.meta_key = 'marcato_artist_id' AND {$wpdb->postmeta}.meta_value = '{$_GET['artist_id']}' AND {$wpdb->postmeta}.post_id = {$wpdb->posts}.id)";
-		}
-		else if (isset($_GET['venue_name']) && !empty($_GET['venue_name'])){
-			$where = " AND {$wpdb->posts}.post_type = 'marcato_venue' AND {$wpdb->posts}.post_status = 'publish' AND LOWER({$wpdb->posts}.post_title) = LOWER('{$_GET['venue_name']}')";
-		}
-		else if (isset($_GET['venue_id']) && !empty($_GET['venue_id'])){
-			$where = " AND {$wpdb->posts}.post_type = 'marcato_venue' AND {$wpdb->posts}.post_status = 'publish' AND EXISTS (SELECT * FROM {$wpdb->postmeta} WHERE {$wpdb->postmeta}.meta_key = 'marcato_venue_id' AND {$wpdb->postmeta}.meta_value = '{$_GET['venue_id']}' AND {$wpdb->postmeta}.post_id = {$wpdb->posts}.id)";
-		}
-		else if (isset($_GET['show_id']) && !empty($_GET['show_id'])){
-			$where = " AND {$wpdb->posts}.post_type = 'marcato_show' AND {$wpdb->posts}.post_status = 'publish' AND EXISTS (SELECT * FROM {$wpdb->postmeta} WHERE {$wpdb->postmeta}.meta_key = 'marcato_show_id' AND {$wpdb->postmeta}.meta_value = '{$_GET['show_id']}' AND {$wpdb->postmeta}.post_id = {$wpdb->posts}.id)";
-		}
-		else if (isset($_GET['workshop_id']) && !empty($_GET['workshop_id'])){
-			$where = " AND {$wpdb->posts}.post_type = 'marcato_workshop' AND {$wpdb->posts}.post_status = 'publish' AND EXISTS (SELECT * FROM {$wpdb->postmeta} WHERE {$wpdb->postmeta}.meta_key = 'marcato_workshop_id' AND {$wpdb->postmeta}.meta_value = '{$_GET['workshop_id']}' AND {$wpdb->postmeta}.post_id = {$wpdb->posts}.id)";
-		}
-		else if (isset($_GET['show_name']) && !empty($_GET['show_name'])){
-			$where = " AND {$wpdb->posts}.post_type = 'marcato_show' AND {$wpdb->posts}.post_status = 'publish' AND LOWER({$wpdb->posts}.post_title) = LOWER('{$_GET['show_name']}')";
-		}
-		else if (isset($_GET['workshop_name']) && !empty($_GET['workshop_name'])){
-			$where = " AND {$wpdb->posts}.post_type = 'marcato_workshop' AND {$wpdb->posts}.post_status = 'publish' AND LOWER({$wpdb->posts}.post_title) = LOWER('{$_GET['workshop_name']}')";
-		}
-		else if (isset($_GET['vendor_name']) && !empty($_GET['vendor_name'])){
-			$where = " AND {$wpdb->posts}.post_type = 'marcato_vendor' AND {$wpdb->posts}.post_status = 'publish' AND LOWER({$wpdb->posts}.post_title) = LOWER('{$_GET['vendor_name']}')";
-		}
-		else if (isset($_GET['vendor_id']) && !empty($_GET['vendor_id'])){
-			$where = " AND {$wpdb->posts}.post_type = 'marcato_vendor' AND {$wpdb->posts}.post_status = 'publish' AND EXISTS (SELECT * FROM {$wpdb->postmeta} WHERE {$wpdb->postmeta}.meta_key = 'marcato_vendor_id' AND {$wpdb->postmeta}.meta_value = '{$_GET['vendor_id']}' AND {$wpdb->postmeta}.post_id = {$wpdb->posts}.id)";
-		}
-		else if (isset($_GET['contact_name']) && !empty($_GET['contact_name'])){
-			$where = " AND {$wpdb->posts}.post_type = 'marcato_contact' AND {$wpdb->posts}.post_status = 'publish' AND LOWER({$wpdb->posts}.post_title) = LOWER('{$_GET['contact_name']}')";
-		}
-		else if (isset($_GET['contact_id']) && !empty($_GET['contact_id'])){
-			$where = " AND {$wpdb->posts}.post_type = 'marcato_contact' AND {$wpdb->posts}.post_status = 'publish' AND EXISTS (SELECT * FROM {$wpdb->postmeta} WHERE {$wpdb->postmeta}.meta_key = 'marcato_contact_id' AND {$wpdb->postmeta}.meta_value = '{$_GET['contact_id']}' AND {$wpdb->postmeta}.post_id = {$wpdb->posts}.id)";
-		}
-		
-		return $where;
 	}
 	public function build_menus(){
 		// add_object_page("Marcato XML Importer","Marcato","import","marcatoxmlsettings",array($this,'admin_page'),plugin_dir_url(__FILE__)."/images/wp_marcato_logo.png");
