@@ -157,12 +157,12 @@ class WPGitHubUpdater {
 			if ( is_wp_error( $raw_response ) )
 				return false;
 
-			$__version	= explode( '~Current Version:', $raw_response['body'] );
+			$__version	= explode( '*Current Version:', $raw_response['body'] );
 
 			if ( !isset($__version['1']) )
 				return false;
 
-			$_version	= explode( '~', $__version['1'] );
+			$_version	= explode( '*', $__version['1'] );
 			$version	= $_version[0];
 
 			// refresh every 6 hours
