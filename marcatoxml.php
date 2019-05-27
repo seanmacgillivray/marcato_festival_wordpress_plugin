@@ -4,14 +4,14 @@
  * Description: Imports artists, venues, shows, contacts, vendors, and workshops from Marcato Festival XML Feeds.
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
- * Plugin URI: http://github.com/morgancurrie/marcato_festival_wordpress_plugin
- * Version: 1.7.3
+ * Plugin URI: http://github.com/marcatodigital/marcato_festival_wordpress_plugin
+ * Version: 1.7.5
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License, version 2, as 
+    it under the terms of the GNU General Public License, version 2, as
     published by the Free Software Foundation.
 
     This program is distributed in the hope that it will be useful,
@@ -31,10 +31,10 @@ if (is_admin()){
 		'slug' => plugin_basename(__FILE__),
 		'transient_slug' => "marcato",
 		'proper_folder_name' => plugin_dir_path(__FILE__),
-		'api_url' => 'https://api.github.com/repos/morgancurrie/marcato_festival_wordpress_plugin',
-		'raw_url' => 'https://raw.github.com/morgancurrie/marcato_festival_wordpress_plugin/master',
-		'github_url' => 'https://github.com/morgancurrie/marcato_festival_wordpress_plugin',
-		'zip_url' => 'https://github.com/morgancurrie/marcato_festival_wordpress_plugin/zipball/master',
+		'api_url' => 'https://api.github.com/repos/marcatodigital/marcato_festival_wordpress_plugin',
+		'raw_url' => 'https://raw.github.com/marcatodigital/marcato_festival_wordpress_plugin/master',
+		'github_url' => 'https://github.com/marcatodigital/marcato_festival_wordpress_plugin',
+		'zip_url' => 'https://github.com/marcatodigital/marcato_festival_wordpress_plugin/zipball/master',
 		'sslverify' => true,
 		'requires' => '3.0',
 		'tested' => '3.5.1',
@@ -45,7 +45,7 @@ if (is_admin()){
 //Initialize the plugin
 $marcatoxml = new marcatoxml_plugin();
 class marcatoxml_plugin {
-	
+
 	public $importer;
 
 	function marcatoxml_plugin(){
@@ -133,7 +133,7 @@ class marcatoxml_plugin {
 			}
 		}
 	}
-	
+
 	function query_post_type($query) {
 	  if(is_category() || is_tag()) {
 	    $post_type = get_query_var('post_type');
@@ -145,7 +145,7 @@ class marcatoxml_plugin {
 		}
 		return $query;
 	    }
-	}		
+	}
 	public function flush_rewrites(){
 		flush_rewrite_rules();
 	}
@@ -169,9 +169,9 @@ class marcatoxml_plugin {
 			$supports[] = "excerpt";
 		}
 		register_post_type("marcato_artist", array(
-			"label"=>"Artists", "has_archive"=>"artists", 
-			"labels"=>array("name"=>"Artists","singular_name"=>"Artist"), 
-			"public"=>true, 
+			"label"=>"Artists", "has_archive"=>"artists",
+			"labels"=>array("name"=>"Artists","singular_name"=>"Artist"),
+			"public"=>true,
 			"has_archive"=>true,
 			"rewrite"=>array("slug"=>"artists", "with_front"=>false),
 			"supports"=>$supports,
@@ -241,36 +241,36 @@ class marcatoxml_plugin {
 		  'all_items' => __( 'All Genres' ),
 		  'parent_item' => __( 'Parent Genre' ),
 		  'parent_item_colon' => __( 'Parent Genre:' ),
-		  'edit_item' => __( 'Edit Genre' ), 
+		  'edit_item' => __( 'Edit Genre' ),
 		  'update_item' => __( 'Update Genre' ),
 		  'add_new_item' => __( 'Add New Genre' ),
 		  'new_item_name' => __( 'New Genre Name' ),
 		  'menu_name' => __( 'Genres' ),
-		); 	
+		);
 		register_taxonomy( 'marcato_genre', array('marcato_artist'), array(
 		  'hierarchical' => true,
 		  'labels' => $labels,
 		  'show_ui' => true,
-		  'has_archive' => true, 
+		  'has_archive' => true,
 		  'query_var' => true,
 		  'rewrite' => array( 'slug' => 'genre' ),
 		) );
 	}
-		
+
 	public function import($field){
 		return $this->importer->import($field);
 	}
-	
+
 	public function cron_job(){
 		if ($this->importer->options["auto_update"]=="1"){
 			$this->import_all();
-		}	
+		}
 	}
-	
+
 	public function import_all(){
 		return $this->importer->import_all();
 	}
-	
+
 	public function manage_update_schedule(){
 		if (!wp_next_scheduled('marcato_update') && $this->importer->options["auto_update"]=="1"){
 			wp_schedule_event( time(), 'hourly', 'marcato_update' );
@@ -314,17 +314,17 @@ class marcatoxml_plugin {
 								echo $error."<br/>";
 							}
 						}else{
-							_e('Marcato XML Feed Imported','marcatoxml-options'); 
+							_e('Marcato XML Feed Imported','marcatoxml-options');
 						}
 					?>
 				</strong></p></div>
 				<?php
-			}	
+			}
 		}
 		echo('<div class="wrap">');
 		echo("<h2>" . __('Marcato XML Plugin Settings', 'marcatoxml-options') . "</h2>");
 		?>
-		
+
 		<form name="marcatoxmlsettings" method="post" action="">
 			<input type="hidden" name="marcato_submit_hidden" value="Y">
 			<p>
@@ -333,7 +333,7 @@ class marcatoxml_plugin {
 				<strong>Enter each id separated by a comma</strong><br/>
 				<input type='text' name='marcato_organization_ids' value="<?php echo $this->importer->options["marcato_organization_ids"] ?>" />
 			</p>
-			
+
 			<table>
 				<tbody>
 					<tr>
@@ -355,7 +355,7 @@ class marcatoxml_plugin {
 							Include photos in post body?<br/>
 							<label for="post_photo_size">Size:</label>
 							<select name="post_photo_size">
-								<?php 
+								<?php
 									$options = array("thumbnail","medium","large","full");
 									foreach($options as $option){
 										echo "<option value='".$option."' ".($this->importer->options["post_photo_size"]==$option ? "selected='selected'" : "").">".$option."</option>";
@@ -447,12 +447,12 @@ class marcatoxml_plugin {
 	<?php
 	}
 }
-class marcatoxml_importer {		
+class marcatoxml_importer {
 
 	public $options = array('marcato_organization_id' => '0', 'marcato_organization_ids'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0","artist_lineup_set_times"=>"0","post_photo_size"=>"full","use_xml_label"=>"0");
 	public $fields = array("artists","venues","shows","workshops","contacts","vendors");
 	public $marcato_xml_url = "https://www.marcatoweb.com/xml";
-		
+
 	function marcatoxml_importer(){
 		foreach($this->options as $option=>$value){
 			$set_value = get_option($option);
@@ -464,13 +464,13 @@ class marcatoxml_importer {
 			$this->options['marcato_organization_ids'] = $this->options['marcato_organization_id'];
 			update_option('marcato_organization_id');
 		}
-	}	
-	
+	}
+
 	public function import_all(){
 		if(empty($this->options['marcato_organization_ids'])){
 			return array("Organization ID is not set.");
 		}
-		
+
 		$results = array();
 		foreach($this->fields as $field){
 			$results[] = $this->import($field);
@@ -480,7 +480,7 @@ class marcatoxml_importer {
 		}
 		return $results;
 	}
-	
+
 	public function import($field) {
 		$org_ids = explode(',', $this->options['marcato_organization_ids']);
 		$errors = array();
@@ -492,7 +492,7 @@ class marcatoxml_importer {
 			if ($posts = $this->get_posts($field, $org_id)){
 				foreach ($posts as $key=>$post){
 					if(!$this->import_post($post, $org_id)){
-						$errors[0] = $post['post_title'];					
+						$errors[0] = $post['post_title'];
 					}
 				}
 			}else{
@@ -501,7 +501,7 @@ class marcatoxml_importer {
 		}
 		return "{$field} Imported.\n" . implode("\n", $errors);
 	}
-	
+
 	private function get_xml_location($field, $org_id){
 		return $this->marcato_xml_url . '/' . $field . '_' . $org_id . '.xml';
 	}
@@ -526,7 +526,7 @@ class marcatoxml_importer {
 			wp_import_cleanup($xml['id']);
 		}else{
 			return false;
-		}		
+		}
 	}
 	private function load_performances($org_id){
 		$map = array();
@@ -568,7 +568,7 @@ class marcatoxml_importer {
       curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
       $result = curl_exec($curl);
       curl_close($curl);
-      
+
       libxml_use_internal_errors(true);
 			$doc = simplexml_load_string($result);
 			libxml_clear_errors();
@@ -578,7 +578,7 @@ class marcatoxml_importer {
       return $doc;
     }else{
       return false;
-    }    
+    }
 	}
 	private function remove_posts_missing_from_xml_feed($xml_ids, $post_type, $org_id){
 		if(!empty($xml_ids)){
@@ -635,7 +635,7 @@ class marcatoxml_importer {
 				return "Error creating {$post_title}.";
 			}
 		}
-	}	
+	}
 	private function parse_artists($xml, $org_id){
 		global $wpdb;
    	$index = 0;
@@ -699,7 +699,7 @@ class marcatoxml_importer {
 				}
 			}
 			$post_content .= "<div class='artist_websites'>" . $link_content . "</div>";
-			
+
 			if($this->options["include_artist_lineup"]){
 				$events = array();
 				if($this->options['artist_lineup_set_times']=="0"){
@@ -724,10 +724,10 @@ class marcatoxml_importer {
 	  			usort($events, array($this, 'sort_by_unix_time'));
 	  		}else{
 	  			if($performance_map){
-	  				$array1 = $performance_map[(string)$artist->id];	
+	  				$array1 = $performance_map[(string)$artist->id];
 	  			}
 	  			if($presentation_map){
-	  				$array2 = $presentation_map[(string)$artist->id];	
+	  				$array2 = $presentation_map[(string)$artist->id];
 	  			}
 	  			if(!isset($array1)){$array1 = array();}
 	  			if(!isset($array2)){$array2 = array();}
@@ -879,14 +879,14 @@ class marcatoxml_importer {
 					$post_meta["marcato_venue_".$field] = $venue->$field;
 				}
 				$post_meta = array_merge($post_meta, $this->parse_custom_fields('venue', $venue));
-			}			
+			}
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id', 'post_status', 'post_meta','post_attachment', 'post_excerpt');
 			$index++;
 		}
 		$this->remove_posts_missing_from_xml_feed($ids, $post_type, $org_id);
 		return $posts;
 	}
-	
+
 	private function parse_shows($xml, $org_id){
 		global $wpdb;
    	$index = 0;
@@ -899,7 +899,7 @@ class marcatoxml_importer {
 			}
 			$ids[] = (string)$show->id;
 			$post_attachment = array();
-			$post_title = (string)$show->name;			
+			$post_title = (string)$show->name;
 			$post_content = "";
 			$post_content .= "<div class='show_time'>";
 			$post_content .= "<span class='date'>" . date_i18n(get_option('date_format'), strtotime($show->date)) . "</span>";
@@ -951,9 +951,9 @@ class marcatoxml_importer {
 				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','start_time_unix','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','updated_at','seating') as $field){
 					$post_meta["marcato_show_".$field] = nl2br((string)$show->$field);
 				}
-				
+
 				$post_meta = array_merge($post_meta, $this->parse_custom_fields('show', $show));
-				
+
 				foreach($show->venue as $venue){
 					foreach(array('name','street','city','province_state','community','longitute','latitude','id') as $field){
 						$post_meta["marcato_show_venue_".$field] = $venue->$field;
@@ -968,14 +968,14 @@ class marcatoxml_importer {
 						$i++;
 					}
 				}
-			}			
+			}
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
 		$this->remove_posts_missing_from_xml_feed($ids, $post_type, $org_id);
 		return $posts;
 	}
-	
+
 	private function parse_workshops($xml, $org_id){
 		global $wpdb;
    	$index = 0;
@@ -1018,7 +1018,7 @@ class marcatoxml_importer {
 				$description = (string)$workshop->description_public;
 			}
 			$post_content .= "<div class='workshop_description'>" . nl2br($description) . "</div>";
-			
+
 			$post_content .= "<div class='workshop_types'>";
 			if(!empty($workshop->workshop_types)){
 				foreach ($workshop->workshop_types->workshop_type as $type){
@@ -1058,9 +1058,9 @@ class marcatoxml_importer {
 				foreach(array('name','date','formatted_date','venue_name','formatted_start_time','start_time_unix','end_time','formatted_end_time','facebook_link','description_public','description_web','ticket_info','ticket_link','price','poster_url','poster_url_root','event_contact_summary','event_contact_name','event_contact_phone','event_contact_email','hosting_organization_title','updated_at','seating') as $field){
 					$post_meta["marcato_workshop_".$field] = nl2br((string)$workshop->$field);
 				}
-				
+
 				$post_meta = array_merge($post_meta, $this->parse_custom_fields('workshop', $workshop));
-				
+
 				if(!empty($workshop->workshop_types)){
 					$i = 0;
 					foreach($workshop->workshop_types->workshop_type as $workshop_type){
@@ -1083,14 +1083,14 @@ class marcatoxml_importer {
 						$i++;
 					}
 				}
-			}			
+			}
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
 		$this->remove_posts_missing_from_xml_feed($ids, $post_type, $org_id);
 		return $posts;
 	}
-	
+
 	private function parse_contacts($xml, $org_id){
 		global $wpdb;
    	$index = 0;
@@ -1143,14 +1143,14 @@ class marcatoxml_importer {
 					$post_meta["marcato_contact_".$field] = nl2br((string)$contact->$field);
 				}
 				$post_meta = array_merge($post_meta, $this->parse_custom_fields('contact', $contact));
-			}			
+			}
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
 		$this->remove_posts_missing_from_xml_feed($ids, $post_type, $org_id);
 		return $posts;
 	}
-		
+
 	private function parse_vendors($xml, $org_id){
 		global $wpdb;
    	$index = 0;
@@ -1190,7 +1190,7 @@ class marcatoxml_importer {
 					$post_meta["marcato_vendor_tag_".$i] = $category;
 					$i++;
 				}
-			}	
+			}
 
 			$link_content = "";
 			$embed_codes = array();
@@ -1231,7 +1231,7 @@ class marcatoxml_importer {
 					$post_meta["marcato_vendor_".$field] = nl2br((string)$vendor->$field);
 				}
 				$post_meta = array_merge($post_meta, $this->parse_custom_fields('vendor', $vendor));
-			}			
+			}
 			$posts[$index] = compact('post_content', 'post_title', 'post_type', 'post_marcato_id','post_attachment','post_meta','post_excerpt');
 			$index++;
 		}
@@ -1246,20 +1246,20 @@ class marcatoxml_importer {
 			$workshop_xml = $this->load_XML('workshops', $org_id);
 			$show_xml = $this->load_XML('shows', $org_id);
 			if(!$workshop_xml && !$show_xml){return false;}
-		
+
 			$post_title = "Schedule";
 			$post_content = "";
 			$events = array();
 			if($workshop_xml){
 				foreach($workshop_xml->workshop as $workshop){
 					$workshop->type = "workshop";
-					$events[] = $workshop; 
+					$events[] = $workshop;
 				}
 			}
 			if($show_xml){
 				foreach($show_xml->show as $show){
 					$show->type = "show";
-					$events[] = $show; 
+					$events[] = $show;
 				}
 			}
 			usort($events, array($this, 'sort_by_datetime'));
@@ -1474,7 +1474,7 @@ class marcatoxml_importer {
 		}
 		return $data;
 	}
-	
+
 	private function format_floating_datetime_string($string){
 		$timestamp = strtotime($string);
 		$format = get_option('date_format') . ' ' . get_option('time_format');
