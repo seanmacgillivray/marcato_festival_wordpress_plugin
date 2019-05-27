@@ -451,7 +451,7 @@ class marcatoxml_importer {
 
 	public $options = array('marcato_organization_id' => '0', 'marcato_organization_ids'=>"0", 'attach_photos'=>"0",'include_photos_in_posts'=>'0', 'embed_video_links'=>"0", 'include_meta_data'=>"0",'include_excerpts'=>"0","auto_update"=>"1","include_artist_lineup"=>"0","artist_lineup_set_times"=>"0","post_photo_size"=>"full","use_xml_label"=>"0");
 	public $fields = array("artists","venues","shows","workshops","contacts","vendors");
-	public $marcato_xml_url = "http://marcatoweb.com/xml";
+	public $marcato_xml_url = "https://www.marcatoweb.com/xml";
 		
 	function marcatoxml_importer(){
 		foreach($this->options as $option=>$value){
