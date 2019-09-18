@@ -4,8 +4,8 @@
  * Description: Imports artists, venues, shows, contacts, vendors, and workshops from Marcato Festival XML Feeds.
  * Author: Marcato Digital Solutions
  * Author URI: http://marcatofestival.com
- * Plugin URI: http://github.com/marcatodigital/marcato_festival_wordpress_plugin
- * Version: 1.7.5
+ * Plugin URI: http://github.com/seanmacgillivray/marcato_festival_wordpress_plugin
+ * Version: 1.7.6
  * License: GPL2
  * =======================================================================
 	Copyright 2012  Marcato Digital Solutions  (email : support@marcatodigital.com)
