@@ -826,7 +826,7 @@ class marcatoxml_importer {
 			$post_content .= "<div class='venue_community'>" . $venue->community . "</div>";
 			if (!empty($venue->photo_url)){
 				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_posts']=="1"){
-					$post_attachment = array('url'=>(string)$venue->photo_url_root . "original.jpg", 'name'=>(string)$venue->name, 'fingerprint'=>(string)$venue->photo_fingerprint, 'field'=>'photo');
+					$post_attachment = array('url'=>(string)$venue->photo_url_root . "original.png", 'name'=>(string)$venue->name, 'fingerprint'=>(string)$venue->photo_fingerprint, 'field'=>'photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "[marcato-thumbnail size='".$this->options['post_photo_size']."']";
