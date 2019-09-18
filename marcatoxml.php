@@ -662,7 +662,7 @@ class marcatoxml_importer {
 			}
 			if (!empty($artist->web_photo_url)){
 				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_posts']=="1"){
-					$post_attachment = array('url'=>(string)$artist->web_photo_url_root . "large.jpg", 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->web_photo_fingerprint, 'field'=>'web_photo');
+					$post_attachment = array('url'=>(string)$artist->web_photo_url_root . "original.jpg", 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->web_photo_fingerprint, 'field'=>'web_photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "[marcato-thumbnail size='".$this->options['post_photo_size']."']";
@@ -670,7 +670,7 @@ class marcatoxml_importer {
 				}
 			}else if(!empty($artist->photo_url)){
 				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_posts']=="1"){
-					$post_attachment = array('url'=>(string)$artist->photo_url_root."large.jpg", 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->photo_fingerprint, 'field'=>'photo');
+					$post_attachment = array('url'=>(string)$artist->photo_url_root."original.jpg", 'name'=>(string)$artist->name, 'fingerprint'=>(string)$artist->photo_fingerprint, 'field'=>'photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "[marcato-thumbnail size='".$this->options['post_photo_size']."']";
@@ -826,7 +826,7 @@ class marcatoxml_importer {
 			$post_content .= "<div class='venue_community'>" . $venue->community . "</div>";
 			if (!empty($venue->photo_url)){
 				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_posts']=="1"){
-					$post_attachment = array('url'=>(string)$venue->photo_url_root . "web.png", 'name'=>(string)$venue->name, 'fingerprint'=>(string)$venue->photo_fingerprint, 'field'=>'photo');
+					$post_attachment = array('url'=>(string)$venue->photo_url_root . "original.jpg", 'name'=>(string)$venue->name, 'fingerprint'=>(string)$venue->photo_fingerprint, 'field'=>'photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "[marcato-thumbnail size='".$this->options['post_photo_size']."']";
@@ -1001,7 +1001,7 @@ class marcatoxml_importer {
 			$post_content .= "<div class='workshop_venue'><a class='workshop_venue_link' href=\"[marcato-link type='marcato_venue' marcato_id='".$workshop->venue->id."']\">" . $workshop->venue_name . "</a></div>";
 			if (!empty($workshop->poster_url)){
 				if ($this->options['attach_photos']=="1" || $this->options["include_photos_in_posts"]){
-					$post_attachment = array('url'=>(string)$workshop->poster_url_root . "web.png", 'name'=>(string)$workshop->name, 'fingerprint'=>(string)$workshop->poster_fingerprint, 'field'=>'poster');
+					$post_attachment = array('url'=>(string)$workshop->poster_url_root . "original.jpg", 'name'=>(string)$workshop->name, 'fingerprint'=>(string)$workshop->poster_fingerprint, 'field'=>'poster');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "[marcato-thumbnail size='".$this->options["post_photo_size"]."']";
@@ -1111,7 +1111,7 @@ class marcatoxml_importer {
 			$post_meta = array();
 			if (!empty($contact->photo_url)){
 				if ($this->options['attach_photos']=="1"){
-					$post_attachment = array('url'=>(string)$contact->photo_url . "large.jpg", 'name'=>(string)$contact->name, 'fingerprint'=>(string)$contact->photo_fingerprint, 'field'=>'photo');
+					$post_attachment = array('url'=>(string)$contact->photo_url . "original.jpg", 'name'=>(string)$contact->name, 'fingerprint'=>(string)$contact->photo_fingerprint, 'field'=>'photo');
 				}
 			}
 			if(!empty($contact->categories)){
@@ -1167,14 +1167,14 @@ class marcatoxml_importer {
 			$post_content = "";
 			if (!empty($vendor->web_photo_url)){
 				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_posts']=="1"){
-					$post_attachment = array('url'=>(string)$vendor->web_photo_url_root . "large.jpg", 'name'=>(string)$vendor->name, 'fingerprint'=>(string)$vendor->web_photo_fingerprint, 'field'=>'web_photo');
+					$post_attachment = array('url'=>(string)$vendor->web_photo_url_root . "original.jpg", 'name'=>(string)$vendor->name, 'fingerprint'=>(string)$vendor->web_photo_fingerprint, 'field'=>'web_photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "[marcato-thumbnail size='".$this->options['post_photo_size']."']";
 				}
 			}else if(!empty($vendor->photo_url)){
 				if ($this->options['attach_photos']=="1" || $this->options['include_photos_in_posts']=="1"){
-					$post_attachment = array('url'=>(string)$vendor->photo_url_root."large.jpg", 'name'=>(string)$vendor->name, 'fingerprint'=>(string)$vendor->photo_fingerprint, 'field'=>'photo');
+					$post_attachment = array('url'=>(string)$vendor->photo_url_root."original.jpg", 'name'=>(string)$vendor->name, 'fingerprint'=>(string)$vendor->photo_fingerprint, 'field'=>'photo');
 				}
 				if($this->options['include_photos_in_posts']=="1"){
 					$post_content .= "[marcato-thumbnail size='".$this->options['post_photo_size']."']";
